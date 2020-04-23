@@ -1,8 +1,17 @@
 #define WIN32_LEAN_AND_MEAN
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
 #define _CRT_SECURE_NO_WARNINGS
-#include <Windows.h>
-#include <WinSock2.h>
+#ifdef _WIN32
+    #include <Windows.h>
+    #include <WinSock2.h>
+#else
+    #include <unistd.h>
+    #include <arpa/inet.h>
+    #include <string.h>
+    #define SOCKET  int
+    #define INVALID_SOCKET (SOCKET)(0)
+    #define SOCKET_ERROR (-1)
+#endif
 #include <stdio.h>
 #include <thread>
 enum CMD {
@@ -71,40 +80,40 @@ struct NewUserJoin :public DataHeader
 int processor(SOCKET _cSock)
 {
 	char recvBUF[4096] = {};
-	//½ÓÊÕ¿Í»§¶ËµÄÇëÇóÊı¾İ
+	//æ¥æ”¶å®¢æˆ·ç«¯çš„è¯·æ±‚æ•°æ®
 	int nLen = recv(_cSock, recvBUF, sizeof(DataHeader), 0);
 	DataHeader *header = (DataHeader*)recvBUF;
 	if (nLen < 0)
 	{
-		printf("Óë·şÎñÆ÷¶Ï¿ªÁ¬½Ó£¡£¬ÈÎÎñ½áÊø£¡\n");
+		printf("ä¸æœåŠ¡å™¨æ–­å¼€è¿æ¥ï¼ï¼Œä»»åŠ¡ç»“æŸï¼\n");
 		return -1;
 	}
 
-	//´¦Àí¿Í»§¶ËÇëÇó
+	//å¤„ç†å®¢æˆ·ç«¯è¯·æ±‚
 	switch (header->cmd)
 	{
 	case CMD_LOGIN_RESULT:
 	{
-		//½ÓÊÕ·şÎñÆ÷·µ»ØµÄÊı¾İ
+		//æ¥æ”¶æœåŠ¡å™¨è¿”å›çš„æ•°æ®
 		recv(_cSock, recvBUF + sizeof(DataHeader), header->dataLength - sizeof(DataHeader), 0);
 		LoginResult *ret = (LoginResult*)recvBUF;
-		printf("ÊÕµ½·şÎñ¶ËÏûÏ¢£ºretLogin = %d£¬Êı¾İ³¤¶È:%d\n", ret->result, header->dataLength);
+		printf("æ”¶åˆ°æœåŠ¡ç«¯æ¶ˆæ¯ï¼šretLogin = %dï¼Œæ•°æ®é•¿åº¦:%d\n", ret->result, header->dataLength);
 	}
 	break;
 	case CMD_LOGOUT_RESULT:
 	{
-		//½ÓÊÕ·şÎñÆ÷·µ»ØµÄÊı¾İ
+		//æ¥æ”¶æœåŠ¡å™¨è¿”å›çš„æ•°æ®
 		recv(_cSock, recvBUF + sizeof(DataHeader), header->dataLength - sizeof(DataHeader), 0);
 		LogoutResult *ret = (LogoutResult*)recvBUF;
-		printf("ÊÕµ½·şÎñ¶ËÏûÏ¢£ºretLogout = %d£¬Êı¾İ³¤¶È:%d\n", ret->result, header->dataLength);
+		printf("æ”¶åˆ°æœåŠ¡ç«¯æ¶ˆæ¯ï¼šretLogout = %dï¼Œæ•°æ®é•¿åº¦:%d\n", ret->result, header->dataLength);
 	}
 	break;
 	case CMD_NEW_USER_JOIN:
 	{
-		//½ÓÊÕ·şÎñÆ÷·µ»ØµÄÊı¾İ
+		//æ¥æ”¶æœåŠ¡å™¨è¿”å›çš„æ•°æ®
 		recv(_cSock, recvBUF + sizeof(DataHeader), header->dataLength - sizeof(DataHeader), 0);
 		NewUserJoin *ret = (NewUserJoin*)recvBUF;
-		printf("ÊÕµ½·şÎñ¶ËÏûÏ¢£ºnewUerJoinIN  sock = %d£¬Êı¾İ³¤¶È:%d\n", ret->sock, header->dataLength);
+		printf("æ”¶åˆ°æœåŠ¡ç«¯æ¶ˆæ¯ï¼šnewUerJoinIN  sock = %dï¼Œæ•°æ®é•¿åº¦:%d\n", ret->sock, header->dataLength);
 	}
 	break;
 	default:
@@ -121,7 +130,7 @@ void cmdthread(SOCKET sock)
 		scanf("%s", cmdBUF);
 		if (0 == strcmp(cmdBUF, "exit"))
 		{
-			printf("ÍË³öÏß³Ì\n");
+			printf("é€€å‡ºçº¿ç¨‹\n");
 			g_bRun = false;
 			return;
 		}
@@ -140,38 +149,44 @@ void cmdthread(SOCKET sock)
 		}
 		else
 		{
-			printf("²»Ö§³ÖµÄÃüÁî\n");
+			printf("ä¸æ”¯æŒçš„å‘½ä»¤\n");
 		}
 	}
 }
 int  main()
 {
+#ifdef _WIN32
 	WORD ver = MAKEWORD(2, 2);
 	WSADATA data;
 	WSAStartup(ver, &data);
-	//½¨Á¢
+#endif
+	//å»ºç«‹
 	SOCKET _sock = socket(AF_INET, SOCK_STREAM,0);
 	if (INVALID_SOCKET == _sock)
 	{
-		printf("socket½¨Á¢Ê§°Ü\n");
+		printf("socketå»ºç«‹å¤±è´¥\n");
 	}
 	else
 	{
-		printf("socket½¨Á¢³É¹¦\n");
+		printf("socketå»ºç«‹æˆåŠŸ\n");
 	}
-	//Á´½Ó
+	//é“¾æ¥
 	sockaddr_in _sin = {};
 	_sin.sin_family = AF_INET;
 	_sin.sin_port = htons(4567);
+#ifdef _WIN32
 	_sin.sin_addr.S_un.S_addr = inet_addr("127.0.0.1");
+#else
+        _sin.sin_addr.s_addr = inet_addr("127.0.0.1");
+#endif
 	int ret = connect(_sock, (sockaddr*)&_sin, sizeof(sockaddr_in));
 	if (SOCKET_ERROR == ret)
 	{
-		printf("socket ½¨Á¢Á¬½Ó´íÎó\n");
+		printf("socket å»ºç«‹è¿æ¥é”™è¯¯\n");
 	}
 	else
 	{
-		printf("socket ½¨Á¢Á¬½Ó³É¹¦\n");
+		printf("socket å»ºç«‹è¿æ¥æˆåŠŸ\n");
 	}
 
 	
@@ -186,7 +201,7 @@ int  main()
 		int ret = select(_sock,&fd_read,NULL,NULL,&tl);
 		if (ret < 0)
 		{
-			printf("select ÈÎÎñ½áÊø\n");
+			printf("select ä»»åŠ¡ç»“æŸ\n");
 			break;
 		}
 		if (FD_ISSET(_sock, &fd_read))
@@ -194,19 +209,20 @@ int  main()
 			FD_CLR(_sock, &fd_read);
 			if (-1 == processor(_sock))
 			{
-				printf("select ÈÎÎñ½áÊø2\n");
+				printf("select ä»»åŠ¡ç»“æŸ2\n");
 				break;
 			}
 		}
-		//printf("¿ÕÏĞÊ±¼ä´¦ÀíÆäËûÒµÎñ\n");
+		//printf("ç©ºé—²æ—¶é—´å¤„ç†å…¶ä»–ä¸šåŠ¡\n");
 		
 		//Sleep(1000);
 	}
-	
+#ifdef _WIN32
 	closesocket(_sock);
 	WSACleanup();
-	printf("ÒÑÍË³ö\n");
+#else
+        close(_sock);
+#endif
+	printf("å·²é€€å‡º\n");
 	return 0;
 }
-
-
