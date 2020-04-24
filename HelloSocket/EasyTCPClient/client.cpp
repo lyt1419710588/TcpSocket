@@ -80,40 +80,40 @@ struct NewUserJoin :public DataHeader
 int processor(SOCKET _cSock)
 {
 	char recvBUF[4096] = {};
-	//æ¥æ”¶å®¢æˆ·ç«¯çš„è¯·æ±‚æ•°æ®
+	//½ÓÊÕ¿Í»§¶ËµÄÇëÇóÊı¾İ
 	int nLen = recv(_cSock, recvBUF, sizeof(DataHeader), 0);
 	DataHeader *header = (DataHeader*)recvBUF;
 	if (nLen < 0)
 	{
-		printf("ä¸æœåŠ¡å™¨æ–­å¼€è¿æ¥ï¼ï¼Œä»»åŠ¡ç»“æŸï¼\n");
+		printf("Óë·şÎñÆ÷¶Ï¿ªÁ¬½Ó£¡£¬ÈÎÎñ½áÊø£¡\n");
 		return -1;
 	}
 
-	//å¤„ç†å®¢æˆ·ç«¯è¯·æ±‚
+	//´¦Àí¿Í»§¶ËÇëÇó
 	switch (header->cmd)
 	{
 	case CMD_LOGIN_RESULT:
 	{
-		//æ¥æ”¶æœåŠ¡å™¨è¿”å›çš„æ•°æ®
+		//½ÓÊÕ·şÎñÆ÷·µ»ØµÄÊı¾İ
 		recv(_cSock, recvBUF + sizeof(DataHeader), header->dataLength - sizeof(DataHeader), 0);
 		LoginResult *ret = (LoginResult*)recvBUF;
-		printf("æ”¶åˆ°æœåŠ¡ç«¯æ¶ˆæ¯ï¼šretLogin = %dï¼Œæ•°æ®é•¿åº¦:%d\n", ret->result, header->dataLength);
+		printf("ÊÕµ½·şÎñ¶ËÏûÏ¢£ºretLogin = %d£¬Êı¾İ³¤¶È:%d\n", ret->result, header->dataLength);
 	}
 	break;
 	case CMD_LOGOUT_RESULT:
 	{
-		//æ¥æ”¶æœåŠ¡å™¨è¿”å›çš„æ•°æ®
+		//½ÓÊÕ·şÎñÆ÷·µ»ØµÄÊı¾İ
 		recv(_cSock, recvBUF + sizeof(DataHeader), header->dataLength - sizeof(DataHeader), 0);
 		LogoutResult *ret = (LogoutResult*)recvBUF;
-		printf("æ”¶åˆ°æœåŠ¡ç«¯æ¶ˆæ¯ï¼šretLogout = %dï¼Œæ•°æ®é•¿åº¦:%d\n", ret->result, header->dataLength);
+		printf("ÊÕµ½·şÎñ¶ËÏûÏ¢£ºretLogout = %d£¬Êı¾İ³¤¶È:%d\n", ret->result, header->dataLength);
 	}
 	break;
 	case CMD_NEW_USER_JOIN:
 	{
-		//æ¥æ”¶æœåŠ¡å™¨è¿”å›çš„æ•°æ®
+		//½ÓÊÕ·şÎñÆ÷·µ»ØµÄÊı¾İ
 		recv(_cSock, recvBUF + sizeof(DataHeader), header->dataLength - sizeof(DataHeader), 0);
 		NewUserJoin *ret = (NewUserJoin*)recvBUF;
-		printf("æ”¶åˆ°æœåŠ¡ç«¯æ¶ˆæ¯ï¼šnewUerJoinIN  sock = %dï¼Œæ•°æ®é•¿åº¦:%d\n", ret->sock, header->dataLength);
+		printf("ÊÕµ½·şÎñ¶ËÏûÏ¢£ºnewUerJoinIN  sock = %d£¬Êı¾İ³¤¶È:%d\n", ret->sock, header->dataLength);
 	}
 	break;
 	default:
@@ -130,7 +130,7 @@ void cmdthread(SOCKET sock)
 		scanf("%s", cmdBUF);
 		if (0 == strcmp(cmdBUF, "exit"))
 		{
-			printf("é€€å‡ºçº¿ç¨‹\n");
+			printf("ÍË³öÏß³Ì\n");
 			g_bRun = false;
 			return;
 		}
@@ -149,7 +149,7 @@ void cmdthread(SOCKET sock)
 		}
 		else
 		{
-			printf("ä¸æ”¯æŒçš„å‘½ä»¤\n");
+			printf("²»Ö§³ÖµÄÃüÁî\n");
 		}
 	}
 }
@@ -160,17 +160,17 @@ int  main()
 	WSADATA data;
 	WSAStartup(ver, &data);
 #endif
-	//å»ºç«‹
+	//½¨Á¢
 	SOCKET _sock = socket(AF_INET, SOCK_STREAM,0);
 	if (INVALID_SOCKET == _sock)
 	{
-		printf("socketå»ºç«‹å¤±è´¥\n");
+		printf("socket½¨Á¢Ê§°Ü\n");
 	}
 	else
 	{
-		printf("socketå»ºç«‹æˆåŠŸ\n");
+		printf("socket½¨Á¢³É¹¦\n");
 	}
-	//é“¾æ¥
+	//Á´½Ó
 	sockaddr_in _sin = {};
 	_sin.sin_family = AF_INET;
 	_sin.sin_port = htons(4567);
@@ -182,11 +182,11 @@ int  main()
 	int ret = connect(_sock, (sockaddr*)&_sin, sizeof(sockaddr_in));
 	if (SOCKET_ERROR == ret)
 	{
-		printf("socket å»ºç«‹è¿æ¥é”™è¯¯\n");
+		printf("socket ½¨Á¢Á¬½Ó´íÎó\n");
 	}
 	else
 	{
-		printf("socket å»ºç«‹è¿æ¥æˆåŠŸ\n");
+		printf("socket ½¨Á¢Á¬½Ó³É¹¦\n");
 	}
 
 	
@@ -201,7 +201,7 @@ int  main()
 		int ret = select(_sock,&fd_read,NULL,NULL,&tl);
 		if (ret < 0)
 		{
-			printf("select ä»»åŠ¡ç»“æŸ\n");
+			printf("select ÈÎÎñ½áÊø\n");
 			break;
 		}
 		if (FD_ISSET(_sock, &fd_read))
@@ -209,11 +209,11 @@ int  main()
 			FD_CLR(_sock, &fd_read);
 			if (-1 == processor(_sock))
 			{
-				printf("select ä»»åŠ¡ç»“æŸ2\n");
+				printf("select ÈÎÎñ½áÊø2\n");
 				break;
 			}
 		}
-		//printf("ç©ºé—²æ—¶é—´å¤„ç†å…¶ä»–ä¸šåŠ¡\n");
+		//printf("¿ÕÏĞÊ±¼ä´¦ÀíÆäËûÒµÎñ\n");
 		
 		//Sleep(1000);
 	}
@@ -223,6 +223,6 @@ int  main()
 #else
         close(_sock);
 #endif
-	printf("å·²é€€å‡º\n");
+	printf("ÒÑÍË³ö\n");
 	return 0;
 }

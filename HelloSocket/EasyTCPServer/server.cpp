@@ -84,24 +84,24 @@ std::vector<SOCKET> g_clents;
 int processor(SOCKET _cSock)
 {
     char recvBUF[4096] = {};
-    //æ¥æ”¶å®¢æˆ·ç«¯çš„è¯·æ±‚æ•°æ®
+    //½ÓÊÕ¿Í»§¶ËµÄÇëÇóÊı¾İ
     int nLen = recv(_cSock, recvBUF, sizeof(DataHeader), 0);
     DataHeader *header = (DataHeader*)recvBUF;
     if (nLen < 0)
     {
-        printf("å®¢æˆ·ç«¯<socket = %d>å·²æ¨å‡ºï¼ï¼Œä»»åŠ¡ç»“æŸï¼\n", _cSock);
+        printf("¿Í»§¶Ë<socket = %d>ÒÑÍÆ³ö£¡£¬ÈÎÎñ½áÊø£¡\n", _cSock);
         return -1;
     }
 
-    //å¤„ç†å®¢æˆ·ç«¯è¯·æ±‚
+    //´¦Àí¿Í»§¶ËÇëÇó
     switch (header->cmd)
     {
     case CMD_LOGIN:
     {
         int nLen = recv(_cSock, recvBUF + sizeof(DataHeader), header->dataLength - sizeof(DataHeader), 0);
         Login *login = (Login*)recvBUF;
-        printf("æ”¶åˆ°å‘½ä»¤CMD_LOGIN æ•°æ®é•¿åº¦:%d,userName = %s Password = %s\n", header->dataLength, login->userName, login->password);
-        //å¿½ç•¥åˆ¤æ–­ç”¨æˆ·åå¯†ç æ˜¯å¦æ­£ç¡®
+        printf("ÊÕµ½ÃüÁîCMD_LOGIN Êı¾İ³¤¶È:%d,userName = %s Password = %s\n", header->dataLength, login->userName, login->password);
+        //ºöÂÔÅĞ¶ÏÓÃ»§ÃûÃÜÂëÊÇ·ñÕıÈ·
         LoginResult loginresult;
         loginresult.result = 1;
         send(_cSock, (char*)&loginresult, sizeof(LoginResult), 0);
@@ -111,8 +111,8 @@ int processor(SOCKET _cSock)
     {
         int nLen = recv(_cSock, recvBUF + sizeof(DataHeader), header->dataLength - sizeof(DataHeader), 0);
         Logout *logout = (Logout*)recvBUF;
-        printf("æ”¶åˆ°å‘½ä»¤CMD_LOGOUT æ•°æ®é•¿åº¦:%d,userName = %s\n", header->dataLength, logout->userName);
-        //å¿½ç•¥åˆ¤æ–­ç”¨æˆ·åå¯†ç æ˜¯å¦æ­£ç¡®
+        printf("ÊÕµ½ÃüÁîCMD_LOGOUT Êı¾İ³¤¶È:%d,userName = %s\n", header->dataLength, logout->userName);
+        //ºöÂÔÅĞ¶ÏÓÃ»§ÃûÃÜÂëÊÇ·ñÕıÈ·
         LogoutResult ret;
         ret.result = 1;
         send(_cSock, (char*)&ret, sizeof(LogoutResult), 0);
@@ -149,20 +149,20 @@ int  main()
 #endif
     if (SOCKET_ERROR == bind(_sock, (sockaddr*)&_sin, sizeof(_sin)))
     {
-        printf("ERROR,ç»‘å®šç«¯å£å¤±è´¥ï¼\n");
+        printf("ERROR,°ó¶¨¶Ë¿ÚÊ§°Ü£¡\n");
     }
     else
     {
-        printf("SUCCESS,ç»‘å®šç«¯å£æˆåŠŸï¼\n");
+        printf("SUCCESS,°ó¶¨¶Ë¿Ú³É¹¦£¡\n");
     }
     //listen
     if (SOCKET_ERROR == listen(_sock, 5))
     {
-        printf("ERROR,ç›‘å¬å¤±è´¥ï¼\n");
+        printf("ERROR,¼àÌıÊ§°Ü£¡\n");
     }
     else
     {
-        printf("SUCCESS,ç›‘å¬æˆåŠŸï¼\n");
+        printf("SUCCESS,¼àÌı³É¹¦£¡\n");
     }
 
     while (true)
@@ -188,13 +188,13 @@ int  main()
 				maxSoc = g_clents[i];
 			}
         }
-        //nfdsæ˜¯ä¸€ä¸ªæ•´æ•°å€¼ï¼Œæ˜¯æŒ‡fd_seté›†åˆä¸­æ‰€æœ‰æè¿°ç¬¦(socket)çš„èŒƒå›´
-        //å³æ˜¯æ‰€æœ‰æè¿°ç¬¦æœ€å¤§å€¼+1ï¼Œåœ¨windowsä¸­è¿™ä¸ªå‚æ•°å¯ä»¥å†™0
+        //nfdsÊÇÒ»¸öÕûÊıÖµ£¬ÊÇÖ¸fd_set¼¯ºÏÖĞËùÓĞÃèÊö·û(socket)µÄ·¶Î§
+        //¼´ÊÇËùÓĞÃèÊö·û×î´óÖµ+1£¬ÔÚwindowsÖĞÕâ¸ö²ÎÊı¿ÉÒÔĞ´0
         timeval tl = { 1,1 };
         int ret = select(maxSoc + 1, &fd_read, &fd_write, &fd_except, &tl);
         if (ret < 0)
         {
-            printf("selectä»»åŠ¡ç»“æŸï¼Œé€€å‡º\n");
+            printf("selectÈÎÎñ½áÊø£¬ÍË³ö\n");
             break;
         }
         if (FD_ISSET(_sock, &fd_read))
@@ -215,7 +215,7 @@ int  main()
             _cSock = accept(_sock, (sockaddr*)&clientA, &nClientA);
             if (INVALID_SOCKET == _cSock)
             {
-                printf("é”™è¯¯ï¼Œæ¥å—çš„å®¢æˆ·ç«¯SOCKET æ— æ•ˆ\n");
+                printf("´íÎó£¬½ÓÊÜµÄ¿Í»§¶ËSOCKET ÎŞĞ§\n");
             }
             else
             {
@@ -227,22 +227,10 @@ int  main()
                 }
                 g_clents.push_back(_cSock);
                 //send
-                printf("æ–°å®¢æˆ·ç«¯åŠ å…¥,sock = %d,ip = %s\n", _cSock, inet_ntoa(clientA.sin_addr));
+                printf("ĞÂ¿Í»§¶Ë¼ÓÈë,sock = %d,ip = %s\n", _cSock, inet_ntoa(clientA.sin_addr));
             }
         }
-#ifdef _WIN32
-        for (int i = 0; i < (int)fd_read.fd_count; i++)
-        {
-            if (-1 == processor(fd_read.fd_array[i]))
-            {
-                auto iter = std::find(g_clents.begin(), g_clents.end(), fd_read.fd_array[i]);
-                if (iter != g_clents.end())
-                {
-                    g_clents.erase(iter);
-                }
-            }
-        }
-#else
+
         auto it = g_clents.begin();
         while (it != g_clents.end())
         {
@@ -250,20 +238,21 @@ int  main()
             {
                 if (-1 == processor(*it))
                 {
-                    auto itdel = it;
-                    it++;
-                    g_clents.erase(itdel);
+                    it = g_clents.erase(it);
                 }
                 else
                 {
                     it++;
                 }
             }
+			else
+			{
+				it++;
+			}
         }
-#endif // _WIN32
 
        
-        printf("ç©ºé—²æ—¶é—´å¤„ç†å…¶ä»–ä¸šåŠ¡\n");
+        printf("¿ÕÏĞÊ±¼ä´¦ÀíÆäËûÒµÎñ\n");
     }
 
 #ifdef _WIN32
@@ -284,7 +273,7 @@ int  main()
 #else
     close(_sock);
 #endif
-    printf("å·²é€€å‡º\n");
+    printf("ÒÑÍË³ö\n");
     getchar();
     return 0;
 }
