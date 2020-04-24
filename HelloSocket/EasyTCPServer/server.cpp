@@ -179,14 +179,19 @@ int  main()
         FD_SET(_sock, &fd_write);
         FD_SET(_sock, &fd_except);
 
+		SOCKET maxSoc = _sock;
         for (int i = (int)g_clents.size() - 1; i >= 0; i--)
         {
             FD_SET(g_clents[i], &fd_read);
+			if (maxSoc  < g_clents[i])
+			{
+				maxSoc = g_clents[i];
+			}
         }
         //nfds是一个整数值，是指fd_set集合中所有描述符(socket)的范围
         //即是所有描述符最大值+1，在windows中这个参数可以写0
         timeval tl = { 1,1 };
-        int ret = select(_sock + 1, &fd_read, &fd_write, &fd_except, &tl);
+        int ret = select(maxSoc + 1, &fd_read, &fd_write, &fd_except, &tl);
         if (ret < 0)
         {
             printf("select任务结束，退出\n");
