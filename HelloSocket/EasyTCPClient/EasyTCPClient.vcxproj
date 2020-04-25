@@ -143,6 +143,10 @@
   <ItemGroup>
     <ClCompile Include="client.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="EasyTcpClient.hpp" />
+    <ClInclude Include="MesssageHeader.hpp" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
