@@ -50,11 +50,11 @@ public:
 		m_sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 		if (INVALID_SOCKET == m_sock)
 		{
-			printf("socket建立失败\n");
+			printf("socket = %d建立失败\n",m_sock);
 		}
 		else
 		{
-			printf("socket建立成功\n");
+			printf("socket = %d建立成功\n",m_sock);
 		}
 		return 0;
 	}
@@ -78,11 +78,11 @@ public:
 		int ret = connect(m_sock, (sockaddr*)&_sin, sizeof(sockaddr_in));
 		if (SOCKET_ERROR == ret)
 		{
-			printf("socket 建立连接错误\n");
+			printf("socket = %d 链接服务器%s,%d失败\n",m_sock, ip, port);
 		}
 		else
 		{
-			printf("socket 建立连接成功\n");
+			printf("socket = %d 链接服务器%s,%d\n",m_sock, ip, port);
 		}
 		return ret;
 	}
@@ -100,7 +100,6 @@ public:
 			close(m_sock);
 #endif
 			m_sock = INVALID_SOCKET;
-			printf("已退出\n");
 		}
 	}
 
@@ -116,11 +115,12 @@ public:
 			fd_set fd_read;
 			FD_ZERO(&fd_read);
 			FD_SET(m_sock, &fd_read);
-			timeval tl = { 1,1 };
+			timeval tl = { 0,0 };
 			int ret = select(m_sock, &fd_read, NULL, NULL, &tl);
 			if (ret < 0)
 			{
-				printf("select = %d 任务结束\n", m_sock);
+				printf("select = %d 客户端退出，任务结束\n", m_sock);
+				Close();
 				return false;
 			}
 			if (FD_ISSET(m_sock, &fd_read))
