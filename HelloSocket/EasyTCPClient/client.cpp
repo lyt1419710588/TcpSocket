@@ -42,19 +42,13 @@ int  main()
 	//client.initSocket();
 	client.Connect("127.0.0.1", 4567);
 
-	EasyTcpClient client2;
-	//client.initSocket();
-	client2.Connect("127.0.0.1", 4568);
-	//启动UI线程
 	std::thread mythread(cmdthread, &client);
 	mythread.detach();
-	while (client.isRun() || client2.isRun())
+	while (client.isRun() )
 	{
-		client.OnRun();
-		client2.OnRun();
+		client.OnRun();	
 	}
 	client.Close();
-	client2.Close();
 	printf("已退出\n");
 	getchar();
 	return 0;
