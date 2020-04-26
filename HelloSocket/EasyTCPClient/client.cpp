@@ -42,11 +42,16 @@ int  main()
 	//client.initSocket();
 	client.Connect("127.0.0.1", 4567);
 
-	std::thread mythread(cmdthread, &client);
-	mythread.detach();
+	//std::thread mythread(cmdthread, &client);
+	//mythread.detach();
+
+	Login login;
+	strcpy(login.userName, "lyt");
+	strcpy(login.password, "123456");
 	while (client.isRun() )
 	{
 		client.OnRun();	
+		client.SendData(&login);
 	}
 	client.Close();
 	printf("ÒÑÍË³ö\n");

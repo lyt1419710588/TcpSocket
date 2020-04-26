@@ -106,7 +106,7 @@ public:
 	//发送数据
 
 	
-
+	int _count = 0;
 	//处理网络数据
 	bool OnRun()
 	{
@@ -117,6 +117,7 @@ public:
 			FD_SET(m_sock, &fd_read);
 			timeval tl = { 0,0 };
 			int ret = select(m_sock, &fd_read, NULL, NULL, &tl);
+			//printf("select ret = %d,count  = %d\n", ret, _count++);
 			if (ret < 0)
 			{
 				printf("select = %d 客户端退出，任务结束\n", m_sock);
@@ -141,19 +142,55 @@ public:
 		return m_sock != INVALID_SOCKET;
 	}
 	//接收数据,处理粘包，拆分包
+	//第二缓冲区，双缓冲
+#define RECV_BUFF_SIZE 102400//缓冲区大小
+	//接收缓冲区
+	char m_recvBUF[RECV_BUFF_SIZE] = {};
+	//消息缓冲区
+	char m_szMsgBUF[RECV_BUFF_SIZE * 2] = {};
+	//消息缓冲区尾部位置
+	int m_lastPos = 0;
 	int RecvData()
-	{
-		char recvBUF[4096] = {};
+	{	
 		//接收客户端的请求数据
-		int nLen = recv(m_sock, recvBUF, sizeof(DataHeader), 0);
-		DataHeader *header = (DataHeader*)recvBUF;
+		int nLen = recv(m_sock, m_recvBUF, RECV_BUFF_SIZE, 0);
 		if (nLen < 0)
 		{
 			printf("与服务器断开连接！，任务结束！\n");
 			return -1;
 		}
-		recv(m_sock, recvBUF + sizeof(DataHeader), header->dataLength - sizeof(DataHeader), 0);
-		OnNetMsg(header);
+		//printf("Recv len = %d\n",nLen);
+		//将接收到的数据拷贝到消息缓冲区
+		memcpy(m_szMsgBUF + m_lastPos, m_recvBUF, nLen);
+		//消息缓冲区尾部的位置后移
+		m_lastPos += nLen;
+		//判断已收消息缓冲区的数据长度是否大于消息头
+		while (m_lastPos >= sizeof(DataHeader))
+		{
+			DataHeader* header = (DataHeader*)m_szMsgBUF;
+			if (m_lastPos >= header->dataLength)
+			{
+				//剩余未处理的消息缓冲区数据的长度
+				int nSize = m_lastPos - header->dataLength;
+				//处理网络消息
+				OnNetMsg(header);
+				//将未处理的数据前移
+				memcpy(m_szMsgBUF, m_szMsgBUF + header->dataLength, nSize);
+				m_lastPos = nSize;
+			}
+			else
+			{
+				break;
+			}
+		}
+		/*DataHeader *header = (DataHeader*)recvBUF;
+		if (nLen < 0)
+		{
+			printf("与服务器断开连接！，任务结束！\n");
+			return -1;
+		}
+		//recv(m_sock, recvBUF + sizeof(DataHeader), header->dataLength - sizeof(DataHeader), 0);
+		OnNetMsg(header);*/
 		return 0;
 	}
 	//响应网络数据
@@ -183,8 +220,17 @@ public:
 				printf("收到服务端消息：newUerJoinIN  sock = %d，数据长度:%d\n", ret->sock, header->dataLength);
 			}
 			break;
+			case CMD_ERROR:
+			{
+				//接收服务器返回的数据
+				printf("收到服务端消息：CMD_ERROR  sock = %d，数据长度:%d\n", m_sock, header->dataLength);
+			}
+			break;
 			default:
-				break;
+			{
+				printf("收到服务端未定义数据，  sock = %d，数据长度:%d\n", m_sock, header->dataLength);
+			}
+			break;
 		}
 	}
 	//发送数据

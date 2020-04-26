@@ -173,6 +173,7 @@ public:
 	{
 		return m_sock != INVALID_SOCKET;
 	}
+	int _count = 0;
 	//处理网络信息
 	bool OnRun()
 	{
@@ -203,6 +204,7 @@ public:
 			//即是所有描述符最大值+1，在windows中这个参数可以写0
 			timeval tl = { 1,1 };
 			int ret = select(maxSoc + 1, &fd_read, &fd_write, &fd_except, &tl);
+			//printf("select ret = %d,count  = %d\n",ret, _count++);
 			if (ret < 0)
 			{
 				printf("select任务结束，退出\n");
@@ -239,19 +241,23 @@ public:
 		
 	}
 	//接收数据
+	char recvBUF[409600] = {};
 	int RecvData(SOCKET _cSock)
 	{
-		char recvBUF[4096] = {};
+		
 		//接收客户端的请求数据
-		int nLen = recv(_cSock, recvBUF, sizeof(DataHeader), 0);
-		DataHeader *header = (DataHeader*)recvBUF;
+		int nLen = recv(_cSock, recvBUF, 409600, 0);
+		//printf("Recv len = %d\n", nLen);
+		//DataHeader *header = (DataHeader*)recvBUF;
 		if (nLen < 0)
 		{
 			printf("客户端<socket = %d>已推出！，任务结束！\n", _cSock);
 			return -1;
 		}
-		 recv(_cSock, recvBUF + sizeof(DataHeader), header->dataLength - sizeof(DataHeader), 0);
-		 OnNetMsg(_cSock, header);
+		LoginResult ret;
+		SendData(_cSock, &ret);
+		/* recv(_cSock, recvBUF + sizeof(DataHeader), header->dataLength - sizeof(DataHeader), 0);
+		 OnNetMsg(_cSock, header);*/
 		return 0;
 	}
 	void OnNetMsg(SOCKET _cSock,DataHeader* header)
