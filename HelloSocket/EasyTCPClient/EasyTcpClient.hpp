@@ -143,7 +143,11 @@ public:
 	}
 	//接收数据,处理粘包，拆分包
 	//第二缓冲区，双缓冲
+#ifndef RECV_BUFF_SIZE
 #define RECV_BUFF_SIZE 102400//缓冲区大小
+#endif // !RECV_BUFF_SIZE
+
+
 	//接收缓冲区
 	char m_recvBUF[RECV_BUFF_SIZE] = {};
 	//消息缓冲区
@@ -203,21 +207,21 @@ public:
 			{
 				//接收服务器返回的数据
 				LoginResult *ret = (LoginResult*)header;
-				printf("收到服务端消息：retLogin = %d，数据长度:%d\n", ret->result, header->dataLength);
+				//printf("收到服务端消息：retLogin = %d，数据长度:%d\n", ret->result, header->dataLength);
 			}
 			break;
 			case CMD_LOGOUT_RESULT:
 			{
 				//接收服务器返回的数据
 				LogoutResult *ret = (LogoutResult*)header;
-				printf("收到服务端消息：retLogout = %d，数据长度:%d\n", ret->result, header->dataLength);
+				//printf("收到服务端消息：retLogout = %d，数据长度:%d\n", ret->result, header->dataLength);
 			}
 			break;
 			case CMD_NEW_USER_JOIN:
 			{
 				//接收服务器返回的数据
 				NewUserJoin *ret = (NewUserJoin*)header;
-				printf("收到服务端消息：newUerJoinIN  sock = %d，数据长度:%d\n", ret->sock, header->dataLength);
+				//printf("收到服务端消息：newUerJoinIN  sock = %d，数据长度:%d\n", ret->sock, header->dataLength);
 			}
 			break;
 			case CMD_ERROR:

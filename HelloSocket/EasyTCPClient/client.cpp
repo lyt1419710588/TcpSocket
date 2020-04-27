@@ -15,24 +15,6 @@ void cmdthread(EasyTcpClient *pclient)
 			pclient->Close();
 			break;
 		}
-		else if (0 == strcmp(cmdBUF, "login"))
-		{
-			Login login;
-			strcpy(login.userName, "lyt");
-			strcpy(login.password, "123456");
-			
-			pclient->SendData(&login);
-		}
-		else if (0 == strcmp(cmdBUF, "logout"))
-		{
-			Logout logout;
-			strcpy(logout.userName, "lyt");
-			pclient->SendData(&logout);
-		}
-		else
-		{
-			printf("不支持的命令\n");
-		}
 	}
 }
 int  main()
@@ -42,8 +24,8 @@ int  main()
 	//client.initSocket();
 	client.Connect("127.0.0.1", 4567);
 
-	//std::thread mythread(cmdthread, &client);
-	//mythread.detach();
+	std::thread mythread(cmdthread, &client);
+	mythread.detach();
 
 	Login login;
 	strcpy(login.userName, "lyt");
