@@ -294,7 +294,7 @@ public:
 		//DataHeader *header = (DataHeader*)recvBUF;
 		if (nLen < 0)
 		{
-			printf("客户端<socket = %d>已推出！，任务结束！\n", pClient->getSocket());
+			printf("客户端<socket = %d>已退出！，任务结束！\n", pClient->getSocket());
 			return -1;
 		}
 

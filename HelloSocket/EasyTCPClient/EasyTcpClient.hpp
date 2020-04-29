@@ -120,7 +120,7 @@ public:
 			//printf("select ret = %d,count  = %d\n", ret, _count++);
 			if (ret < 0)
 			{
-				printf("select = %d 客户端退出，任务结束\n", m_sock);
+				printf("select = %d 与服务端断开链接，任务结束\n", m_sock);
 				Close();
 				return false;
 			}
@@ -130,6 +130,7 @@ public:
 				if (-1 == RecvData())
 				{
 					printf("select = %d 任务结束2\n",m_sock);
+					Close();
 					return false;
 				}
 			}
