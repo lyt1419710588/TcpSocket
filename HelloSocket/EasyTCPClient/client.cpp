@@ -19,21 +19,30 @@ void cmdthread()
 }
 int  main()
 {
-	const int cCount = FD_SETSIZE - 1;
+	const int cCount = 10000;
 	EasyTcpClient *client[cCount];
 	//Õ»ÄÚ´æ1M
 	//client.initSocket();
+	int nConnect = 0;
 	for (int  i = 0; i < cCount; i++)
 	{
+		if (!g_Run)
+		{
+			nConnect = i;
+			break;
+		}
 		client[i] = new EasyTcpClient;
 		client[i]->Connect("127.0.0.1", 4567); 
+		printf("nConnect = %d\n",i);
 	}
 	
-
-	for (int i = 0; i < cCount; i++)
+	if (!g_Run)
 	{
-		client[i] = new EasyTcpClient;
-		client[i]->Connect("127.0.0.1", 4567);
+		for (int i = 0; i < nConnect; i++)
+		{
+			client[i]->Close();
+			delete (client[i]);
+		}
 	}
 	std::thread mythread(cmdthread);
 	mythread.detach();
@@ -46,7 +55,7 @@ int  main()
 		for (int i = 0; i < cCount; i++)
 		{
 			client[i]->SendData(&login);
-			client[i]->OnRun();
+			//client[i]->OnRun();
 		}
 		
 	}

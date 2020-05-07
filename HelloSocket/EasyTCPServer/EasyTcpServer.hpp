@@ -1,11 +1,12 @@
 #ifndef _EASYTCPSERVER_HPP
 #define _EASYTCPSERVER_HPP
 #ifdef _WIN32
-#define WIN32_LEAN_AND_MEAN
-#define _WINSOCK_DEPRECATED_NO_WARNINGS
-#define _CRT_SECURE_NO_WARNINGS
-#include <Windows.h>
-#include <WinSock2.h>
+	#define FD_SETSIZE 10024
+	#define WIN32_LEAN_AND_MEAN
+	#define _WINSOCK_DEPRECATED_NO_WARNINGS
+	#define _CRT_SECURE_NO_WARNINGS
+	#include <Windows.h>
+	#include <WinSock2.h>
 #else
 #include <unistd.h>
 #include <arpa/inet.h>
@@ -17,9 +18,9 @@
 #include <stdio.h>
 #include "MessageHeader.hpp"
 #include <vector>
-
+#include  "CELLTimestamp.hpp"
 #ifndef RECV_BUFF_SIZE
-#define RECV_BUFF_SIZE 102400//缓冲区大小
+#define RECV_BUFF_SIZE 10240//缓冲区大小
 #endif // !RECV_BUFF_SIZE
 
 class ClientSocket
@@ -61,10 +62,13 @@ class EasyTcpServer
 private:
 	SOCKET m_sock;
 	std::vector<ClientSocket*> m_vectClients;
+	CELLTimestamp m_tTime;
+	int m_recvCount;
 public:
 	EasyTcpServer()
 	{
 		m_sock = INVALID_SOCKET; 
+		m_recvCount = 0;
 	}
 	virtual ~EasyTcpServer()
 	{
@@ -174,12 +178,12 @@ public:
 		}
 		else
 		{
-			NewUserJoin userJoin;
-			userJoin.sock = _cSock;
-			SendDataToAll((DataHeader*)&userJoin);
+			//NewUserJoin userJoin;
+			//userJoin.sock = _cSock;
+			//SendDataToAll((DataHeader*)&userJoin);
 			m_vectClients.push_back(new ClientSocket(_cSock));
 			//send
-			printf("新客户端加入,sock = %d,ip = %s\n", _cSock, inet_ntoa(clientA.sin_addr));
+			//printf("新客户端加入,sock = %d,ip = %s，客户端数 = %d \n", _cSock, inet_ntoa(clientA.sin_addr), m_vectClients.size());
 		}
 		return _cSock;
 	}
@@ -256,6 +260,7 @@ public:
 			{
 				FD_CLR(m_sock, &fd_read);
 				Accept();
+				return true;
 			}
 
 			auto it = m_vectClients.begin();
@@ -330,6 +335,14 @@ public:
 	void OnNetMsg(SOCKET _cSock,DataHeader* header)
 	{
 		//处理客户端请求
+		m_recvCount++;
+		auto t1 = m_tTime.getElaspedSecond();
+		if (t1 >= 1.0)
+		{
+			printf("time<%lf>,socket<%d>,clientNum<%d>,recvCount<%d>\n",t1, _cSock, m_vectClients.size(), m_recvCount);
+			m_tTime.update();
+			m_recvCount = 0;
+		}
 		switch (header->cmd)
 		{
 			case CMD_LOGIN:
@@ -338,9 +351,9 @@ public:
 				Login *login = (Login*)header;
 				//printf("收到命令<socket = %d>CMD_LOGIN 数据长度:%d,userName = %s Password = %s\n", _cSock,header->dataLength, login->userName, login->password);
 				//忽略判断用户名密码是否正确
-				LoginResult loginresult;
-				loginresult.result = 1;
-				SendData(_cSock, &loginresult);
+				//LoginResult loginresult;
+				//loginresult.result = 1;
+				//SendData(_cSock, &loginresult);
 			}
 			break;
 			case CMD_LOGOUT:
@@ -348,9 +361,9 @@ public:
 				Logout *logout = (Logout*)header;
 				//printf("收到命令<socket = %d>CMD_LOGOUT 数据长度:%d,userName = %s\n", _cSock, header->dataLength, logout->userName);
 				//忽略判断用户名密码是否正确
-				LogoutResult ret;
-				ret.result = 1;
-				SendData(_cSock, &ret);
+				//LogoutResult ret;
+				//ret.result = 1;
+				//SendData(_cSock, &ret);
 			}
 			break;
 			default:

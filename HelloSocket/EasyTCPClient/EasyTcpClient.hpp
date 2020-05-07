@@ -54,7 +54,7 @@ public:
 		}
 		else
 		{
-			printf("socket = %d建立成功\n",m_sock);
+			//printf("socket = %d建立成功\n",m_sock);
 		}
 		return 0;
 	}
@@ -82,7 +82,7 @@ public:
 		}
 		else
 		{
-			printf("socket = %d 链接服务器%s,%d\n",m_sock, ip, port);
+			//printf("socket = %d 链接服务器%s,%d\n",m_sock, ip, port);
 		}
 		return ret;
 	}
@@ -145,7 +145,7 @@ public:
 	//接收数据,处理粘包，拆分包
 	//第二缓冲区，双缓冲
 #ifndef RECV_BUFF_SIZE
-#define RECV_BUFF_SIZE 102400//缓冲区大小
+#define RECV_BUFF_SIZE 10240//缓冲区大小
 #endif // !RECV_BUFF_SIZE
 
 
