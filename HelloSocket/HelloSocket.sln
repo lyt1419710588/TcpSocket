@@ -9,6 +9,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EasyTCPServer", "EasyTCPSer
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EasyTCPClient", "EasyTCPClient\EasyTCPClient.vcxproj", "{9CCA9023-3938-4F02-83E9-34E44EF7F154}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HelloThread", "HelloThread\HelloThread.vcxproj", "{369F57DA-F7F2-44AA-83C7-1362C4777277}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -41,6 +43,14 @@ Global
 		{9CCA9023-3938-4F02-83E9-34E44EF7F154}.Release|x64.Build.0 = Release|x64
 		{9CCA9023-3938-4F02-83E9-34E44EF7F154}.Release|x86.ActiveCfg = Release|Win32
 		{9CCA9023-3938-4F02-83E9-34E44EF7F154}.Release|x86.Build.0 = Release|Win32
+		{369F57DA-F7F2-44AA-83C7-1362C4777277}.Debug|x64.ActiveCfg = Debug|x64
+		{369F57DA-F7F2-44AA-83C7-1362C4777277}.Debug|x64.Build.0 = Debug|x64
+		{369F57DA-F7F2-44AA-83C7-1362C4777277}.Debug|x86.ActiveCfg = Debug|Win32
+		{369F57DA-F7F2-44AA-83C7-1362C4777277}.Debug|x86.Build.0 = Debug|Win32
+		{369F57DA-F7F2-44AA-83C7-1362C4777277}.Release|x64.ActiveCfg = Release|x64
+		{369F57DA-F7F2-44AA-83C7-1362C4777277}.Release|x64.Build.0 = Release|x64
+		{369F57DA-F7F2-44AA-83C7-1362C4777277}.Release|x86.ActiveCfg = Release|Win32
+		{369F57DA-F7F2-44AA-83C7-1362C4777277}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

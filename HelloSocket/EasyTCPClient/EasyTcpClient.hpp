@@ -63,7 +63,7 @@ public:
 	{
 		if (INVALID_SOCKET == m_sock)
 		{
-			printf("初始化socket\n");
+			//printf("初始化socket\n");
 			initSocket();
 		}
 		//链接
@@ -239,11 +239,11 @@ public:
 		}
 	}
 	//发送数据
-	int SendData(DataHeader *header)
+	int SendData(DataHeader *header,int nLen)
 	{
 		if (isRun() && header)
 		{
-			return send(m_sock, (const char*)header, header->dataLength, 0);
+			return send(m_sock, (const char*)header, nLen, 0);
 		}
 		return SOCKET_ERROR;
 	}

@@ -23,6 +23,7 @@ int  main()
 	server.initSocket();
 	server.Bind(nullptr, 4567);
 	server.Listen(5);
+	server.Start();
 	std::thread mythread(cmdthread);
 	mythread.detach();
     while (g_Run)

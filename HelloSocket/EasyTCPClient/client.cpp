@@ -17,52 +17,81 @@ void cmdthread()
 		}
 	}
 }
-int  main()
+
+const int cCount = 10000;
+EasyTcpClient *client[cCount];
+const int tCount = 4;//线程数量
+void sendthread(int id)
 {
-	const int cCount = 10000;
-	EasyTcpClient *client[cCount];
+	
 	//栈内存1M
 	//client.initSocket();
 	int nConnect = 0;
-	for (int  i = 0; i < cCount; i++)
+	int c = cCount / tCount;
+	int begin = (id - 1) * c;
+	int end = id * c;
+	for (int i = begin; i < end; i++)
 	{
 		if (!g_Run)
 		{
 			nConnect = i;
-			break;
+			return ;
 		}
 		client[i] = new EasyTcpClient;
-		client[i]->Connect("127.0.0.1", 4567); 
-		printf("nConnect = %d\n",i);
+		client[i]->Connect("127.0.0.1", 4567);
+		printf("线程 %d,nConnect = %d\n", id,i);
 	}
-	
+
 	if (!g_Run)
 	{
-		for (int i = 0; i < nConnect; i++)
+		for (int i = begin; i < end; i++)
 		{
 			client[i]->Close();
 			delete (client[i]);
 		}
 	}
-	std::thread mythread(cmdthread);
-	mythread.detach();
 
-	Login login;
-	strcpy(login.userName, "lyt");
-	strcpy(login.password, "123456");
+	std::chrono::milliseconds t(3000);
+	std::this_thread::sleep_for(t);
+	Login login[10];
+	for (int i = 0; i < 10; i++)
+	{
+		strcpy(login[i].userName, "lyt");
+		strcpy(login[i].password, "123456");
+	}
+	const int nLen = sizeof(login);
 	while (g_Run)
 	{
-		for (int i = 0; i < cCount; i++)
+		for (int i = begin; i < end; i++)
 		{
-			client[i]->SendData(&login);
+			client[i]->SendData(login, nLen);
 			//client[i]->OnRun();
 		}
-		
+
 	}
-	for (int i = 0; i < cCount; i++)
+	for (int i = begin; i < end; i++)
 	{
 		client[i]->Close();
 		delete (client[i]);
+	}
+
+}
+int  main()
+{
+	
+
+	std::thread mythread(cmdthread);
+	mythread.detach();
+
+	
+	for (int  i = 0; i < tCount; i++)
+	{
+		std::thread mythread(sendthread, i + 1);
+		mythread.detach();
+	}
+	while (g_Run)
+	{
+		Sleep(0);
 	}
 	
 	printf("已退出\n");
