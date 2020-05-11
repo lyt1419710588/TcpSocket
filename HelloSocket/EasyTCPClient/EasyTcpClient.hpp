@@ -23,10 +23,12 @@ class EasyTcpClient
 {
 private:
 	SOCKET m_sock;
+	bool m_isConnected;
 public:
 	EasyTcpClient()
 	{
 		m_sock = INVALID_SOCKET;
+		m_isConnected = true;
 	}
 	//虚析构函数
 	virtual ~EasyTcpClient()
@@ -82,6 +84,7 @@ public:
 		}
 		else
 		{
+			m_isConnected = true;
 			//printf("socket = %d 链接服务器%s,%d\n",m_sock, ip, port);
 		}
 		return ret;
@@ -101,6 +104,7 @@ public:
 #endif
 			m_sock = INVALID_SOCKET;
 		}
+		m_isConnected = false;
 	}
 
 	//发送数据
@@ -140,7 +144,7 @@ public:
 	}
 	bool isRun()
 	{
-		return m_sock != INVALID_SOCKET;
+		return (m_sock != INVALID_SOCKET) && m_isConnected;
 	}
 	//接收数据,处理粘包，拆分包
 	//第二缓冲区，双缓冲
@@ -241,11 +245,16 @@ public:
 	//发送数据
 	int SendData(DataHeader *header,int nLen)
 	{
+		int ret = SOCKET_ERROR;
 		if (isRun() && header)
 		{
-			return send(m_sock, (const char*)header, nLen, 0);
+			ret =  send(m_sock, (const char*)header, nLen, 0);
+			if (SOCKET_ERROR == ret)
+			{
+				Close();
+			}
 		}
-		return SOCKET_ERROR;
+		return ret;
 	}
 private:
 

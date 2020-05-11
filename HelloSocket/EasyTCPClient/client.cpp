@@ -39,9 +39,8 @@ void sendthread(int id)
 		}
 		client[i] = new EasyTcpClient;
 		client[i]->Connect("127.0.0.1", 4567);
-		printf("线程 %d,nConnect = %d\n", id,i);
 	}
-
+	printf("线程 %d进入,nConnect<begin=%d><end=%d>\n", id,begin,end);
 	if (!g_Run)
 	{
 		for (int i = begin; i < end; i++)
@@ -53,8 +52,8 @@ void sendthread(int id)
 
 	std::chrono::milliseconds t(3000);
 	std::this_thread::sleep_for(t);
-	Login login[10];
-	for (int i = 0; i < 10; i++)
+	Login login[1];
+	for (int i = 0; i < 1; i++)
 	{
 		strcpy(login[i].userName, "lyt");
 		strcpy(login[i].password, "123456");
@@ -65,7 +64,7 @@ void sendthread(int id)
 		for (int i = begin; i < end; i++)
 		{
 			client[i]->SendData(login, nLen);
-			//client[i]->OnRun();
+			client[i]->OnRun();
 		}
 
 	}
@@ -74,7 +73,7 @@ void sendthread(int id)
 		client[i]->Close();
 		delete (client[i]);
 	}
-
+	printf("线程 %d退出,nConnect<begin=%d><end=%d>\n", id, begin, end);
 }
 int  main()
 {
