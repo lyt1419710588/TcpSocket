@@ -322,15 +322,17 @@ class EasyTcpServer:public INetEvent
 {
 private:
 	SOCKET m_sock;
-	std::vector<ClientSocket*> m_vectClients;
 	//服务列表
 	std::vector<CellSercer*> m_vectServers;
 	//每秒消息计时
 	CELLTimestamp m_tTime;
+	//客户端计数
+	std::atomic_int m_clientCount;
 public:
 	EasyTcpServer()
 	{
 		m_sock = INVALID_SOCKET; 
+		m_clientCount = 0；
 	}
 	virtual ~EasyTcpServer()
 	{
@@ -453,7 +455,6 @@ public:
 
 	void addClientToCellServer(ClientSocket* pClient)
 	{
-		m_vectClients.push_back(pClient);
 		//查询客户端最少得消息处理线程
 		auto pMinClient = m_vectServers[0];
 		for (auto pClient : m_vectServers)
@@ -464,6 +465,7 @@ public:
 			}
 		}
 		pMinClient->addClient(pClient);
+		m_clientCount++;
 	}
 	void Start()
 	{
@@ -549,7 +551,7 @@ public:
 				recvCount += ser->m_recvCount;
 				ser->m_recvCount = 0;
 			}
-			printf("thread<%d>,time<%lf>,socket<%d>,clientNum<%d>,recvCount<%d>\n",m_vectServers.size(), t1,m_sock, m_vectClients.size(), (int)(recvCount/t1));
+			printf("thread<%d>,time<%lf>,socket<%d>,clientNum<%d>,recvCount<%d>\n",m_vectServers.size(), t1,m_sock, m_clientCount, (int)(recvCount/t1));
 			m_tTime.update();
 		}
 	}
@@ -562,27 +564,10 @@ public:
 		}
 		return SOCKET_ERROR;
 	}
-	void SendDataToAll(DataHeader *header)
-	{
-		for (int i = (int)m_vectClients.size() - 1; i >= 0; i--)
-		{
-			SendData(m_vectClients[i]->getSocket(), header);
-		}
-	}
 
 	virtual void OnLeave(ClientSocket* pClient)
 	{
-		for (int i = (int)m_vectClients.size() - 1; i >= 0; i--)
-		{
-			if (pClient == m_vectClients[i])
-			{
-				auto iter = m_vectClients.begin() + i;
-				if (iter != m_vectClients.end())
-				{
-					m_vectClients.erase(iter);
-				}
-			}
-		}
+		m_clientCount--;
 	}
 	virtual void OnNetMsg(SOCKET _cSock, DataHeader* header)
 	{
