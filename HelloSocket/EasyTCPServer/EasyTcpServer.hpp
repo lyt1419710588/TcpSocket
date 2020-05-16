@@ -18,6 +18,7 @@
 #include <stdio.h>
 #include "MessageHeader.hpp"
 #include <vector>
+#include <map>
 #include <thread>
 #include <mutex>
 #include <atomic>
@@ -111,17 +112,22 @@ public:
     {
         m_pInetEvent = pObj;
     }
+	fd_set m_fd_read_back;
+	bool m_client_change;
+	SOCKET m_maxSock;
     //处理网络信息
     bool OnRun()
     {
         while (isRun())
         {
+			m_client_change = false;
             if (m_vectClientsBuff.size() > 0)
             {
                 std::lock_guard<std::mutex> lock(m_mutex);
-                for (auto pClient : m_vectClientsBuff)
+                for (auto iter : m_vectClientsBuff)
                 {
-                    m_vectClients.push_back(pClient);
+                    m_vectClients[iter->getSocket()] = iter;
+					m_client_change = true;
                 }
                 m_vectClientsBuff.clear();
             }
@@ -134,49 +140,72 @@ public:
             }
             fd_set fd_read;
             FD_ZERO(&fd_read);
-            SOCKET maxSoc = m_vectClients[0]->getSocket();
-            for (int i = (int)m_vectClients.size() - 1; i >= 0; i--)
-            {
-                FD_SET(m_vectClients[i]->getSocket(), &fd_read);
-                if (maxSoc  < m_vectClients[i]->getSocket())
-                {
-                    maxSoc = m_vectClients[i]->getSocket();
-                }
-            }
+			if (m_client_change)
+			{
+				m_maxSock = m_vectClients.begin()->first;
+				for (auto iter : m_vectClients)
+				{
+					FD_SET(iter.first, &fd_read);
+					if (m_maxSock  < iter.first)
+					{
+						m_maxSock = iter.first;
+					}
+				}
+				memcpy(&m_fd_read_back, &fd_read, sizeof(fd_read));
+				m_client_change = false;
+			}
+			else
+			{
+				memcpy(&fd_read, &m_fd_read_back, sizeof(m_fd_read_back));
+			}
+            
             //nfds是一个整数值，是指fd_set集合中所有描述符(socket)的范围
             //即是所有描述符最大值+1，在windows中这个参数可以写0
-            int ret = select(maxSoc + 1, &fd_read, nullptr, nullptr, nullptr);
+            int ret = select(m_maxSock + 1, &fd_read, nullptr, nullptr, nullptr);
             //printf("select ret = %d,count  = %d\n",ret, _count++);
             if (ret < 0)
             {
                 printf("select任务结束，退出\n");
                 return false;
             }
+#ifdef _WIN32
+		for (int i = 0; i < fd_read.fd_count;i++)
+		{
+			SOCKET fd = fd_read.fd_array[i];
+			auto iter = m_vectClients.find(fd);
+			if (iter != m_vectClients.end())
+			{
+				if (-1 == RecvData(iter->second))
+				{
+					if (m_pInetEvent)
+					{
+						m_pInetEvent->OnNetLeave(iter->second);
+					}
+					delete (iter->second);
+					iter =  m_vectClients.erase(iter);
+					m_client_change = true;
+				}
+			}
+		}
+#else
+		for (auto iter : m_vectClients)
+		{
+			if (FD_ISSET(iter.first, &fd_read))
+			{
+				if (-1 == RecvData(iter.second))
+				{
+					if (m_pInetEvent)
+					{
+						m_pInetEvent->OnNetLeave(iter.second);
+					}
+					delete (iter.second);
+					iter = m_vectClients.erase(iter);
+					m_client_change = true;
+				}
+			}
+		}
+#endif // _WIN32
 
-            auto it = m_vectClients.begin();
-            while (it != m_vectClients.end())
-            {
-                if (FD_ISSET((*it)->getSocket(), &fd_read))
-                {
-                    if (-1 == RecvData(*it))
-                    {
-                        if (m_pInetEvent)
-                        {
-                            m_pInetEvent->OnNetLeave(*it);
-                        }
-                        delete (*it);
-                        it = m_vectClients.erase(it);
-                    }
-                    else
-                    {
-                        it++;
-                    }
-                }
-                else
-                {
-                    it++;
-                }
-            }
             //return true;
         }
         //return false;
@@ -253,16 +282,16 @@ public:
         if (m_sock != INVALID_SOCKET)
         {
 #ifdef _WIN32
-            for (int i = m_vectClients.size() - 1; i >= 0; i--)
-            {
-                closesocket(m_vectClients[i]->getSocket());
-                delete (m_vectClients[i]);
-            }
+			for (auto iter : m_vectClients)
+			{
+				closesocket(iter.first);
+				delete (iter.second);
+			}
 #else
-            for (size_t i = m_vectClients.size() - 1; i >= 0; i--)
-            {
-                close(m_vectClients[i]->getSocket());
-                delete m_vectClients[i];
+			for (auto iter : m_vectClients)
+			{
+				closesocket(iter.first);
+				delete (iter.second);
             }
 #endif
             m_sock = INVALID_SOCKET;
@@ -290,7 +319,7 @@ public:
 private:
     SOCKET m_sock;
     //客户端正式队列
-    std::vector<ClientSocket*> m_vectClients;
+    std::map<SOCKET,ClientSocket*> m_vectClients;
     std::vector<ClientSocket*> m_vectClientsBuff;//客户端缓冲队列
     std::mutex m_mutex;//增加客户端锁,缓冲队列锁
     std::thread *m_pthread;

@@ -18,7 +18,7 @@ void cmdthread()
 	}
 }
 
-const int cCount = 10000;
+const int cCount = 20;
 EasyTcpClient *client[cCount];
 const int tCount = 4;//线程数量
 void sendthread(int id)
@@ -64,7 +64,7 @@ void sendthread(int id)
 		for (int i = begin; i < end; i++)
 		{
 			client[i]->SendData(login, nLen);
-			client[i]->OnRun();
+		//	client[i]->OnRun();
 		}
 
 	}
