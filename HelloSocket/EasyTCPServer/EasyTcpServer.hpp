@@ -84,6 +84,8 @@ public:
     virtual void OnNetLeave(ClientSocket* pClient) = 0;
     //客户端端收到消息后通知主线程
     virtual void OnNetMsg(ClientSocket* pClient, DataHeader* header) = 0;
+	//recv事件
+	virtual void OnNetRecv(ClientSocket* pClient) = 0;
 private:
 
 };
@@ -224,6 +226,7 @@ public:
 
         //接收客户端的请求数据
         int nLen = recv(pClient->getSocket(), recvBUF, RECV_BUFF_SIZE, 0);
+		m_pInetEvent->OnNetRecv(pClient);
         //printf("Recv len = %d\n", nLen);
         //DataHeader *header = (DataHeader*)recvBUF;
         if (nLen < 0)
@@ -340,14 +343,17 @@ private:
 protected:
     //客户端计数
     std::atomic_int m_clientCount;
-	//消息包鼠
+	//接收到消息包鼠
 	std::atomic_int m_recvCount;
+	//消息包数
+	std::atomic_int  m_msgCount;
 public:
     EasyTcpServer()
     {
         m_sock = INVALID_SOCKET;
         m_clientCount = 0;
 		m_recvCount = 0;
+		m_msgCount = 0;
     }
     virtual ~EasyTcpServer()
     {
@@ -560,8 +566,9 @@ public:
         auto t1 = m_tTime.getElaspedSecond();
         if (t1 >= 1.0)
         {
-            printf("thread<%d>,time<%lf>,socket<%d>,clientNum<%d>,recvCount<%d>\n", m_vectServers.size(), t1, m_sock, m_clientCount, (int)(m_recvCount / t1));
+            printf("thread<%d>,time<%lf>,socket<%d>,clientNum<%d>,recvCount<%d>，msgCount<%d>\n", m_vectServers.size(), t1, m_sock, m_clientCount, (int)(m_recvCount / t1),(int)(m_msgCount / t1));
 			m_recvCount = 0;
+			m_msgCount = 0;
             m_tTime.update();
         }
     }
@@ -574,11 +581,15 @@ public:
     }
     virtual void OnNetMsg(ClientSocket* pClient, DataHeader* header)
     {
-		m_recvCount++;
+		m_msgCount++;
     }
 	virtual void OnNetJoin(ClientSocket* pClient)
 	{
 		m_clientCount++;
+	}
+	virtual void OnNetRecv(ClientSocket* pClient)
+	{
+
 	}
 private:
 

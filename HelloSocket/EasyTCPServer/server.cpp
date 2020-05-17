@@ -31,10 +31,16 @@ public:
 	{
 		m_clientCount--;
 	}
+
+	//Recv
+	virtual void OnNetRecv(ClientSocket* pClient)
+	{
+		m_recvCount++;
+	}
 	//客户端端收到消息后通知主线程
 	virtual void OnNetMsg(ClientSocket* pClient, DataHeader* header)
 	{
-		m_recvCount++;
+		m_msgCount++;
 		switch (header->cmd)
 		{
 		case CMD_LOGIN:
