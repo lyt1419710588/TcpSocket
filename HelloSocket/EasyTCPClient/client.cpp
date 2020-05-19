@@ -74,7 +74,7 @@ void sendthread(int id)
 			{
 				m_sendCount++;
 			}
-		//	client[i]->OnRun();
+			client[i]->OnRun();
 		}
 
 	}

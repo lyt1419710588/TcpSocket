@@ -51,7 +51,7 @@ public:
 			//忽略判断用户名密码是否正确
 			LoginResult loginresult;
 			loginresult.result = 1;
-			//pClient->SendData(&loginresult);
+			pClient->SendData(&loginresult);
 		}
 		break;
 		case CMD_LOGOUT:

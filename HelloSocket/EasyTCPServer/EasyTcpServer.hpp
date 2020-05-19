@@ -24,7 +24,8 @@
 #include <atomic>
 #include  "CELLTimestamp.hpp"
 #ifndef RECV_BUFF_SIZE
-#define RECV_BUFF_SIZE 10240//缓冲区大小
+#define RECV_BUFF_SIZE 10240 * 2//缓冲区大小
+#define SEND_BUFF_SIZE RECV_BUFF_SIZE //发送缓冲区 
 #endif // !RECV_BUFF_SIZE
 
 //客户端数据对象
@@ -35,7 +36,9 @@ public:
     {
         m_sockfd = sock;
         memset(m_szMSGBuf, 0, sizeof(m_szMSGBuf));
+		memset(m_szSendMSGBuf, 0, sizeof(m_szSendMSGBuf));
         m_lastPos = 0;
+		m_SendlastPos = 0;
     }
 
     SOCKET getSocket()
@@ -60,18 +63,49 @@ public:
 	//发送SOCKET数据
 	int SendData(DataHeader *header)
 	{
+		int ret = SOCKET_ERROR;
 		if ( header)
 		{
-			return send(m_sockfd, (const char*)header, header->dataLength, 0);
+			const char* pSendData = (const char*)header;
+			int nSendLen = header->dataLength;
+			while (true)
+			{
+				if (m_SendlastPos + nSendLen >= SEND_BUFF_SIZE)
+				{
+					int nCopyLen = SEND_BUFF_SIZE - m_SendlastPos;
+					memcpy(m_szSendMSGBuf + m_SendlastPos, pSendData, nCopyLen);
+					ret = send(m_sockfd, m_szSendMSGBuf, SEND_BUFF_SIZE, 0);
+					nSendLen -= nCopyLen;
+					pSendData += nCopyLen;
+					m_SendlastPos = 0;
+					if (SOCKET_ERROR == ret)
+					{
+						return ret;
+					}
+				}
+				else
+				{
+					memcpy(m_szSendMSGBuf + m_SendlastPos, pSendData, header->dataLength);
+					m_SendlastPos += header->dataLength;
+					break;
+				}
+			}
+			
+			
 		}
-		return SOCKET_ERROR;
+		return ret;
 	}
 private:
     SOCKET m_sockfd;
     //缓冲区
-    char m_szMSGBuf[RECV_BUFF_SIZE * 2];
+    char m_szMSGBuf[RECV_BUFF_SIZE];
     //消息缓冲区尾部位置
     int  m_lastPos = 0;
+
+	//发送缓冲区
+	char m_szSendMSGBuf[SEND_BUFF_SIZE];
+	//消息缓冲区尾部位置
+	int  m_SendlastPos = 0;
 };
 //网络事件接口
 class INetEvent
