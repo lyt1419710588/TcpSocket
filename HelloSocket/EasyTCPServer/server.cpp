@@ -24,23 +24,23 @@ public:
 	//客户端加入时通知，客户端离开事件
 	virtual void OnNetJoin(ClientSocket* pClient)
 	{
-		m_clientCount++;
+		EasyTcpServer::OnNetJoin(pClient);
 	}
 	//客户端离开时通知，客户端离开事件
 	virtual void OnNetLeave(ClientSocket* pClient)
 	{
-		m_clientCount--;
+		EasyTcpServer::OnNetLeave(pClient);
 	}
 
 	//Recv
 	virtual void OnNetRecv(ClientSocket* pClient)
 	{
-		m_recvCount++;
+		EasyTcpServer::OnNetRecv(pClient);
 	}
 	//客户端端收到消息后通知主线程
-	virtual void OnNetMsg(ClientSocket* pClient, DataHeader* header)
+	virtual void OnNetMsg(CellSercer *pCellServer, ClientSocket* pClient, DataHeader* header)
 	{
-		m_msgCount++;
+		EasyTcpServer::OnNetMsg(pCellServer,pClient, header);
 		switch (header->cmd)
 		{
 		case CMD_LOGIN:
@@ -49,9 +49,13 @@ public:
 			Login *login = (Login*)header;
 			//printf("收到命令<socket = %d>CMD_LOGIN 数据长度:%d,userName = %s Password = %s\n", _cSock,header->dataLength, login->userName, login->password);
 			//忽略判断用户名密码是否正确
-			LoginResult loginresult;
-			loginresult.result = 1;
-			pClient->SendData(&loginresult);
+			//LoginResult loginresult;
+			//loginresult.result = 1;
+			
+			//pClient->SendData(&loginresult);
+			LoginResult* ret = new LoginResult();
+			
+			pCellServer->addSendTask(pClient,ret);
 		}
 		break;
 		case CMD_LOGOUT:

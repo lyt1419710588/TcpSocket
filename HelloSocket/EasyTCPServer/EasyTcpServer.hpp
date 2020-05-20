@@ -23,6 +23,7 @@
 #include <mutex>
 #include <atomic>
 #include  "CELLTimestamp.hpp"
+#include "CELLTask.hpp"
 #ifndef RECV_BUFF_SIZE
 #define RECV_BUFF_SIZE 10240 * 2//缓冲区大小
 #define SEND_BUFF_SIZE RECV_BUFF_SIZE //发送缓冲区 
@@ -107,7 +108,9 @@ private:
 	//消息缓冲区尾部位置
 	int  m_SendlastPos = 0;
 };
+
 //网络事件接口
+class CellSercer;
 class INetEvent
 {
 public:
@@ -117,12 +120,39 @@ public:
     //客户端离开时通知，客户端离开事件
     virtual void OnNetLeave(ClientSocket* pClient) = 0;
     //客户端端收到消息后通知主线程
-    virtual void OnNetMsg(ClientSocket* pClient, DataHeader* header) = 0;
+    virtual void OnNetMsg(CellSercer *pCellServer, ClientSocket* pClient, DataHeader* header) = 0;
 	//recv事件
 	virtual void OnNetRecv(ClientSocket* pClient) = 0;
 private:
 
 };
+
+//网络消息发送服务
+class CellSendMsgToClientTask :public CellTask
+{
+private:
+	ClientSocket *m_pClient;
+	DataHeader* m_pHeader;
+public:
+	CellSendMsgToClientTask(ClientSocket* pClient, DataHeader* pHeader)
+	{
+		m_pClient = pClient;
+		m_pHeader = pHeader;
+	}
+
+	~CellSendMsgToClientTask()
+	{
+
+	}
+
+	void doTask()
+	{
+		m_pClient->SendData(m_pHeader);
+		delete m_pHeader;
+	}
+};
+
+//网络处理收服务
 class CellSercer
 {
 public:
@@ -301,7 +331,7 @@ public:
     void OnNetMsg(ClientSocket* pClient, DataHeader* header)
     {
         //处理客户端请求
-		m_pInetEvent->OnNetMsg(pClient, header);
+		m_pInetEvent->OnNetMsg(this,pClient, header);
         /*auto t1 = m_tTime.getElaspedSecond();
         if (t1 >= 1.0)
         {
@@ -347,12 +377,20 @@ public:
     void Start()
     {
         m_pthread = new std::thread(std::mem_fn(&CellSercer::OnRun), this);
+		m_CellTaskServer.Start();
     }
 
     size_t getClientNum()
     {
         return m_vectClients.size() + m_vectClientsBuff.size();
     }
+
+	void addSendTask(ClientSocket* pClient,DataHeader *ret)
+	{
+		CellSendMsgToClientTask *task = new CellSendMsgToClientTask(pClient, ret);
+		m_CellTaskServer.addTask(task);
+	}
+
 private:
     SOCKET m_sock;
     //客户端正式队列
@@ -364,8 +402,11 @@ private:
     INetEvent* m_pInetEvent;
     //接收数据
     char recvBUF[RECV_BUFF_SIZE] = {};
-public:
+	
+	CellTaskServer m_CellTaskServer;
 };
+
+//客户端接收服务
 class EasyTcpServer :public INetEvent
 {
 private:
@@ -613,7 +654,7 @@ public:
     {
         m_clientCount--;
     }
-    virtual void OnNetMsg(ClientSocket* pClient, DataHeader* header)
+	virtual void OnNetMsg(CellSercer *pCellServer, ClientSocket* pClient, DataHeader* header)
     {
 		m_msgCount++;
     }
@@ -623,7 +664,7 @@ public:
 	}
 	virtual void OnNetRecv(ClientSocket* pClient)
 	{
-
+		m_recvCount++;
 	}
 private:
 
