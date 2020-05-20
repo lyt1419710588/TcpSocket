@@ -85,8 +85,8 @@ public:
 				}
 				else
 				{
-					memcpy(m_szSendMSGBuf + m_SendlastPos, pSendData, header->dataLength);
-					m_SendlastPos += header->dataLength;
+					memcpy(m_szSendMSGBuf + m_SendlastPos, pSendData, nSendLen);
+					m_SendlastPos += nSendLen;
 					break;
 				}
 			}
