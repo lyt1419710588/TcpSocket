@@ -19,7 +19,7 @@ void cmdthread()
 	}
 }
 
-const int cCount = 1000;
+const int cCount = 10000;
 EasyTcpClient *client[cCount];
 const int tCount = 4;//线程数量
 std::atomic_int m_sendCount = 0;

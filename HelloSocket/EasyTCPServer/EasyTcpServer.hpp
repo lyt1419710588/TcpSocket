@@ -140,12 +140,12 @@ public:
 		m_pHeader = pHeader;
 	}
 
-	~CellSendMsgToClientTask()
+	virtual ~CellSendMsgToClientTask()
 	{
 
 	}
 
-	void doTask()
+	virtual void doTask()
 	{
 		m_pClient->SendData(m_pHeader);
 		delete m_pHeader;

@@ -19,7 +19,7 @@ public:
 	}
 
 	//Ö´ÐÐÈÎÎñ
-	void doTask()
+	virtual void doTask()
 	{
 
 	}
@@ -74,6 +74,7 @@ private:
 				{
 					m_listCellTask.push_back(pTask);
 				}
+				m_listCellTaskBuff.clear();
 			}
 			if (m_listCellTask.empty())
 			{
@@ -82,10 +83,10 @@ private:
 				continue;
 			}
 
-			for (auto pTask : m_listCellTask)
+			for (auto iter : m_listCellTask)
 			{
-				pTask->doTask();
-				delete pTask;
+				iter->doTask();
+				delete iter;
 			}
 			m_listCellTask.clear();
 		}
