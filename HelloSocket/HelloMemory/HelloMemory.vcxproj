@@ -159,6 +159,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Alloctor.h" />
+    <ClInclude Include="CELLTimestamp.hpp" />
     <ClInclude Include="MemoryMgr.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
