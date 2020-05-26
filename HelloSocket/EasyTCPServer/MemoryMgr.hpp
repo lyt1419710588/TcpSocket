@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <mutex>
-#define MAX_MEMORY_SIZE 1024
+#define MAX_MEMORY_SIZE 128
 
 #ifdef _DEBUG
 	#include<stdio.h>
@@ -85,13 +85,15 @@ public:
 	{
 		
 		MemoryBlock* pBlock = (MemoryBlock*)((char*)pMem - sizeof(MemoryBlock));
-		xPrintf("freeMemory:%llx,id=%d\n", pBlock, pBlock->nID);
+		//xPrintf("freeMemory:%llx,id=%d\n", pBlock, pBlock->nID);
 		assert(1 == pBlock->nRef);
+		
 		if (pBlock->bPool)
 		{
 			std::lock_guard<std::mutex> t(m_mutex);
 			if (--pBlock->nRef != 0)
 			{
+				xPrintf("freeMemory:Error", pBlock, pBlock->nID);
 				return;
 			}
 			pBlock->pNext = m_pHeader;
@@ -115,6 +117,7 @@ public:
 		{
 			return;
 		}
+		xPrintf("内存池：%llx初始化,m_nSize = %d,m_nBlockSize = %d\n", m_pBuf, m_nSize, m_nBlockSize);
 		//计算内存池大小
 		size_t bufsize = (m_nSize + sizeof(MemoryBlock)) * m_nBlockSize;
 		//像系统申请池的内存
@@ -173,11 +176,12 @@ class MemoryMgr
 private:
 	MemoryMgr()
 	{
-		Init_szAlloc(0, 64, &m_mem64);
+		Init_szAlloc(0, 128, &m_mem128);
+		/*Init_szAlloc(0, 64, &m_mem64);
 		Init_szAlloc(65, 128, &m_mem128);
 		Init_szAlloc(129, 256, &m_mem256);
-		Init_szAlloc(257, 512, &m_mem256);
-		Init_szAlloc(513, 1024, &m_mem512);
+		Init_szAlloc(257, 512, &m_mem512);
+		Init_szAlloc(513, 1024, &m_mem1024);*/
 	}
 	~MemoryMgr()
 	{
@@ -206,7 +210,7 @@ public:
 			pReturn->nRef = 1;
 			pReturn->pAlloc = nullptr;
 			pReturn->pNext = nullptr;
-			xPrintf("allocMem:%llx,id=%d,size=%d\n",pReturn,pReturn->nID, nLen);
+			//xPrintf("allocMem:%llx,id=%d,size=%d\n",pReturn,pReturn->nID, nLen);
 			return ((char*)pReturn + sizeof(MemoryBlock));
 		}	
 	}
@@ -238,17 +242,18 @@ private:
 	//初始化内存池映射数组
 	void Init_szAlloc(int nBegin,int nEnd, MemoryAlloc* mem)
 	{
+		xPrintf("Init_szAlloc(nBegin = %d,nEnd = %d,mem = %llx \n)", nBegin, nEnd, mem);
 		for (int n  = nBegin;n <= nEnd; n++)
 		{
 			m_szAlloc[n] = mem;
 		}
 	}
 private:
-	MemoryAlloctor<64, 100> m_mem64;
-	MemoryAlloctor<128, 100> m_mem128;
-	MemoryAlloctor<256, 100> m_mem256;
-	MemoryAlloctor<512, 100> m_mem512;
-	MemoryAlloctor<1024, 100> m_mem1024;
+	//MemoryAlloctor<64, 100000> m_mem64;
+	MemoryAlloctor<128, 1000000> m_mem128;
+	//MemoryAlloctor<256, 100000> m_mem256;
+	//MemoryAlloctor<512, 100000> m_mem512;
+	//MemoryAlloctor<1024, 100000> m_mem1024;
 	MemoryAlloc* m_szAlloc[MAX_MEMORY_SIZE + 1];
 };
 

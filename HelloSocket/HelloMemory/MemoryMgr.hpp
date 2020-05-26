@@ -6,10 +6,10 @@
 #define MAX_MEMORY_SIZE 1024
 
 #ifdef _DEBUG
-	#include<stdio.h>
-	#define xPrintf(...) printf(__VA_ARGS__)
+#include<stdio.h>
+#define xPrintf(...) printf(__VA_ARGS__)
 #else
-	#define xPrintf(...)
+#define xPrintf(...)
 #endif // !_DEBUG
 
 class MemoryAlloc;
@@ -68,12 +68,12 @@ public:
 			pReturn->nRef = 1;
 			pReturn->pAlloc = nullptr;
 			pReturn->pNext = nullptr;
-			
+
 		}
 		else
 		{
 			pReturn = m_pHeader;
-			assert(0 == pReturn->nRef );
+			assert(0 == pReturn->nRef);
 			pReturn->nRef = 1;
 			m_pHeader = pReturn->pNext;
 		}
@@ -83,15 +83,17 @@ public:
 	//释放内存
 	void freeMemory(void* pMem)
 	{
-		
+
 		MemoryBlock* pBlock = (MemoryBlock*)((char*)pMem - sizeof(MemoryBlock));
-		xPrintf("freeMemory:%llx,id=%d\n", pBlock, pBlock->nID);
+		//xPrintf("freeMemory:%llx,id=%d\n", pBlock, pBlock->nID);
 		assert(1 == pBlock->nRef);
+
 		if (pBlock->bPool)
 		{
 			std::lock_guard<std::mutex> t(m_mutex);
 			if (--pBlock->nRef != 0)
 			{
+				xPrintf("freeMemory:Error", pBlock, pBlock->nID);
 				return;
 			}
 			pBlock->pNext = m_pHeader;
@@ -115,6 +117,7 @@ public:
 		{
 			return;
 		}
+		xPrintf("内存池：%llx初始化,m_nSize = %d,m_nBlockSize = %d\n", m_pBuf, m_nSize, m_nBlockSize);
 		//计算内存池大小
 		size_t bufsize = (m_nSize + sizeof(MemoryBlock)) * m_nBlockSize;
 		//像系统申请池的内存
@@ -127,7 +130,7 @@ public:
 		m_pHeader->pAlloc = this;
 		m_pHeader->pNext = nullptr;
 
-		
+
 		MemoryBlock *pTempPre = m_pHeader;
 		for (size_t i = 1; i < m_nBlockSize; i++)
 		{
@@ -155,7 +158,7 @@ protected:
 	std::mutex m_mutex;
 };
 
-template <size_t nSize,size_t nBlockSize>
+template <size_t nSize, size_t nBlockSize>
 class MemoryAlloctor :public MemoryAlloc
 {
 public:
@@ -176,8 +179,8 @@ private:
 		Init_szAlloc(0, 64, &m_mem64);
 		Init_szAlloc(65, 128, &m_mem128);
 		Init_szAlloc(129, 256, &m_mem256);
-		Init_szAlloc(257, 512, &m_mem256);
-		Init_szAlloc(513, 1024, &m_mem512);
+		Init_szAlloc(257, 512, &m_mem512);
+		Init_szAlloc(513, 1024, &m_mem1024);
 	}
 	~MemoryMgr()
 	{
@@ -206,9 +209,9 @@ public:
 			pReturn->nRef = 1;
 			pReturn->pAlloc = nullptr;
 			pReturn->pNext = nullptr;
-			xPrintf("allocMem:%llx,id=%d,size=%d\n",pReturn,pReturn->nID, nLen);
+			//xPrintf("allocMem:%llx,id=%d,size=%d\n",pReturn,pReturn->nID, nLen);
 			return ((char*)pReturn + sizeof(MemoryBlock));
-		}	
+		}
 	}
 	//释放内存
 	void freeMemory(void* pMem)
@@ -223,9 +226,9 @@ public:
 			if (--pBlock->nRef == 0)
 			{
 				free(pBlock);
-			}	
+			}
 		}
-		
+
 	}
 
 	//增加内存块的引用
@@ -236,9 +239,10 @@ public:
 	}
 private:
 	//初始化内存池映射数组
-	void Init_szAlloc(int nBegin,int nEnd, MemoryAlloc* mem)
+	void Init_szAlloc(int nBegin, int nEnd, MemoryAlloc* mem)
 	{
-		for (int n  = nBegin;n <= nEnd; n++)
+		xPrintf("Init_szAlloc(nBegin = %d,nEnd = %d,mem = %llx \n)", nBegin, nEnd, mem);
+		for (int n = nBegin; n <= nEnd; n++)
 		{
 			m_szAlloc[n] = mem;
 		}

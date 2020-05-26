@@ -17,7 +17,7 @@ void workfun(int index)
 	char* data[nCount];
 	for (size_t i = 0; i < nCount; i++)
 	{
-		data[i] = new char[rand() % 128  + 1];
+		data[i] = new char[rand() % 1024 + 1];
 	}
 
 	for (size_t i = 0; i < nCount; i++)
