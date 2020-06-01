@@ -4,6 +4,7 @@
 #include <iostream>
 #include <thread>
 #include <mutex>
+#include <memory>
 #include "CELLTimestamp.hpp"
 using namespace std;
 
@@ -29,20 +30,23 @@ void workfun(int index)
 }
 int main()
 {
-	thread *t[tCount];
-	for (int i = 0; i < tCount; i++)
-	{
-		t[i] = new thread(workfun, i);
-	}
-	CELLTimestamp ctime;
-	for (int i = 0; i < tCount; i++)
-	{
-		t[i]->join();
-	}
-	//t.join();
+	//thread *t[tCount];
+	//for (int i = 0; i < tCount; i++)
+	//{
+	//	t[i] = new thread(workfun, i);
+	//}
+	//CELLTimestamp ctime;
+	//for (int i = 0; i < tCount; i++)
+	//{
+	//	t[i]->join();
+	//}
+	////t.join();
 
-	cout << "cTime = " << (long long)ctime.getElaspedInMillSec() <<  endl;
-	cout << "hello,main thread" << endl;
+	//cout << "cTime = " << (long long)ctime.getElaspedInMillSec() <<  endl;
+	//cout << "hello,main thread" << endl;
+
+	std::shared_ptr<int> b = std::make_shared<int>();
+	*b = 100;
 	getchar();
 	return 0;
 

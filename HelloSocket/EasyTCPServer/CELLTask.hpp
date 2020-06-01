@@ -32,9 +32,9 @@ class CellTaskServer
 {
 private:
 	//任务数据
-	std::list<CellTask*> m_listCellTask;
+	std::list<std::shared_ptr<CellTask> > m_listCellTask;
 	//任务数据缓冲区
-	std::list<CellTask*> m_listCellTaskBuff;
+	std::list<std::shared_ptr<CellTask> > m_listCellTaskBuff;
 	//改变数据缓冲区需要枷锁
 	std::mutex m_mutex;
 	
@@ -48,7 +48,7 @@ public:
 
 	}
 	//添加任务
-	void addTask(CellTask* pTask)
+	void addTask(std::shared_ptr<CellTask>& pTask)
 	{
 		std::lock_guard<std::mutex> lock(m_mutex);
 		m_listCellTaskBuff.push_back(pTask);
@@ -86,7 +86,6 @@ private:
 			for (auto iter : m_listCellTask)
 			{
 				iter->doTask();
-				delete iter;
 			}
 			m_listCellTask.clear();
 		}

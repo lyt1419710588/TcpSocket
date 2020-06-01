@@ -85,7 +85,7 @@ public:
 	{
 		
 		MemoryBlock* pBlock = (MemoryBlock*)((char*)pMem - sizeof(MemoryBlock));
-		//xPrintf("freeMemory:%llx,id=%d\n", pBlock, pBlock->nID);
+		xPrintf("freeMemory:%llx,id=%d\n", pBlock, pBlock->nID);
 		assert(1 == pBlock->nRef);
 		
 		if (pBlock->bPool)
@@ -176,7 +176,8 @@ class MemoryMgr
 private:
 	MemoryMgr()
 	{
-		Init_szAlloc(0, 128, &m_mem128);
+		Init_szAlloc(0, 64, &m_mem64);
+		Init_szAlloc(65, 128, &m_mem128);
 		/*Init_szAlloc(0, 64, &m_mem64);
 		Init_szAlloc(65, 128, &m_mem128);
 		Init_szAlloc(129, 256, &m_mem256);
@@ -249,7 +250,7 @@ private:
 		}
 	}
 private:
-	//MemoryAlloctor<64, 100000> m_mem64;
+	MemoryAlloctor<64, 4000000> m_mem64;
 	MemoryAlloctor<128, 1000000> m_mem128;
 	//MemoryAlloctor<256, 100000> m_mem256;
 	//MemoryAlloctor<512, 100000> m_mem512;

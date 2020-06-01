@@ -23,23 +23,23 @@ class Myserver :public EasyTcpServer
 {
 public:
 	//客户端加入时通知，客户端离开事件
-	virtual void OnNetJoin(ClientSocket* pClient)
+	virtual void OnNetJoin(std::shared_ptr<ClientSocket> pClient)
 	{
 		EasyTcpServer::OnNetJoin(pClient);
 	}
 	//客户端离开时通知，客户端离开事件
-	virtual void OnNetLeave(ClientSocket* pClient)
+	virtual void OnNetLeave(std::shared_ptr<ClientSocket> pClient)
 	{
 		EasyTcpServer::OnNetLeave(pClient);
 	}
 
 	//Recv
-	virtual void OnNetRecv(ClientSocket* pClient)
+	virtual void OnNetRecv(std::shared_ptr<ClientSocket> pClient)
 	{
 		EasyTcpServer::OnNetRecv(pClient);
 	}
 	//客户端端收到消息后通知主线程
-	virtual void OnNetMsg(CellSercer *pCellServer, ClientSocket* pClient, DataHeader* header)
+	virtual void OnNetMsg(CellServer* pCellServer, std::shared_ptr<ClientSocket> pClient, DataHeader*  header)
 	{
 		EasyTcpServer::OnNetMsg(pCellServer,pClient, header);
 		switch (header->cmd)
@@ -54,14 +54,13 @@ public:
 			//loginresult.result = 1;
 			
 			//pClient->SendData(&loginresult);
-			LoginResult* ret = new LoginResult();
-			
+			std::shared_ptr<LoginResult> ret = std::make_shared<LoginResult>();
 			pCellServer->addSendTask(pClient,ret);
 		}
 		break;
 		case CMD_LOGOUT:
 		{
-			Logout *logout = (Logout*)header;
+			//Logout *logout = (Logout*)header;
 			//printf("收到命令<socket = %d>CMD_LOGOUT 数据长度:%d,userName = %s\n", _cSock, header->dataLength, logout->userName);
 			//忽略判断用户名密码是否正确
 			//LogoutResult ret;
