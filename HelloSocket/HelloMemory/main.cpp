@@ -6,6 +6,7 @@
 #include <mutex>
 #include <memory>
 #include "CELLTimestamp.hpp"
+#include "CELLIObjectPool.h"
 using namespace std;
 
 const int tCount = 8;
@@ -28,6 +29,24 @@ void workfun(int index)
 	 //m.unlock();//ÁÙ½çÇø½áÊø
 	 //cout << index << "hello,other thread" << endl;
 }
+
+class ClassA:public ObjectPoolBase<ClassA,100>
+{
+public:
+	ClassA()
+	{
+		num = 0;
+		printf("ClassA\n");
+	}
+	~ClassA()
+	{
+		printf("~ClassA\n");
+	}
+private:
+	int num = 0;
+
+};
+
 int main()
 {
 	//thread *t[tCount];
@@ -45,9 +64,12 @@ int main()
 	//cout << "cTime = " << (long long)ctime.getElaspedInMillSec() <<  endl;
 	//cout << "hello,main thread" << endl;
 
-	std::shared_ptr<int> b = std::make_shared<int>();
+	/*std::shared_ptr<int> b = std::make_shared<int>();
 	*b = 100;
-	getchar();
+	getchar();*/
+
+	ClassA *a1 = ClassA::createObj();
+	ClassA::deleteObj(a1);
 	return 0;
 
 }

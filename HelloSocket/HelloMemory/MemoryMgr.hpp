@@ -6,10 +6,14 @@
 #define MAX_MEMORY_SIZE 1024
 
 #ifdef _DEBUG
-#include<stdio.h>
-#define xPrintf(...) printf(__VA_ARGS__)
+	#ifndef xPrintf
+	#include<stdio.h>
+	#define xPrintf(...) printf(__VA_ARGS__)
+	#endif // !xPrintf
 #else
-#define xPrintf(...)
+	#ifndef xPrintf
+	#define xPrintf(...)
+	#endif // !xPrintf
 #endif // !_DEBUG
 
 class MemoryAlloc;
