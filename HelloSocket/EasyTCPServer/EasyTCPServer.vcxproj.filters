@@ -41,5 +41,8 @@
     <ClInclude Include="Alloctor.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="CELLIObjectPool.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

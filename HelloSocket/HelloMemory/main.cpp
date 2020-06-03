@@ -9,33 +9,13 @@
 #include "CELLIObjectPool.h"
 using namespace std;
 
-const int tCount = 8;
-const int mCount = 100000;
-const int nCount = mCount / tCount;
-void workfun(int index)
-{
-	//m.lock();//临界区开始
-	//lock_guard<mutex> lg(m); //自旋锁
-	char* data[nCount];
-	for (size_t i = 0; i < nCount; i++)
-	{
-		data[i] = new char[rand() % 1024 + 1];
-	}
 
-	for (size_t i = 0; i < nCount; i++)
-	{
-		delete[] data[i];
-	}
-	 //m.unlock();//临界区结束
-	 //cout << index << "hello,other thread" << endl;
-}
-
-class ClassA:public ObjectPoolBase<ClassA,100>
+class ClassA :public ObjectPoolBase<ClassA, 5>
 {
 public:
-	ClassA()
+	ClassA(int n)
 	{
-		num = 0;
+		num = n;
 		printf("ClassA\n");
 	}
 	~ClassA()
@@ -46,6 +26,27 @@ private:
 	int num = 0;
 
 };
+
+const int tCount = 4;
+const int mCount = 8;
+const int nCount = mCount / tCount;
+void workfun(int index)
+{
+	//m.lock();//临界区开始
+	//lock_guard<mutex> lg(m); //自旋锁
+	ClassA* data[nCount];
+	for (size_t i = 0; i < nCount; i++)
+	{
+		data[i] = ClassA::createObj(6);
+	}
+
+	for (size_t i = 0; i < nCount; i++)
+	{
+		ClassA::deleteObj(data[i]);
+	}
+	 //m.unlock();//临界区结束
+	 //cout << index << "hello,other thread" << endl;
+}
 
 int main()
 {
@@ -68,8 +69,22 @@ int main()
 	*b = 100;
 	getchar();*/
 
-	ClassA *a1 = ClassA::createObj();
-	ClassA::deleteObj(a1);
+	/*ClassA *a1 = ClassA::createObj();
+	ClassA::deleteObj(a1);*/
+	ClassA *b = new ClassA(5);
+	printf("---------1-----------\n");
+	{
+		std::shared_ptr<ClassA> a1 = std::make_shared<ClassA>(5);
+	}
+	printf("---------2-----------\n");
+	{
+		std::shared_ptr<ClassA> a2(new ClassA(5));
+	}
+	printf("---------3-----------\n");
+	ClassA *a3 = new ClassA(5);
+	delete a3;
+	printf("---------4-----------\n");
+	getchar();
 	return 0;
 
 }

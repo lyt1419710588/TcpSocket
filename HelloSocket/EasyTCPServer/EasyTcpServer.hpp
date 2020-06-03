@@ -30,8 +30,9 @@
 #define SEND_BUFF_SIZE RECV_BUFF_SIZE //发送缓冲区 
 #endif // !RECV_BUFF_SIZE
 
+#include "CELLIObjectPool.h"
 //客户端数据对象
-class ClientSocket
+class ClientSocket:public ObjectPoolBase<ClientSocket,1000>
 {
 public:
     ClientSocket(SOCKET sock = INVALID_SOCKET)
@@ -539,7 +540,10 @@ public:
             //NewUserJoin userJoin;
             //userJoin.sock = _cSock;
             //SendDataToAll((DataHeader*)&userJoin);
-            addClientToCellServer(std::make_shared<ClientSocket>(_cSock));
+			//直接make_shared无法进入对象池 
+			std::shared_ptr<ClientSocket> c(new ClientSocket(_cSock));
+			addClientToCellServer(c);
+           // addClientToCellServer(std::make_shared<ClientSocket>(_cSock));
             //m_vectClients.push_back(new ClientSocket(_cSock));
             //send
             //printf("新客户端加入,sock = %d,ip = %s，客户端数 = %d \n", _cSock, inet_ntoa(clientA.sin_addr), m_vectClients.size());
