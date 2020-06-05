@@ -81,54 +81,82 @@ public:
 
 			//nfds是一个整数值，是指fd_set集合中所有描述符(socket)的范围
 			//即是所有描述符最大值+1，在windows中这个参数可以写0
-			int ret = select(m_maxSock + 1, &fd_read, nullptr, nullptr, nullptr);
+			timeval t{ 0,1 };
+			int ret = select(m_maxSock + 1, &fd_read, nullptr, nullptr, &t);
 			//printf("select ret = %d,count  = %d\n",ret, _count++);
 			if (ret < 0)
 			{
 				printf("select任务结束，退出\n");
 				return false;
 			}
-#ifdef _WIN32
-			for (int i = 0; i < fd_read.fd_count; i++)
-			{
-				SOCKET fd = fd_read.fd_array[i];
-				auto iter = m_vectClients.find(fd);
-				if (iter != m_vectClients.end())
-				{
-					if (-1 == RecvData(iter->second))
-					{
-						if (m_pInetEvent)
-						{
-							m_pInetEvent->OnNetLeave(iter->second);
-						}
-						iter = m_vectClients.erase(iter);
-						m_client_change = true;
-					}
-				}
-			}
-#else
-			for (auto iter : m_vectClients)
-			{
-				if (FD_ISSET(iter.first, &fd_read))
-				{
-					if (-1 == RecvData(iter.second))
-					{
-						if (m_pInetEvent)
-						{
-							m_pInetEvent->OnNetLeave(iter.second);
-						}
-						iter = m_vectClients.erase(iter);
-						m_client_change = true;
-					}
-				}
-			}
-#endif // _WIN32
-
+			ReadData(fd_read);
+			checkTime();
 			//return true;
 		}
 		//return false;
 	}
 
+	time_t oldTime = CELLTime::getNowInMilliSec();
+	void checkTime()
+	{
+		auto nowTime = CELLTime::getNowInMilliSec();
+		auto dt = nowTime - oldTime;
+		oldTime = nowTime;
+		for (auto iter = m_vectClients.begin();iter != m_vectClients.end();)
+		{
+			if (iter->second->checkHeart(dt))
+			{
+				if (m_pInetEvent)
+				{
+					m_pInetEvent->OnNetLeave(iter->second);
+					auto iterdel = iter++;
+					m_vectClients.erase(iterdel);
+					m_client_change = true;
+					continue;
+				}
+			}
+			iter++;
+		}
+	}
+
+	void ReadData(fd_set& fd_read)
+	{
+#ifdef _WIN32
+		for (int i = 0; i < fd_read.fd_count; i++)
+		{
+			SOCKET fd = fd_read.fd_array[i];
+			auto iter = m_vectClients.find(fd);
+			if (iter != m_vectClients.end())
+			{
+				if (-1 == RecvData(iter->second))
+				{
+					if (m_pInetEvent)
+					{
+						m_pInetEvent->OnNetLeave(iter->second);
+					}
+					iter = m_vectClients.erase(iter);
+					m_client_change = true;
+				}
+			}
+		}
+#else
+		for (auto iter : m_vectClients)
+		{
+			if (FD_ISSET(iter.first, &fd_read))
+			{
+				if (-1 == RecvData(iter.second))
+				{
+					if (m_pInetEvent)
+					{
+						m_pInetEvent->OnNetLeave(iter.second);
+					}
+					iter = m_vectClients.erase(iter);
+					m_client_change = true;
+				}
+			}
+		}
+#endif // _WIN32
+	}
 	//
 	bool isRun()
 	{

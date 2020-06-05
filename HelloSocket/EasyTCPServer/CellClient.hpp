@@ -2,6 +2,9 @@
 #define _CELLCLIENT_HPP_
 
 #include "Cell.hpp"
+
+//客户端死亡计时时间
+#define CLIENT_HEART_DEAD_TIME 5000
 //客户端数据对象
 class CellClient :public ObjectPoolBase<CellClient, 1000>
 {
@@ -13,6 +16,7 @@ public:
 		memset(m_szSendMSGBuf, 0, sizeof(m_szSendMSGBuf));
 		m_lastPos = 0;
 		m_SendlastPos = 0;
+		resetDTHeart();
 	}
 
 	SOCKET getSocket()
@@ -69,6 +73,24 @@ public:
 		}
 		return ret;
 	}
+
+	//计时重置
+	void resetDTHeart()
+	{
+		m_dtHeart = 0;
+	}
+	//检测客户端是否断开
+	bool checkHeart(time_t dt)
+	{
+		m_dtHeart += dt;
+		if (m_dtHeart >= CLIENT_HEART_DEAD_TIME)
+		{	
+			printf("checkheart dead:%d,dt_heart=%d\n",m_sockfd,m_dtHeart);
+			m_dtHeart = 0;
+			return true;
+		}
+		return false;
+	}
 private:
 	SOCKET m_sockfd;
 	//缓冲区
@@ -80,6 +102,9 @@ private:
 	char m_szSendMSGBuf[SEND_BUFF_SIZE];
 	//消息缓冲区尾部位置
 	int  m_SendlastPos = 0;
+
+	//死亡计时
+	time_t m_dtHeart;
 };
 #endif // !_CELLCLIENT_HPP_
 

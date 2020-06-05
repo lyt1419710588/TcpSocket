@@ -235,6 +235,11 @@ public:
 				printf("收到服务端消息：CMD_ERROR  sock = %d，数据长度:%d\n", m_sock, header->dataLength);
 			}
 			break;
+			case CMD_HEART_S2C:
+			{
+
+			}
+			break;
 			default:
 			{
 				printf("收到服务端未定义数据，  sock = %d，数据长度:%d\n", m_sock, header->dataLength);

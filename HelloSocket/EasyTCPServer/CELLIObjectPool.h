@@ -80,7 +80,6 @@ public:
 		xPrintf("freeObjMemory:%llx\n", pBlock);
 		//xPrintf("freeMemory:%llx,id=%d\n", pBlock, pBlock->nID);
 		assert(1 == pBlock->nRef);
-		pBlock->nRef = 0;
 		if (pBlock->bPool)
 		{
 			std::lock_guard<std::mutex> t(m_mutex);

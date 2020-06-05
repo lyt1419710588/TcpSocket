@@ -6,6 +6,8 @@ enum CMD {
 	CMD_LOGOUT,
 	CMD_LOGOUT_RESULT,
 	CMD_NEW_USER_JOIN,
+	CMD_HEART_C2S,
+	CMD_HEART_S2C,
 	CMD_ERROR
 };
 struct DataHeader {
@@ -69,6 +71,24 @@ struct NewUserJoin :public DataHeader
 		sock = 0;
 	}
 	int sock;
+};
+
+struct netmsg_c2s_Heart :public DataHeader
+{
+	netmsg_c2s_Heart()
+	{
+		dataLength = sizeof(netmsg_c2s_Heart);
+		cmd = CMD_HEART_C2S;
+	}
+};
+
+struct netmsg_s2c_Heart :public DataHeader
+{
+	netmsg_s2c_Heart()
+	{
+		dataLength = sizeof(netmsg_s2c_Heart);
+		cmd = CMD_HEART_S2C;
+	}
 };
 #endif // !_MESSAGEHEADER_HPP
 

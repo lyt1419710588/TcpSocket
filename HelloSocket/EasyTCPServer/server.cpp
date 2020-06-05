@@ -69,6 +69,13 @@ public:
 			//SendData(_cSock, &ret);
 		}
 		break;
+		case CMD_HEART_C2S:
+		{
+			pClient->resetDTHeart();
+			std::shared_ptr<netmsg_s2c_Heart> ret = std::make_shared<netmsg_s2c_Heart>();
+			pCellServer->addSendTask(pClient, ret);
+		}
+		break;
 		default:
 			printf("未定义数据，  sock = %d，数据长度:%d\n", pClient->getSocket(), header->dataLength);
 			//DataHeader header;
