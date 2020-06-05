@@ -6,30 +6,6 @@
 #include <vector>
 #include <map>
 
-//网络消息发送服务
-class CellSendMsgToClientTask :public CellTask
-{
-private:
-	std::shared_ptr<CellClient> m_pClient;
-	std::shared_ptr<DataHeader> m_pHeader;
-public:
-	CellSendMsgToClientTask(std::shared_ptr<CellClient> pClient, std::shared_ptr<DataHeader> pHeader)
-	{
-		m_pClient = pClient;
-		m_pHeader = pHeader;
-	}
-
-	virtual ~CellSendMsgToClientTask()
-	{
-
-	}
-
-	virtual void doTask()
-	{
-		m_pClient->SendData(m_pHeader);
-	}
-};
-
 //网络处理收服务
 class CellServer
 {
@@ -262,10 +238,14 @@ public:
 
 	void addSendTask(std::shared_ptr<CellClient> pClient, std::shared_ptr<DataHeader> ret)
 	{
-		std::shared_ptr<CellSendMsgToClientTask> task = std::make_shared<CellSendMsgToClientTask>(pClient, ret);
-		m_CellTaskServer.addTask((std::shared_ptr<CellTask>)task);
+		//利用lambda表达式实现，避免过多的类，逻辑太复杂
+		m_CellTaskServer.addTask([pClient, ret]() 
+		{
+			pClient->SendData(ret);
+		}
+		);
 	}
-
+		
 private:
 	SOCKET m_sock;
 	//客户端正式队列

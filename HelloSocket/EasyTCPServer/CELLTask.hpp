@@ -4,37 +4,17 @@
 #include <thread>
 #include <mutex>
 #include <list>
-//任务类型
-class CellTask
-{
-public:
-	CellTask()
-	{
-
-	}
-	//虚析构
-	virtual	~CellTask()
-	{
-
-	}
-
-	//执行任务
-	virtual void doTask()
-	{
-
-	}
-private:
-
-};
+#include <functional>
 
 //用于执行任务的服务类型
 class CellTaskServer
 {
+	typedef std::function<void()> CellTask;
 private:
 	//任务数据
-	std::list<std::shared_ptr<CellTask> > m_listCellTask;
+	std::list<CellTask> m_listCellTask;
 	//任务数据缓冲区
-	std::list<std::shared_ptr<CellTask> > m_listCellTaskBuff;
+	std::list<CellTask> m_listCellTaskBuff;
 	//改变数据缓冲区需要枷锁
 	std::mutex m_mutex;
 	
@@ -48,7 +28,7 @@ public:
 
 	}
 	//添加任务
-	void addTask(std::shared_ptr<CellTask>& pTask)
+	void addTask(CellTask pTask)
 	{
 		std::lock_guard<std::mutex> lock(m_mutex);
 		m_listCellTaskBuff.push_back(pTask);
@@ -83,9 +63,9 @@ private:
 				continue;
 			}
 
-			for (auto iter : m_listCellTask)
+			for (auto Task : m_listCellTask)
 			{
-				iter->doTask();
+				Task();
 			}
 			m_listCellTask.clear();
 		}
