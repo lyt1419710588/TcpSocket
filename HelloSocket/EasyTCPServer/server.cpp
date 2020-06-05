@@ -1,4 +1,5 @@
 #include "Alloctor.h"
+#include "Cell.hpp"
 #include "EasyTcpServer.hpp"
 #include <stdio.h>
 #include <thread>
@@ -23,23 +24,23 @@ class Myserver :public EasyTcpServer
 {
 public:
 	//客户端加入时通知，客户端离开事件
-	virtual void OnNetJoin(std::shared_ptr<ClientSocket> pClient)
+	virtual void OnNetJoin(std::shared_ptr<CellClient> pClient)
 	{
 		EasyTcpServer::OnNetJoin(pClient);
 	}
 	//客户端离开时通知，客户端离开事件
-	virtual void OnNetLeave(std::shared_ptr<ClientSocket> pClient)
+	virtual void OnNetLeave(std::shared_ptr<CellClient> pClient)
 	{
 		EasyTcpServer::OnNetLeave(pClient);
 	}
 
 	//Recv
-	virtual void OnNetRecv(std::shared_ptr<ClientSocket> pClient)
+	virtual void OnNetRecv(std::shared_ptr<CellClient> pClient)
 	{
 		EasyTcpServer::OnNetRecv(pClient);
 	}
 	//客户端端收到消息后通知主线程
-	virtual void OnNetMsg(CellServer* pCellServer, std::shared_ptr<ClientSocket> pClient, DataHeader*  header)
+	virtual void OnNetMsg(CellServer* pCellServer, std::shared_ptr<CellClient> pClient, DataHeader*  header)
 	{
 		EasyTcpServer::OnNetMsg(pCellServer,pClient, header);
 		switch (header->cmd)

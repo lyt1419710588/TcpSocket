@@ -120,7 +120,7 @@ private:
 		for (size_t i = 1; i < nSize; i++)
 		{	
 			NodeHeader *pTemp = (NodeHeader*)(m_pBuf + i * (sizeof(T) + sizeof(NodeHeader)));
-			pTemp->nID = i;
+			pTemp->nID = (int)i;
 			pTemp->nRef = 0;
 			pTemp->bPool = true;
 			pTemp->pNext = nullptr;
