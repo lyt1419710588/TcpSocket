@@ -24,9 +24,19 @@ EasyTcpClient *client[cCount];
 const int tCount = 4;//线程数量
 std::atomic_int m_sendCount = 0;
 std::atomic_int m_readyCount = 0;
+
+void recvthread(int begin, int end)
+{
+	while (g_Run)
+	{
+		for (int i = begin; i < end; i++)
+		{
+			client[i]->OnRun();
+		}
+	}
+}
 void sendthread(int id)
 {
-	
 	//栈内存1M
 	//client.initSocket();
 	int nConnect = 0;
@@ -59,6 +69,11 @@ void sendthread(int id)
 		std::chrono::milliseconds t(10);
 		std::this_thread::sleep_for(t);
 	}
+	//
+	//建立接收线程
+	std::thread mythread(recvthread,begin,end);
+	mythread.detach();
+	//
 	Login login[1];
 	for (int i = 0; i < 1; i++)
 	{
@@ -74,8 +89,9 @@ void sendthread(int id)
 			{
 				m_sendCount++;
 			}
-			client[i]->OnRun();
 		}
+		/*std::chrono::milliseconds t(10);
+		std::this_thread::sleep_for(t);*/
 
 	}
 	for (int i = begin; i < end; i++)
@@ -92,7 +108,7 @@ int  main()
 	std::thread mythread(cmdthread);
 	mythread.detach();
 
-	
+
 	for (int  i = 0; i < tCount; i++)
 	{
 		std::thread mythread(sendthread, i + 1);
