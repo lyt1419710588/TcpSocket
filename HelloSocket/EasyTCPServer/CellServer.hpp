@@ -32,9 +32,7 @@ public:
 	{
 		m_pInetEvent = pObj;
 	}
-	fd_set m_fd_read_back;
-	bool m_client_change;
-	SOCKET m_maxSock;
+	
 	//处理网络信息
 	bool OnRun()
 	{
@@ -99,7 +97,7 @@ public:
 		return true;
 	}
 
-	time_t oldTime = CELLTime::getNowInMilliSec();
+	
 	void checkTime()
 	{
 		auto nowTime = CELLTime::getNowInMilliSec();
@@ -114,7 +112,6 @@ public:
 					m_pInetEvent->OnNetLeave(iter->second);
 					auto iterdel = iter++;
 					m_client_change = true;
-					closesocket(iterdel->first);
 					m_vectClients.erase(iterdel);
 					continue;
 				}
@@ -139,7 +136,6 @@ public:
 					{
 						m_pInetEvent->OnNetLeave(iter->second);
 					}
-					closesocket(iter->first);
 					iter = m_vectClients.erase(iter);
 					m_client_change = true;
 				}
@@ -156,7 +152,6 @@ public:
 					{
 						m_pInetEvent->OnNetLeave(iter.second);
 					}
-					close(iter->first);
 					iter = m_vectClients.erase(iter);
 					m_client_change = true;
 				}
@@ -169,8 +164,6 @@ public:
 	{
 		return m_sock != INVALID_SOCKET;
 	}
-	int _count = 0;
-
 
 	int RecvData(std::shared_ptr<CellClient>& pClient)
 	{
@@ -235,20 +228,11 @@ public:
 		//清除环境
 		if (m_sock != INVALID_SOCKET)
 		{
-#ifdef _WIN32
-			for (auto iter : m_vectClients)
-			{
-				closesocket(iter.first);
-			}
-#else
-			for (auto iter : m_vectClients)
-			{
-				close(iter.first);
-			}
-#endif
-			m_sock = INVALID_SOCKET;
 			m_vectClients.clear();
+			m_vectClientsBuff.clear();
+			m_sock = INVALID_SOCKET;
 		}
+		m_CellTaskServer.Close();
 	}
 
 	void addClient(std::shared_ptr<CellClient> pClient)
@@ -295,6 +279,15 @@ private:
 	char recvBUF[RECV_BUFF_SIZE] = {};
 
 	CellTaskServer m_CellTaskServer;
+
+	//备份客户端fd_set
+	fd_set m_fd_read_back;
+	//客户端列表是否变化
+	bool m_client_change;
+	//最大客户端sock值
+	SOCKET m_maxSock;
+
+	time_t oldTime = CELLTime::getNowInMilliSec();
 };
 
 

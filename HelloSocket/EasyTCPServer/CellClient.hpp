@@ -22,6 +22,19 @@ public:
 		resetDTSend();
 	}
 
+	~CellClient()
+	{
+		if (INVALID_SOCKET != m_sockfd)
+		{
+#ifdef _WIN32
+			closesocket(m_sockfd);
+#else
+			close(m_sockfd);
+#endif // _WIN32
+			m_sockfd = INVALID_SOCKET;
+		}
+	}
+
 	SOCKET getSocket()
 	{
 		return m_sockfd;

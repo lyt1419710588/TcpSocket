@@ -18,6 +18,8 @@ private:
 	//改变数据缓冲区需要枷锁
 	std::mutex m_mutex;
 	
+	//执行
+	bool m_isRun = false;
 public:
 	CellTaskServer()
 	{
@@ -37,14 +39,21 @@ public:
 	void Start()
 	{
 		//线程
+		m_isRun = true;
 		std::thread thread(std::mem_fn(&CellTaskServer::OnRun),this);
 		thread.detach();
+	}
+
+	//关闭
+	void Close()
+	{
+		m_isRun = false;
 	}
 private:
 	//工作函数
 	void OnRun()
 	{
-		while (true)
+		while (m_isRun)
 		{
 			if (!m_listCellTaskBuff.empty())
 			{

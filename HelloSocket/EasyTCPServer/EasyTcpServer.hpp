@@ -239,6 +239,7 @@ public:
         //Çå³ý»·¾³
         if (m_sock != INVALID_SOCKET)
         {
+			m_vectServers.clear();
 #ifdef _WIN32
             closesocket(m_sock);
             WSACleanup();
