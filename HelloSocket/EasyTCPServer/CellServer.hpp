@@ -113,11 +113,13 @@ public:
 				{
 					m_pInetEvent->OnNetLeave(iter->second);
 					auto iterdel = iter++;
+					m_client_change = true;
 					closesocket(iterdel->first);
 					m_vectClients.erase(iterdel);
 					continue;
 				}
 			}
+			iter->second->checkSendTime(dt);
 			iter++;
 		}
 	}

@@ -19,7 +19,7 @@ void cmdthread()
 	}
 }
 
-const int cCount = 8;
+const int cCount = 1000;
 EasyTcpClient *client[cCount];
 const int tCount = 4;//线程数量
 std::atomic_int m_sendCount = 0;
@@ -53,6 +53,9 @@ void sendthread(int id)
 		client[i] = new EasyTcpClient;
 		client[i]->Connect("127.0.0.1", 4567);
 	}
+	//建立接收线程
+	std::thread mythread(recvthread, begin, end);
+	mythread.detach();
 	printf("线程 %d进入,nConnect<begin=%d><end=%d>\n", id,begin,end);
 	if (!g_Run)
 	{
@@ -66,16 +69,14 @@ void sendthread(int id)
 	while (m_readyCount < tCount)
 	{
 		//等待其他线程准备好发送数据
-		std::chrono::milliseconds t(10);
+		std::chrono::milliseconds t(1);
 		std::this_thread::sleep_for(t);
 	}
 	//
-	//建立接收线程
-	std::thread mythread(recvthread,begin,end);
-	mythread.detach();
+	
 	//
 	Login login[10];
-	for (int i = 0; i < 1; i++)
+	for (int i = 0; i < 10; i++)
 	{
 		strcpy(login[i].userName, "lyt");
 		strcpy(login[i].password, "123456");
@@ -90,7 +91,7 @@ void sendthread(int id)
 				m_sendCount++;
 			}
 		}
-		/*std::chrono::milliseconds t(10);
+		/*std::chrono::milliseconds t(100);
 		std::this_thread::sleep_for(t);*/
 
 	}

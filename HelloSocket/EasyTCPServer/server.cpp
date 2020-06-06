@@ -1,4 +1,4 @@
-#include "Alloctor.h"
+//#include "Alloctor.h"
 #include "Cell.hpp"
 #include "EasyTcpServer.hpp"
 #include <stdio.h>
@@ -57,7 +57,8 @@ public:
 			
 			//pClient->SendData(&loginresult);
 			std::shared_ptr<LoginResult> ret = std::make_shared<LoginResult>();
-			pCellServer->addSendTask(pClient,ret);
+			/*pCellServer->addSendTask(pClient,ret);*/
+			pClient->SendData(ret);
 		}
 		break;
 		case CMD_LOGOUT:
