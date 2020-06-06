@@ -48,6 +48,7 @@ public:
 		case CMD_LOGIN:
 		{
 
+			pClient->resetDTHeart();
 			Login *login = (Login*)header;
 			//printf("收到命令<socket = %d>CMD_LOGIN 数据长度:%d,userName = %s Password = %s\n", _cSock,header->dataLength, login->userName, login->password);
 			//忽略判断用户名密码是否正确

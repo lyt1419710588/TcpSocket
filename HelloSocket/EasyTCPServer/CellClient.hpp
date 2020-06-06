@@ -4,7 +4,7 @@
 #include "Cell.hpp"
 
 //客户端死亡计时时间
-#define CLIENT_HEART_DEAD_TIME 5000
+#define CLIENT_HEART_DEAD_TIME 60000
 //客户端数据对象
 class CellClient :public ObjectPoolBase<CellClient, 1000>
 {
@@ -94,7 +94,7 @@ public:
 private:
 	SOCKET m_sockfd;
 	//缓冲区
-	char m_szMSGBuf[RECV_BUFF_SIZE];
+	char m_szMSGBuf[RECV_BUFF_SIZE * 2];
 	//消息缓冲区尾部位置
 	int  m_lastPos = 0;
 

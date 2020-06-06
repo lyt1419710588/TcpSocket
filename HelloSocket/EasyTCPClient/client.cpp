@@ -74,7 +74,7 @@ void sendthread(int id)
 	std::thread mythread(recvthread,begin,end);
 	mythread.detach();
 	//
-	Login login[1];
+	Login login[10];
 	for (int i = 0; i < 1; i++)
 	{
 		strcpy(login[i].userName, "lyt");

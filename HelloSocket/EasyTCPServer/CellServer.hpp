@@ -56,19 +56,20 @@ public:
 			{
 				std::chrono::milliseconds t(1);
 				std::this_thread::sleep_for(t);
+				oldTime = CELLTime::getNowInMilliSec();
 				continue;
 			}
 			fd_set fd_read;
 			FD_ZERO(&fd_read);
 			if (m_client_change)
 			{
-				m_maxSock = m_vectClients.begin()->first;
+				m_maxSock = m_vectClients.begin()->second->getSocket();
 				for (auto iter : m_vectClients)
 				{
-					FD_SET(iter.first, &fd_read);
-					if (m_maxSock  < iter.first)
+					FD_SET(iter.second->getSocket(), &fd_read);
+					if (m_maxSock  < iter.second->getSocket())
 					{
-						m_maxSock = iter.first;
+						m_maxSock = iter.second->getSocket();
 					}
 				}
 				memcpy(&m_fd_read_back, &fd_read, sizeof(fd_read));
@@ -84,16 +85,18 @@ public:
 			timeval t{ 0,1 };
 			int ret = select(m_maxSock + 1, &fd_read, nullptr, nullptr, &t);
 			//printf("select ret = %d,count  = %d\n",ret, _count++);
-			if (ret < 0)
+			/*if (ret < 0)
 			{
-				printf("select任务结束，退出\n");
+				printf("select出错，退出\n");
 				return false;
-			}
+			}*/
+
 			ReadData(fd_read);
 			checkTime();
 			//return true;
 		}
 		//return false;
+		return true;
 	}
 
 	time_t oldTime = CELLTime::getNowInMilliSec();
@@ -110,8 +113,8 @@ public:
 				{
 					m_pInetEvent->OnNetLeave(iter->second);
 					auto iterdel = iter++;
+					closesocket(iterdel->first);
 					m_vectClients.erase(iterdel);
-					m_client_change = true;
 					continue;
 				}
 			}
@@ -119,7 +122,7 @@ public:
 		}
 	}
 
-	void ReadData(fd_set& fd_read)
+	void ReadData(fd_set &fd_read)
 	{
 #ifdef _WIN32
 		for (int i = 0; i < fd_read.fd_count; i++)
@@ -134,6 +137,7 @@ public:
 					{
 						m_pInetEvent->OnNetLeave(iter->second);
 					}
+					closesocket(iter->first);
 					iter = m_vectClients.erase(iter);
 					m_client_change = true;
 				}
@@ -150,6 +154,7 @@ public:
 					{
 						m_pInetEvent->OnNetLeave(iter.second);
 					}
+					close(iter->first);
 					iter = m_vectClients.erase(iter);
 					m_client_change = true;
 				}
@@ -165,7 +170,7 @@ public:
 	int _count = 0;
 
 
-	int RecvData(std::shared_ptr<CellClient> pClient)
+	int RecvData(std::shared_ptr<CellClient>& pClient)
 	{
 
 		//接收客户端的请求数据
@@ -236,7 +241,7 @@ public:
 #else
 			for (auto iter : m_vectClients)
 			{
-				closesocket(iter.first);
+				close(iter.first);
 			}
 #endif
 			m_sock = INVALID_SOCKET;
