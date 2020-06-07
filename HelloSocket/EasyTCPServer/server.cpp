@@ -103,6 +103,10 @@ int  main()
 
 	server.Close();
     printf("рямкЁЖ\n");
+	while (true)
+	{
+
+	}
     getchar();
     return 0;
 }

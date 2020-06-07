@@ -175,13 +175,12 @@ public:
             }
         }
 		pMinCellServer->addClient(pClient);
-		OnNetJoin(pClient);
     }
     void Start(int nCellCount)
     {
         for (int n = 0; n < nCellCount; n++)
         {
-            auto ser = std::make_shared<CellServer>(m_sock);
+            auto ser = std::make_shared<CellServer>(n + 1);
             m_vectServers.push_back(ser);
             //注册网络事件接受对象
             ser->setEventObj(this);
@@ -236,6 +235,7 @@ public:
     //关闭
     void Close()
     {
+		printf("EasyTcpServerClose begin \ n");
         //清除环境
         if (m_sock != INVALID_SOCKET)
         {
@@ -248,6 +248,7 @@ public:
 #endif
             m_sock = INVALID_SOCKET;
         }
+		printf("EasyTcpServerClose end \ n");
     }
     //计算并输出每秒的消息包数
     void time4msg()

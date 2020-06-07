@@ -9,6 +9,9 @@
 //用于执行任务的服务类型
 class CellTaskServer
 {
+public :
+	int serverID;
+private:
 	typedef std::function<void()> CellTask;
 private:
 	//任务数据
@@ -47,6 +50,7 @@ public:
 	//关闭
 	void Close()
 	{
+		printf("CellTaskServer Close,serverID = %d \ n", serverID);
 		m_isRun = false;
 	}
 private:
@@ -78,6 +82,7 @@ private:
 			}
 			m_listCellTask.clear();
 		}
+		printf("CellTaskServer,OnRun stop \ n");
 	}
 };
 

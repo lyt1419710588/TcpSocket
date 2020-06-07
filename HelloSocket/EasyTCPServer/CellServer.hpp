@@ -10,13 +10,11 @@
 class CellServer
 {
 public:
-	CellServer(SOCKET sock = INVALID_SOCKET)
+	CellServer(int id)
 	{
-		m_sock = sock;
-		// m_pthread = NULL;
-
-
+		m_id = id;
 		m_pInetEvent = NULL;
+		m_CellTaskServer.serverID = id;
 	}
 	~CellServer()
 	{
@@ -36,7 +34,7 @@ public:
 	//处理网络信息
 	bool OnRun()
 	{
-		while (isRun())
+		while (m_isRun)
 		{
 			m_client_change = false;
 			if (m_vectClientsBuff.size() > 0)
@@ -44,6 +42,11 @@ public:
 				std::lock_guard<std::mutex> lock(m_mutex);
 				for (auto iter : m_vectClientsBuff)
 				{
+					if (m_pInetEvent)
+					{
+						iter->serverID = m_id;
+						m_pInetEvent->OnNetJoin(iter);
+					}
 					m_vectClients[iter->getSocket()] = iter;
 					m_client_change = true;
 				}
@@ -159,11 +162,6 @@ public:
 		}
 #endif // _WIN32
 	}
-	//
-	bool isRun()
-	{
-		return m_sock != INVALID_SOCKET;
-	}
 
 	int RecvData(std::shared_ptr<CellClient>& pClient)
 	{
@@ -225,14 +223,12 @@ public:
 	//关闭
 	void Close()
 	{
+		printf("Cellserver Close begin,id = %d \ n", m_id);
 		//清除环境
-		if (m_sock != INVALID_SOCKET)
-		{
-			m_vectClients.clear();
-			m_vectClientsBuff.clear();
-			m_sock = INVALID_SOCKET;
-		}
+		m_vectClients.clear();
+		m_vectClientsBuff.clear();
 		m_CellTaskServer.Close();
+		printf("Cellserver Close end ,id = %d \ n",m_id);
 	}
 
 	void addClient(std::shared_ptr<CellClient> pClient)
@@ -245,9 +241,13 @@ public:
 
 	void Start()
 	{
-		// m_pthread = new std::thread(std::mem_fn(&CellServer::OnRun), this);
-		m_pthread = std::make_shared<std::thread>(std::mem_fn(&CellServer::OnRun), this);
-		m_CellTaskServer.Start();
+		if (!m_isRun)
+		{
+			m_isRun = true;
+			m_pthread = std::make_shared<std::thread>(std::mem_fn(&CellServer::OnRun), this);
+			m_pthread->detach();
+			m_CellTaskServer.Start();
+		}
 	}
 
 	size_t getClientNum()
@@ -288,6 +288,11 @@ private:
 	SOCKET m_maxSock;
 
 	time_t oldTime = CELLTime::getNowInMilliSec();
+
+	//是否运行
+	bool m_isRun = false;
+	//CellServerID
+	int m_id = -1;
 };
 
 

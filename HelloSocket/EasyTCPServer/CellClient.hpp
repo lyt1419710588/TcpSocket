@@ -11,8 +11,13 @@
 class CellClient :public ObjectPoolBase<CellClient, 1000>
 {
 public:
+	int id = -1;
+	int serverID = -1;
+public:
 	CellClient(SOCKET sock = INVALID_SOCKET)
 	{
+		static int n = 1;
+		id = n++;
 		m_sockfd = sock;
 		memset(m_szMSGBuf, 0, sizeof(m_szMSGBuf));
 		memset(m_szSendMSGBuf, 0, sizeof(m_szSendMSGBuf));
@@ -24,6 +29,7 @@ public:
 
 	~CellClient()
 	{
+		printf("CellClient::CellClient:%d,serverID:%d\n",id, serverID);
 		if (INVALID_SOCKET != m_sockfd)
 		{
 #ifdef _WIN32
