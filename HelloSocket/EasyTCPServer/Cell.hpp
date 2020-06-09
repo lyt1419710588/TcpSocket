@@ -22,7 +22,7 @@
 #include "MessageHeader.hpp"
 #include "CELLTimestamp.hpp"
 #include "CELLTask.hpp"
-#include "CELLIObjectPool.h"
+#include "CELLIObjectPool.hpp"
 
 //»º³åÇø
 #ifndef RECV_BUFF_SIZE

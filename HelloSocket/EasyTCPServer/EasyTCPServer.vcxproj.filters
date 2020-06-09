@@ -41,9 +41,6 @@
     <ClInclude Include="Alloctor.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="CELLIObjectPool.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="CellClient.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -56,7 +53,10 @@
     <ClInclude Include="INetEvent.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="CELLSemaphore.h">
+    <ClInclude Include="CELLSemaphore.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="CELLIObjectPool.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
