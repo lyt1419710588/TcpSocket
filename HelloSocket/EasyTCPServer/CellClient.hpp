@@ -29,7 +29,7 @@ public:
 
 	~CellClient()
 	{
-		printf("CellClient::CellClient:%d,serverID:%d\n",id, serverID);
+		printf("~CellClient%d,server:%d\n",id, serverID);
 		if (INVALID_SOCKET != m_sockfd)
 		{
 #ifdef _WIN32

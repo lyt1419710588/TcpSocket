@@ -235,7 +235,7 @@ public:
     //关闭
     void Close()
     {
-		printf("EasyTcpServerClose begin \ n");
+		printf("EasyTcpServerClose begin \n");
         //清除环境
         if (m_sock != INVALID_SOCKET)
         {
@@ -248,7 +248,7 @@ public:
 #endif
             m_sock = INVALID_SOCKET;
         }
-		printf("EasyTcpServerClose end \ n");
+		printf("EasyTcpServerClose end \n");
     }
     //计算并输出每秒的消息包数
     void time4msg()

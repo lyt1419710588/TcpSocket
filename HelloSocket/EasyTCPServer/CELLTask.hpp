@@ -5,7 +5,7 @@
 #include <mutex>
 #include <list>
 #include <functional>
-
+#include "CELLSemaphore.h"
 //用于执行任务的服务类型
 class CellTaskServer
 {
@@ -23,6 +23,8 @@ private:
 	
 	//执行
 	bool m_isRun = false;
+
+	CELLSemaphore m_sem;
 public:
 	CellTaskServer()
 	{
@@ -50,8 +52,13 @@ public:
 	//关闭
 	void Close()
 	{
-		printf("CellTaskServer Close,serverID = %d \ n", serverID);
-		m_isRun = false;
+		if (m_isRun)
+		{
+			printf("CellTaskServer%d Close begin\n", serverID);
+			m_isRun = false;
+			m_sem.wait();
+			printf("CellTaskServer%d Close end\n", serverID);
+		}
 	}
 private:
 	//工作函数
@@ -82,7 +89,8 @@ private:
 			}
 			m_listCellTask.clear();
 		}
-		printf("CellTaskServer,OnRun stop \ n");
+		printf("CellTaskServer%d,OnRun stop \n",serverID);
+		m_sem.wakeup();
 	}
 };
 

@@ -1,4 +1,4 @@
-//#include "Alloctor.h"
+#/*include "Alloctor.h"*/
 #include "Cell.hpp"
 #include "EasyTcpServer.hpp"
 #include <stdio.h>
@@ -105,7 +105,7 @@ int  main()
     printf("ÒÑÍË³ö\n");
 	while (true)
 	{
-
+		Sleep(1);
 	}
     getchar();
     return 0;

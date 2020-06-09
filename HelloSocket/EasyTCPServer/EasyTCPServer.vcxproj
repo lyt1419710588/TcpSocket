@@ -149,6 +149,7 @@
     <ClInclude Include="Cell.hpp" />
     <ClInclude Include="CellClient.hpp" />
     <ClInclude Include="CELLIObjectPool.h" />
+    <ClInclude Include="CELLSemaphore.h" />
     <ClInclude Include="CellServer.hpp" />
     <ClInclude Include="CELLTask.hpp" />
     <ClInclude Include="CELLTimestamp.hpp" />

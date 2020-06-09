@@ -3,8 +3,11 @@
 
 #include "Cell.hpp"
 #include "INetEvent.hpp"
+#include "CELLSemaphore.h"
+
 #include <vector>
 #include <map>
+
 
 //网络处理收服务
 class CellServer
@@ -96,6 +99,8 @@ public:
 			checkTime();
 			//return true;
 		}
+		printf("CellServer%d,OnRun exit\n",m_id);
+		m_sem.wakeup();
 		//return false;
 		return true;
 	}
@@ -223,12 +228,17 @@ public:
 	//关闭
 	void Close()
 	{
-		printf("Cellserver Close begin,id = %d \ n", m_id);
-		//清除环境
-		m_vectClients.clear();
-		m_vectClientsBuff.clear();
-		m_CellTaskServer.Close();
-		printf("Cellserver Close end ,id = %d \ n",m_id);
+		printf("Cellserver%d Close begin\n", m_id);
+		if (m_isRun)
+		{
+			//清除环境
+			m_CellTaskServer.Close();
+			m_isRun = false;
+			m_sem.wait();
+			m_vectClients.clear();
+			m_vectClientsBuff.clear();	
+		}
+		printf("Cellserver%d Close end\n",m_id);
 	}
 
 	void addClient(std::shared_ptr<CellClient> pClient)
@@ -288,7 +298,8 @@ private:
 	SOCKET m_maxSock;
 
 	time_t oldTime = CELLTime::getNowInMilliSec();
-
+	//
+	CELLSemaphore m_sem;
 	//是否运行
 	bool m_isRun = false;
 	//CellServerID

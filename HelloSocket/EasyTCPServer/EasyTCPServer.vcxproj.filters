@@ -56,5 +56,8 @@
     <ClInclude Include="INetEvent.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="CELLSemaphore.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
