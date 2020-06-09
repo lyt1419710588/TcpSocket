@@ -3,6 +3,9 @@
 
 #include <chrono>
 #include <thread>
+
+//条件变量
+#include <condition_variable>
 class CELLSemaphore
 {
 public:
@@ -15,31 +18,36 @@ public:
 
 	}
 
+	//阻塞当前线程
 	void wait()
-	{
-		m_isWait = true;
-		while (m_isWait)
+	{	
+		std::unique_lock<std::mutex> lock(m_mutex);
+		if (--m_Wait < 0)
 		{
-			std::chrono::milliseconds t(1);
-			std::this_thread::sleep_for(t);
-		}
-	}
-
-	void wakeup()
-	{
-		if (m_isWait)
-		{
-			m_isWait = false;
-		}
-		else
-		{
-			printf("CELLSemaphore wakeup error!\n");
+			m_cv.wait(lock, [this]() -> bool {
+				return m_Wakeup > 0;
+			});
 		}
 		
 	}
+	//唤醒当前线程
+	void wakeup()
+	{
+		std::lock_guard<std::mutex> lock(m_mutex);
+		if (++m_Wait <= 0)
+		{
+			++m_Wakeup;
+			m_cv.notify_one();
+		}
+	}
 private:
-
-	bool m_isWait = false;
+	std::mutex m_mutex;
+	//阻塞的条件变量
+	std::condition_variable m_cv;
+	//等待计数
+	int m_Wait = 0;
+	//释放等待计数
+	int m_Wakeup = 0;
 };
 
 
