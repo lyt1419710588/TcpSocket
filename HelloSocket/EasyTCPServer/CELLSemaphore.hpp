@@ -27,7 +27,15 @@ public:
 
 	void wakeup()
 	{
-		m_isWait = false;
+		if (m_isWait)
+		{
+			m_isWait = false;
+		}
+		else
+		{
+			printf("CELLSemaphore wakeup error!\n");
+		}
+		
 	}
 private:
 
