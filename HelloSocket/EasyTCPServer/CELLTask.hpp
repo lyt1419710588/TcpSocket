@@ -5,7 +5,9 @@
 #include <mutex>
 #include <list>
 #include <functional>
-#include "CELLSemaphore.hpp"
+
+
+#include "CELLThread.hpp"
 //用于执行任务的服务类型
 class CellTaskServer
 {
@@ -21,10 +23,8 @@ private:
 	//改变数据缓冲区需要枷锁
 	std::mutex m_mutex;
 	
-	//执行
-	bool m_isRun = false;
-
-	CELLSemaphore m_sem;
+	//线程
+	CELLThread m_thread;
 public:
 	CellTaskServer()
 	{
@@ -44,27 +44,24 @@ public:
 	void Start()
 	{
 		//线程
-		m_isRun = true;
-		std::thread thread(std::mem_fn(&CellTaskServer::OnRun),this);
-		thread.detach();
+		m_thread.Start(nullptr, [this](CELLThread *pThread) {
+			OnRun(pThread);
+		});
 	}
 
 	//关闭
 	void Close()
 	{
-		if (m_isRun)
-		{
-			printf("CellTaskServer%d Close begin\n", serverID);
-			m_isRun = false;
-			m_sem.wait();
-			printf("CellTaskServer%d Close end\n", serverID);
-		}
+		
+		printf("CellTaskServer%d Close begin\n", serverID);
+		m_thread.Close();
+		printf("CellTaskServer%d Close end\n", serverID);
 	}
 private:
 	//工作函数
-	void OnRun()
+	void OnRun(CELLThread *pThread)
 	{
-		while (m_isRun)
+		while (pThread->isRun())
 		{
 			if (!m_listCellTaskBuff.empty())
 			{
@@ -90,7 +87,6 @@ private:
 			m_listCellTask.clear();
 		}
 		printf("CellTaskServer%d,OnRun stop \n",serverID);
-		m_sem.wakeup();
 	}
 };
 

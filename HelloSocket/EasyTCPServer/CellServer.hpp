@@ -35,9 +35,9 @@ public:
 	}
 	
 	//处理网络信息
-	bool OnRun()
+	void  OnRun(CELLThread *pThread)
 	{
-		while (m_isRun)
+		while (pThread->isRun())
 		{
 			m_client_change = false;
 			if (m_vectClientsBuff.size() > 0)
@@ -89,20 +89,20 @@ public:
 			timeval t{ 0,1 };
 			int ret = select(m_maxSock + 1, &fd_read, nullptr, nullptr, &t);
 			//printf("select ret = %d,count  = %d\n",ret, _count++);
-			/*if (ret < 0)
+			if (ret < 0)
 			{
-				printf("select出错，退出\n");
-				return false;
-			}*/
+				printf("CELLServer%d,OnRun,selectr任务结束，ERROR\n",m_id);
+				pThread->Exit();
+				break;
+			}
 
 			ReadData(fd_read);
 			checkTime();
 			//return true;
 		}
 		printf("CellServer%d,OnRun exit\n",m_id);
-		m_sem.wakeup();
 		//return false;
-		return true;
+	/*	return true;*/
 	}
 
 	
@@ -229,18 +229,18 @@ public:
 	void Close()
 	{
 		printf("Cellserver%d Close begin\n", m_id);
-		if (m_isRun)
-		{
-			//清除环境
-			m_CellTaskServer.Close();
-			m_isRun = false;
-			m_sem.wait();
-			m_vectClients.clear();
-			m_vectClientsBuff.clear();	
-		}
+		
+		//清除环境
+		m_CellTaskServer.Close();
+		m_thread.Close();
 		printf("Cellserver%d Close end\n",m_id);
 	}
 
+	void ClearClients()
+	{
+		m_vectClients.clear();
+		m_vectClientsBuff.clear();
+	}
 	void addClient(std::shared_ptr<CellClient> pClient)
 	{
 		std::lock_guard<std::mutex> lock(m_mutex);
@@ -251,13 +251,12 @@ public:
 
 	void Start()
 	{
-		if (!m_isRun)
-		{
-			m_isRun = true;
-			m_pthread = std::make_shared<std::thread>(std::mem_fn(&CellServer::OnRun), this);
-			m_pthread->detach();
-			m_CellTaskServer.Start();
-		}
+		m_thread.Start(nullptr,
+			[this](CELLThread *pThread) {
+			OnRun(pThread);},
+			[this](CELLThread *pThread) {
+				ClearClients(); });
+		m_CellTaskServer.Start();
 	}
 
 	size_t getClientNum()
@@ -298,10 +297,9 @@ private:
 	SOCKET m_maxSock;
 
 	time_t oldTime = CELLTime::getNowInMilliSec();
-	//
-	CELLSemaphore m_sem;
-	//是否运行
-	bool m_isRun = false;
+	
+	//线程
+	CELLThread m_thread;
 	//CellServerID
 	int m_id = -1;
 };

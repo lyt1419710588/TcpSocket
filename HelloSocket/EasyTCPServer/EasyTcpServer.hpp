@@ -20,6 +20,7 @@
 class EasyTcpServer :public INetEvent
 {
 private:
+	CELLThread m_thread;
     SOCKET m_sock;
     //服务列表
     std::vector<std::shared_ptr<CellServer> > m_vectServers;
@@ -187,55 +188,18 @@ public:
             //启动消息处理服务线程
             ser->Start();
         }
+		//线程
+		m_thread.Start(nullptr, [this](CELLThread *pThread) {
+			OnRun(pThread);
+		});
     }
-    bool isRun()
-    {
-        return m_sock != INVALID_SOCKET;
-    }
-    //处理网络信息
-    bool OnRun()
-    {
-        if (isRun())
-        {
-            time4msg();
-            fd_set fd_read;
-            fd_set fd_write;
-            fd_set fd_except;
 
-            FD_ZERO(&fd_read);
-            //FD_ZERO(&fd_write);
-            //FD_ZERO(&fd_except);
-
-            FD_SET(m_sock, &fd_read);
-            //FD_SET(m_sock, &fd_write);
-            //FD_SET(m_sock, &fd_except);
-
-
-            //nfds是一个整数值，是指fd_set集合中所有描述符(socket)的范围
-            //即是所有描述符最大值+1，在windows中这个参数可以写0
-            timeval tl = { 0,10 };
-            int ret = select(m_sock + 1, &fd_read, 0, 0, &tl);
-            //printf("select ret = %d,count  = %d\n",ret, _count++);
-            if (ret < 0)
-            {
-                printf("select任务结束，退出\n");
-                return false;
-            }
-            if (FD_ISSET(m_sock, &fd_read))
-            {
-                FD_CLR(m_sock, &fd_read);
-                Accept();
-                return true;
-            }
-            return true;
-        }
-        return false;
-
-    }
+  
     //关闭
     void Close()
     {
 		printf("EasyTcpServerClose begin \n");
+		m_thread.Close();
         //清除环境
         if (m_sock != INVALID_SOCKET)
         {
@@ -248,6 +212,7 @@ public:
 #endif
             m_sock = INVALID_SOCKET;
         }
+		
 		printf("EasyTcpServerClose end \n");
     }
     //计算并输出每秒的消息包数
@@ -282,7 +247,43 @@ public:
 		m_recvCount++;
 	}
 private:
+	//处理网络信息
+	void OnRun(CELLThread *pThread)
+	{
+		while (pThread->isRun())
+		{
+			time4msg();
+			fd_set fd_read;
+			fd_set fd_write;
+			fd_set fd_except;
 
+			FD_ZERO(&fd_read);
+			//FD_ZERO(&fd_write);
+			//FD_ZERO(&fd_except);
+
+			FD_SET(m_sock, &fd_read);
+			//FD_SET(m_sock, &fd_write);
+			//FD_SET(m_sock, &fd_except);
+
+
+			//nfds是一个整数值，是指fd_set集合中所有描述符(socket)的范围
+			//即是所有描述符最大值+1，在windows中这个参数可以写0
+			timeval tl = { 0,1};
+			int ret = select(m_sock + 1, &fd_read, 0, 0, &tl);
+			//printf("select ret = %d,count  = %d\n",ret, _count++);
+			if (ret < 0)
+			{
+				printf("EasyTcpServer::OnRun,select任务结束，退出\n");
+				pThread->Exit();
+				break;
+			}
+			if (FD_ISSET(m_sock, &fd_read))
+			{
+				FD_CLR(m_sock, &fd_read);
+				Accept();
+			}
+		}
+	}
 };
 
 

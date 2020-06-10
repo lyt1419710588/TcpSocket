@@ -4,21 +4,21 @@
 #include <stdio.h>
 #include <thread>
 
-bool g_Run = true;
-void cmdthread()
-{
-	char cmdBUF[128] = {};
-	while (true)
-	{
-		scanf("%s", cmdBUF);
-		if (0 == strcmp(cmdBUF, "exit"))
-		{
-			g_Run = false;
-			printf("退出线程\n");
-			break;
-		}
-	}
-}
+//bool g_Run = true;
+//void cmdthread()
+//{
+//	char cmdBUF[128] = {};
+//	while (true)
+//	{
+//		scanf("%s", cmdBUF);
+//		if (0 == strcmp(cmdBUF, "exit"))
+//		{
+//			g_Run = false;
+//			printf("退出线程\n");
+//			break;
+//		}
+//	}
+//}
 
 class Myserver :public EasyTcpServer
 {
@@ -93,15 +93,25 @@ int  main()
 	server.Bind(nullptr, 4567);
 	server.Listen(5);
 	server.Start(4);
-	std::thread mythread(cmdthread);
-	mythread.detach();
-    while (g_Run)
-    {
-		server.OnRun();
-       // printf("空闲时间处理其他业务\n");
-    }
+	/*std::thread mythread(cmdthread);
+	mythread.detach();*/
+	char cmdBUF[128] = {};
+	while (true)
+	{
+		scanf("%s", cmdBUF);
+		if (0 == strcmp(cmdBUF, "exit"))
+		{
+			server.Close();
+			printf("退出线程\n");
+			break;
+		}
+		else
+		{
+			printf("不支持的命令！！！\n");
+		}
+	}
 
-	server.Close();
+	
     printf("已退出\n");
 	while (true)
 	{
