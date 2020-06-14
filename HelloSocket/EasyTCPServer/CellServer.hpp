@@ -64,6 +64,8 @@ public:
 				continue;
 			}
 			fd_set fd_read;
+			fd_set fd_write;
+			//fd_set fd_Exc;
 			FD_ZERO(&fd_read);
 			if (m_client_change)
 			{
@@ -83,11 +85,13 @@ public:
 			{
 				memcpy(&fd_read, &m_fd_read_back, sizeof(m_fd_read_back));
 			}
+			memcpy(&fd_write, &m_fd_read_back, sizeof(m_fd_read_back));
+			//memcpy(&fd_Exc, &m_fd_read_back, sizeof(m_fd_read_back));
 
 			//nfds是一个整数值，是指fd_set集合中所有描述符(socket)的范围
 			//即是所有描述符最大值+1，在windows中这个参数可以写0
 			timeval t{ 0,1 };
-			int ret = select(m_maxSock + 1, &fd_read, nullptr, nullptr, &t);
+			int ret = select(m_maxSock + 1, &fd_read, &fd_write, nullptr, &t);
 			//printf("select ret = %d,count  = %d\n",ret, _count++);
 			if (ret < 0)
 			{
@@ -97,7 +101,14 @@ public:
 			}
 
 			ReadData(fd_read);
+			WriteData(fd_write);
+			//WriteData(fd_Exc);
 			checkTime();
+			//printf("CELLServer%d,fd_write=%d.fd_read=%d\n", m_id,fd_write.fd_count,fd_read.fd_count);
+			/*if (fd_Exc.fd_count > 0)
+			{
+				printf("######fd_Exc=%d\n", fd_Exc.fd_count);
+			}*/
 			//return true;
 		}
 		printf("CellServer%d,OnRun exit\n",m_id);
@@ -124,11 +135,49 @@ public:
 					continue;
 				}
 			}
-			iter->second->checkSendTime(dt);
+			/*iter->second->checkSendTime(dt);*/
 			iter++;
 		}
 	}
 
+	void OnClientLeave(std::shared_ptr<CellClient> pClient)
+	{
+		if (m_pInetEvent)
+		{
+			m_pInetEvent->OnNetLeave(pClient);
+		}
+		m_client_change = true;
+	}
+	void WriteData(fd_set &fd_write)
+	{
+#ifdef _WIN32
+		for (int i = 0; i < fd_write.fd_count; i++)
+		{
+			SOCKET fd = fd_write.fd_array[i];
+			auto iter = m_vectClients.find(fd);
+			if (iter != m_vectClients.end())
+			{
+				if (-1 == iter->second->SendDataReal())
+				{
+					OnClientLeave(iter->second);
+					iter = m_vectClients.erase(iter);	
+				}
+			}
+		}
+#else
+		for (auto iter : m_vectClients)
+		{
+			if (FD_ISSET(iter.first, &fd_read))
+			{
+				if (-1 == iter->second->SendDataReal())
+				{
+					OnClientLeave(iter->second);
+					iter = m_vectClients.erase(iter);
+				}
+			}
+		}
+#endif // _WIN32
+	}
 	void ReadData(fd_set &fd_read)
 	{
 #ifdef _WIN32
@@ -140,12 +189,8 @@ public:
 			{
 				if (-1 == RecvData(iter->second))
 				{
-					if (m_pInetEvent)
-					{
-						m_pInetEvent->OnNetLeave(iter->second);
-					}
+					OnClientLeave(iter->second);
 					iter = m_vectClients.erase(iter);
-					m_client_change = true;
 				}
 			}
 		}
@@ -156,12 +201,8 @@ public:
 			{
 				if (-1 == RecvData(iter.second))
 				{
-					if (m_pInetEvent)
-					{
-						m_pInetEvent->OnNetLeave(iter.second);
-					}
+					OnClientLeave(iter->second);
 					iter = m_vectClients.erase(iter);
-					m_client_change = true;
 				}
 			}
 		}
@@ -269,7 +310,10 @@ public:
 		//利用lambda表达式实现，避免过多的类，逻辑太复杂
 		m_CellTaskServer.addTask([pClient, ret]() 
 		{
-			pClient->SendData(ret);
+			if (SOCKET_ERROR == pClient->SendData(ret))
+			{
+
+			}
 		}
 		);
 	}

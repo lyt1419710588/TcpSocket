@@ -19,7 +19,7 @@ void cmdthread()
 	}
 }
 
-const int cCount = 20;
+const int cCount = 1000;
 EasyTcpClient *client[cCount];
 const int tCount = 4;//线程数量
 std::atomic_int m_sendCount = 0;
@@ -27,10 +27,15 @@ std::atomic_int m_readyCount = 0;
 
 void recvthread(int begin, int end)
 {
+	CELLTimestamp t;
 	while (g_Run)
 	{
 		for (int i = begin; i < end; i++)
 		{
+			if (t.getElaspedSecond() > 3.0 && i == begin)
+			{
+				continue;
+			}
 			client[i]->OnRun();
 		}
 	}
@@ -75,8 +80,8 @@ void sendthread(int id)
 	//
 	
 	//
-	Login login[10];
-	for (int i = 0; i < 10; i++)
+	Login login[1];
+	for (int i = 0; i < 1; i++)
 	{
 		strcpy(login[i].userName, "lyt");
 		strcpy(login[i].password, "123456");
@@ -91,8 +96,8 @@ void sendthread(int id)
 				m_sendCount++;
 			}
 		}
-		/*std::chrono::milliseconds t(100);
-		std::this_thread::sleep_for(t);*/
+		std::chrono::milliseconds t(1);
+		std::this_thread::sleep_for(t);
 
 	}
 	for (int i = begin; i < end; i++)

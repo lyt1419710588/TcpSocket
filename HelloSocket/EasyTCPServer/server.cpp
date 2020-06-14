@@ -58,7 +58,11 @@ public:
 			//pClient->SendData(&loginresult);
 			std::shared_ptr<LoginResult> ret = std::make_shared<LoginResult>();
 			/*pCellServer->addSendTask(pClient,ret);*/
-			pClient->SendData(ret);
+			if (SOCKET_ERROR == pClient->SendData(ret))
+			{
+				//»º³åÇøÂú
+				printf("<socket = %d,Send Buff Full!!!!\n>",pClient->getSocket());
+			}
 		}
 		break;
 		case CMD_LOGOUT:

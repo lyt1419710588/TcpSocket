@@ -59,22 +59,18 @@ public:
 	{
 		m_lastPos = last;
 	}
-	int SendDataReal(std::shared_ptr<DataHeader> header)
-	{
-		SendData(header);
-		SendDataReal();
-		return 1;
-	}
+
 	//理解将缓冲区数据发送给客户端
 	int SendDataReal()
 	{
-		int ret = SOCKET_ERROR;
-		if (m_SendlastPos > 0 && SOCKET_ERROR != m_sockfd)
+		int ret = 0;
+		if (m_SendlastPos > 0 && INVALID_SOCKET != m_sockfd)
 		{
 			// //发送数据
 			ret = send(m_sockfd, m_szSendMSGBuf, m_SendlastPos,0);
 			////情况缓冲区
 			m_SendlastPos = 0;
+			m_sendBuffFullCount = 0;
 			//重置发送时间
 			resetDTSend();
 		}
@@ -88,31 +84,21 @@ public:
 		{
 			const char* pSendData = (const char*)header.get();
 			int nSendLen = header->dataLength;
-			while (true)
+		
+			if (m_SendlastPos + nSendLen <= SEND_BUFF_SIZE)
 			{
-				if (m_SendlastPos + nSendLen >= SEND_BUFF_SIZE)
+				memcpy(m_szSendMSGBuf + m_SendlastPos, pSendData, nSendLen);
+				m_SendlastPos += nSendLen;
+				if (m_SendlastPos == SEND_BUFF_SIZE)
 				{
-					int nCopyLen = SEND_BUFF_SIZE - m_SendlastPos;
-					memcpy(m_szSendMSGBuf + m_SendlastPos, pSendData, nCopyLen);
-					ret = send(m_sockfd, m_szSendMSGBuf, SEND_BUFF_SIZE, 0);
-					nSendLen -= nCopyLen;
-					pSendData += nCopyLen;
-					resetDTSend();
-					m_SendlastPos = 0;
-					if (SOCKET_ERROR == ret)
-					{
-						return ret;
-					}
+					m_sendBuffFullCount++;
 				}
-				else
-				{
-					memcpy(m_szSendMSGBuf + m_SendlastPos, pSendData, nSendLen);
-					m_SendlastPos += nSendLen;
-					break;
-				}
+				return nSendLen;
 			}
-
-
+			else
+			{
+				m_sendBuffFullCount++;
+			}
 		}
 		return ret;
 	}
@@ -173,6 +159,9 @@ private:
 
 	//上次发送消息数据时间
 	time_t m_dtSend;
+
+	//发送缓冲区写满的计数
+	int m_sendBuffFullCount = 0;
 };
 #endif // !_CELLCLIENT_HPP_
 
