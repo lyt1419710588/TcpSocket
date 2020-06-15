@@ -213,43 +213,25 @@ public:
 	{
 
 		//接收客户端的请求数据
-		int nLen = recv(pClient->getSocket(), recvBUF, RECV_BUFF_SIZE, 0);
-		m_pInetEvent->OnNetRecv(pClient);
-		//printf("Recv len = %d\n", nLen);
-		//DataHeader *header = (DataHeader*)recvBUF;
+		int nLen = pClient->RecvData();
+		
 		if (nLen < 0)
 		{
 			//printf("客户端<socket = %d>已退出！，任务结束！\n", pClient->getSocket());
 			return -1;
 		}
+		//接收网络数据事件
+		m_pInetEvent->OnNetRecv(pClient);
 
-		memcpy(pClient->msgBuf() + pClient->getLast(), recvBUF, nLen);
-		//消息缓冲区尾部的位置后移
-		pClient->setLast(pClient->getLast() + nLen);
-		//判断已收消息缓冲区的数据长度是否大于消息头
-		while (pClient->getLast() >= sizeof(DataHeader))
+		//循环 判断是否有消息需要处理
+		while (pClient->hasMsg())
 		{
-			DataHeader* header = (DataHeader*)pClient->msgBuf();
-			if (pClient->getLast() >= header->dataLength)
-			{
-				//剩余未处理的消息缓冲区数据的长度
-				int nSize = pClient->getLast() - header->dataLength;
-				//处理网络消息
-				OnNetMsg(pClient, header);
-				//将未处理的数据前移
-				memcpy(pClient->msgBuf(), pClient->msgBuf() + header->dataLength, nSize);
-				pClient->setLast(nSize);;
-			}
-			else
-			{
-				break;
-			}
+			//处理网络消息
+			OnNetMsg(pClient, pClient->front_msg());
+			//移除消息队列（缓冲区）最前端的数据
+			pClient->pop_front_msg();
 		}
 
-		//LoginResult ret;
-		//SendData(pClient->getSocket(), &ret);
-		/* recv(_cSock, recvBUF + sizeof(DataHeader), header->dataLength - sizeof(DataHeader), 0);
-		OnNetMsg(_cSock, header);*/
 		return 0;
 	}
 	void OnNetMsg(std::shared_ptr<CellClient> pClient, DataHeader* header)

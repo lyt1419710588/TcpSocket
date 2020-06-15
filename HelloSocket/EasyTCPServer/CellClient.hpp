@@ -2,7 +2,7 @@
 #define _CELLCLIENT_HPP_
 
 #include "Cell.hpp"
-
+#include "CELLBuffer.hpp"
 //客户端死亡计时时间
 #define CLIENT_HEART_DEAD_TIME 60000
 //指定时间清空发送缓冲区数据
@@ -14,15 +14,14 @@ public:
 	int id = -1;
 	int serverID = -1;
 public:
-	CellClient(SOCKET sock = INVALID_SOCKET)
+	CellClient(SOCKET sock = INVALID_SOCKET):
+		m_SendBuff(SEND_BUFF_SIZE),
+		m_RecvBuff(RECV_BUFF_SIZE)
 	{
 		static int n = 1;
 		id = n++;
 		m_sockfd = sock;
-		memset(m_szMSGBuf, 0, sizeof(m_szMSGBuf));
-		memset(m_szSendMSGBuf, 0, sizeof(m_szSendMSGBuf));
-		m_lastPos = 0;
-		m_SendlastPos = 0;
+		
 		resetDTHeart();
 		resetDTSend();
 	}
@@ -45,36 +44,36 @@ public:
 	{
 		return m_sockfd;
 	}
-	char *msgBuf()
+	
+	int RecvData()
 	{
-		return m_szMSGBuf;
+		return m_RecvBuff.readToSocket(m_sockfd);
 	}
 
-	int getLast()
+	bool hasMsg()
 	{
-		return m_lastPos;
+		return m_RecvBuff.hasMsg();
 	}
 
-	void setLast(int last)
+
+	DataHeader* front_msg()
 	{
-		m_lastPos = last;
+		return (DataHeader*)m_RecvBuff.data();
 	}
 
+	void pop_front_msg()
+	{
+		if (hasMsg())
+		{
+			m_RecvBuff.pop(front_msg()->dataLength);
+		}	
+	}
 	//理解将缓冲区数据发送给客户端
 	int SendDataReal()
 	{
-		int ret = 0;
-		if (m_SendlastPos > 0 && INVALID_SOCKET != m_sockfd)
-		{
-			// //发送数据
-			ret = send(m_sockfd, m_szSendMSGBuf, m_SendlastPos,0);
-			////情况缓冲区
-			m_SendlastPos = 0;
-			m_sendBuffFullCount = 0;
-			//重置发送时间
-			resetDTSend();
-		}
-		return ret;
+		//重置发送时间
+		resetDTSend();
+		return m_SendBuff.writeToSocket(m_sockfd);
 	}
 	//发送SOCKET数据
 	int SendData(std::shared_ptr<DataHeader> header)
@@ -82,22 +81,10 @@ public:
 		int ret = SOCKET_ERROR;
 		if (header)
 		{
-			const char* pSendData = (const char*)header.get();
-			int nSendLen = header->dataLength;
-		
-			if (m_SendlastPos + nSendLen <= SEND_BUFF_SIZE)
+			
+			if (m_SendBuff.push((const char*)header.get(),header->dataLength))
 			{
-				memcpy(m_szSendMSGBuf + m_SendlastPos, pSendData, nSendLen);
-				m_SendlastPos += nSendLen;
-				if (m_SendlastPos == SEND_BUFF_SIZE)
-				{
-					m_sendBuffFullCount++;
-				}
-				return nSendLen;
-			}
-			else
-			{
-				m_sendBuffFullCount++;
+				return header->dataLength;
 			}
 		}
 		return ret;
@@ -144,15 +131,12 @@ public:
 	}
 private:
 	SOCKET m_sockfd;
-	//缓冲区
-	char m_szMSGBuf[RECV_BUFF_SIZE * 2];
-	//消息缓冲区尾部位置
-	int  m_lastPos = 0;
+	//接收消息
+	CELLBuffer m_RecvBuff;
+	
 
 	//发送缓冲区
-	char m_szSendMSGBuf[SEND_BUFF_SIZE];
-	//消息缓冲区尾部位置
-	int  m_SendlastPos = 0;
+	CELLBuffer m_SendBuff;
 
 	//死亡计时
 	time_t m_dtHeart;
