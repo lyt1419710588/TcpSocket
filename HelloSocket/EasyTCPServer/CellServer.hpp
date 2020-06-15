@@ -167,7 +167,7 @@ public:
 #else
 		for (auto iter : m_vectClients)
 		{
-			if (FD_ISSET(iter.first, &fd_read))
+			if (FD_ISSET(iter.first, &fd_write))
 			{
 				if (-1 == iter->second->SendDataReal())
 				{

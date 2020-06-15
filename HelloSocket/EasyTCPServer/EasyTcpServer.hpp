@@ -53,7 +53,14 @@ public:
         WORD ver = MAKEWORD(2, 2);
         WSADATA data;
         WSAStartup(ver, &data);
-#endif
+#else
+		//忽略异常信号，默认情况会导致进程终止
+		if (signal(SIGPIPE,SIG_IGN) == SIG_ERR)
+		{
+			return 1;
+		}
+#endif //_WIN32
+
         if (INVALID_SOCKET != m_sock)
         {
             printf("关闭之前链接，socket = %d\n", m_sock);
