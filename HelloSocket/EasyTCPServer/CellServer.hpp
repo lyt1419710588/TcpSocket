@@ -92,10 +92,10 @@ public:
 			//即是所有描述符最大值+1，在windows中这个参数可以写0
 			timeval t{ 0,1 };
 			int ret = select(m_maxSock + 1, &fd_read, &fd_write, nullptr, &t);
-			//printf("select ret = %d,count  = %d\n",ret, _count++);
+			//CELLLog::Info("select ret = %d,count  = %d\n",ret, _count++);
 			if (ret < 0)
 			{
-				printf("CELLServer%d,OnRun,selectr任务结束，ERROR\n",m_id);
+				CELLLog::Info("CELLServer%d,OnRun,selectr任务结束，ERROR\n",m_id);
 				pThread->Exit();
 				break;
 			}
@@ -104,14 +104,14 @@ public:
 			WriteData(fd_write);
 			//WriteData(fd_Exc);
 			checkTime();
-			//printf("CELLServer%d,fd_write=%d.fd_read=%d\n", m_id,fd_write.fd_count,fd_read.fd_count);
+			//CELLLog::Info("CELLServer%d,fd_write=%d.fd_read=%d\n", m_id,fd_write.fd_count,fd_read.fd_count);
 			/*if (fd_Exc.fd_count > 0)
 			{
-				printf("######fd_Exc=%d\n", fd_Exc.fd_count);
+				CELLLog::Info("######fd_Exc=%d\n", fd_Exc.fd_count);
 			}*/
 			//return true;
 		}
-		printf("CellServer%d,OnRun exit\n",m_id);
+		CELLLog::Info("CellServer%d,OnRun exit\n",m_id);
 		//return false;
 	/*	return true;*/
 	}
@@ -217,7 +217,7 @@ public:
 		
 		if (nLen < 0)
 		{
-			//printf("客户端<socket = %d>已退出！，任务结束！\n", pClient->getSocket());
+			//CELLLog::Info("客户端<socket = %d>已退出！，任务结束！\n", pClient->getSocket());
 			return -1;
 		}
 		//接收网络数据事件
@@ -241,7 +241,7 @@ public:
 		/*auto t1 = m_tTime.getElaspedSecond();
 		if (t1 >= 1.0)
 		{
-		printf("time<%lf>,socket<%d>,clientNum<%d>,recvCount<%d>\n", t1, _cSock, m_vectClients.size(), m_recvCount);
+		CELLLog::Info("time<%lf>,socket<%d>,clientNum<%d>,recvCount<%d>\n", t1, _cSock, m_vectClients.size(), m_recvCount);
 		m_tTime.update();
 		m_recvCount = 0;
 		}*/
@@ -251,12 +251,12 @@ public:
 	//关闭
 	void Close()
 	{
-		printf("Cellserver%d Close begin\n", m_id);
+		CELLLog::Info("Cellserver%d Close begin\n", m_id);
 		
 		//清除环境
 		m_CellTaskServer.Close();
 		m_thread.Close();
-		printf("Cellserver%d Close end\n",m_id);
+		CELLLog::Info("Cellserver%d Close end\n",m_id);
 	}
 
 	void ClearClients()

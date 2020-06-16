@@ -28,7 +28,7 @@ public:
 
 	~CellClient()
 	{
-		printf("~CellClient%d,server:%d\n",id, serverID);
+		CELLLog::Info("~CellClient%d,server:%d\n",id, serverID);
 		if (INVALID_SOCKET != m_sockfd)
 		{
 #ifdef _WIN32
@@ -106,7 +106,7 @@ public:
 		m_dtHeart += dt;
 		if (m_dtHeart >= CLIENT_HEART_DEAD_TIME)
 		{	
-			printf("checkheart dead:%d,dt_heart=%d\n",m_sockfd,m_dtHeart);
+			CELLLog::Info("checkheart dead:%d,dt_heart=%d\n",m_sockfd,m_dtHeart);
 			/*m_dtHeart = 0;*/
 			return true;
 		}
@@ -119,7 +119,7 @@ public:
 		m_dtSend += dt;
 		if (m_dtSend >= CLIENT_SEND_BUFF_TIME)
 		{
-			/*printf("senTime now---:%d,dt_sentTime=%d,dt=%d\n", m_sockfd, m_dtSend,dt);*/
+			/*CELLLog::Info("senTime now---:%d,dt_sentTime=%d,dt=%d\n", m_sockfd, m_dtSend,dt);*/
 			//立即发送缓存数据
 			//重置发送计时
 			SendDataReal();

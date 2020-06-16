@@ -14,7 +14,7 @@
 //		if (0 == strcmp(cmdBUF, "exit"))
 //		{
 //			g_Run = false;
-//			printf("退出线程\n");
+//			CELLLog::Info("退出线程\n");
 //			break;
 //		}
 //	}
@@ -50,7 +50,7 @@ public:
 
 			pClient->resetDTHeart();
 			Login *login = (Login*)header;
-			//printf("收到命令<socket = %d>CMD_LOGIN 数据长度:%d,userName = %s Password = %s\n", _cSock,header->dataLength, login->userName, login->password);
+			//CELLLog::Info("收到命令<socket = %d>CMD_LOGIN 数据长度:%d,userName = %s Password = %s\n", _cSock,header->dataLength, login->userName, login->password);
 			//忽略判断用户名密码是否正确
 			//LoginResult loginresult;
 			//loginresult.result = 1;
@@ -61,14 +61,14 @@ public:
 			//if (SOCKET_ERROR == pClient->SendData(ret))
 			//{
 			//	//缓冲区满
-			//	printf("<socket = %d,Send Buff Full!!!!\n>",pClient->getSocket());
+			//	CELLLog::Info("<socket = %d,Send Buff Full!!!!\n>",pClient->getSocket());
 			//}
 		}
 		break;
 		case CMD_LOGOUT:
 		{
 			//Logout *logout = (Logout*)header;
-			//printf("收到命令<socket = %d>CMD_LOGOUT 数据长度:%d,userName = %s\n", _cSock, header->dataLength, logout->userName);
+			//CELLLog::Info("收到命令<socket = %d>CMD_LOGOUT 数据长度:%d,userName = %s\n", _cSock, header->dataLength, logout->userName);
 			//忽略判断用户名密码是否正确
 			//LogoutResult ret;
 			//ret.result = 1;
@@ -83,7 +83,7 @@ public:
 		}
 		break;
 		default:
-			printf("未定义数据，  sock = %d，数据长度:%d\n", pClient->getSocket(), header->dataLength);
+			CELLLog::Info("未定义数据，  sock = %d，数据长度:%d\n", pClient->getSocket(), header->dataLength);
 			//DataHeader header;
 			//SendData(_cSock, &header);
 			break;
@@ -92,6 +92,7 @@ public:
 };
 int  main()
 {
+	CELLLog::Instance().setLogPath("server.txt","w");
 	Myserver server;
 	server.initSocket();
 	server.Bind(nullptr, 4567);
@@ -106,21 +107,21 @@ int  main()
 		if (0 == strcmp(cmdBUF, "exit"))
 		{
 			server.Close();
-			printf("退出线程\n");
+			CELLLog::Info("退出线程\n");
 			break;
 		}
 		else
 		{
-			printf("不支持的命令！！！\n");
+			CELLLog::Info("不支持的命令！！！\n");
 		}
 	}
 
 	
-    printf("已退出\n");
-	while (true)
+    CELLLog::Info("已退出\n");
+	/*while (true)
 	{
 		Sleep(1);
-	}
+	}*/
     getchar();
     return 0;
 }

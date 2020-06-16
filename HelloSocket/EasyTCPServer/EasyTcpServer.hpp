@@ -15,7 +15,6 @@
 #include <atomic>
 #include <memory>
 
-
 //客户端接收服务
 class EasyTcpServer :public INetEvent
 {
@@ -63,17 +62,17 @@ public:
 
         if (INVALID_SOCKET != m_sock)
         {
-            printf("关闭之前链接，socket = %d\n", m_sock);
+            CELLLog::Info("关闭之前链接，socket = %d\n", m_sock);
             Close();
         }
         m_sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
         if (INVALID_SOCKET == m_sock)
         {
-            printf("socket = %d建立失败\n", m_sock);
+            CELLLog::Info("socket = %d建立失败\n", m_sock);
         }
         else
         {
-            printf("socket = %d建立成功\n", m_sock);
+            CELLLog::Info("socket = %d建立成功\n", m_sock);
         }
         return m_sock;
     }
@@ -82,7 +81,7 @@ public:
     {
         if (INVALID_SOCKET == m_sock)
         {
-            printf("初始化socket\n");
+            CELLLog::Info("初始化socket\n");
             initSocket();
         }
         //bind
@@ -111,11 +110,11 @@ public:
         int ret = bind(m_sock, (sockaddr*)&_sin, sizeof(_sin));
         if (SOCKET_ERROR == ret)
         {
-            printf("ERROR,绑定端口失败,%d！\n", port);
+            CELLLog::Info("ERROR,绑定端口失败,%d！\n", port);
         }
         else
         {
-            printf("SUCCESS,绑定端口成功:%d！\n", port);
+            CELLLog::Info("SUCCESS,绑定端口成功:%d！\n", port);
         }
         return ret;
     }
@@ -126,11 +125,11 @@ public:
         int ret = listen(m_sock, n);
         if (SOCKET_ERROR == ret)
         {
-            printf("ERROR,socket = %d监听失败！\n", m_sock);
+            CELLLog::Info("ERROR,socket = %d监听失败！\n", m_sock);
         }
         else
         {
-            printf("SUCCESS,socket = %d监听成功！\n", m_sock);
+            CELLLog::Info("SUCCESS,socket = %d监听成功！\n", m_sock);
         }
         return ret;
     }
@@ -152,7 +151,7 @@ public:
         _cSock = accept(m_sock, (sockaddr*)&clientA, &nClientA);
         if (INVALID_SOCKET == _cSock)
         {
-            printf("socket = %d错误，接受的客户端SOCKET 无效\n", m_sock);
+            CELLLog::Info("socket = %d错误，接受的客户端SOCKET 无效\n", m_sock);
         }
         else
         {
@@ -165,7 +164,7 @@ public:
            // addClientToCellServer(std::make_shared<CellClient>(_cSock));
             //m_vectClients.push_back(new CellClient(_cSock));
             //send
-            //printf("新客户端加入,sock = %d,ip = %s，客户端数 = %d \n", _cSock, inet_ntoa(clientA.sin_addr), m_vectClients.size());
+            //CELLLog::Info("新客户端加入,sock = %d,ip = %s，客户端数 = %d \n", _cSock, inet_ntoa(clientA.sin_addr), m_vectClients.size());
         }
         return _cSock;
     }
@@ -205,7 +204,7 @@ public:
     //关闭
     void Close()
     {
-		printf("EasyTcpServerClose begin \n");
+		CELLLog::Info("EasyTcpServerClose begin \n");
 		m_thread.Close();
         //清除环境
         if (m_sock != INVALID_SOCKET)
@@ -220,7 +219,7 @@ public:
             m_sock = INVALID_SOCKET;
         }
 		
-		printf("EasyTcpServerClose end \n");
+		CELLLog::Info("EasyTcpServerClose end \n");
     }
     //计算并输出每秒的消息包数
     void time4msg()
@@ -228,7 +227,7 @@ public:
         auto t1 = m_tTime.getElaspedSecond();
         if (t1 >= 1.0)
         {
-            printf("thread<%d>,time<%lf>,socket<%d>,clientNum<%d>,recvCount<%d>，msgCount<%d>\n", m_vectServers.size(), t1, m_sock, m_clientCount, (int)(m_recvCount / t1),(int)(m_msgCount / t1));
+            CELLLog::Info("thread<%d>,time<%lf>,socket<%d>,clientNum<%d>,recvCount<%d>，msgCount<%d>\n", m_vectServers.size(), t1, m_sock,(int)m_clientCount,(int)(m_recvCount / t1),(int)(m_msgCount / t1));
 			m_recvCount = 0;
 			m_msgCount = 0;
             m_tTime.update();
@@ -277,10 +276,10 @@ private:
 			//即是所有描述符最大值+1，在windows中这个参数可以写0
 			timeval tl = { 0,1};
 			int ret = select(m_sock + 1, &fd_read, 0, 0, &tl);
-			//printf("select ret = %d,count  = %d\n",ret, _count++);
+			//CELLLog::Info("select ret = %d,count  = %d\n",ret, _count++);
 			if (ret < 0)
 			{
-				printf("EasyTcpServer::OnRun,select任务结束，退出\n");
+				CELLLog::Info("EasyTcpServer::OnRun,select任务结束，退出\n");
 				pThread->Exit();
 				break;
 			}

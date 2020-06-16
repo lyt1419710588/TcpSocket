@@ -53,9 +53,9 @@ public:
 	void Close()
 	{
 		
-		printf("CellTaskServer%d Close begin\n", serverID);
+		//CELLLog::Info("CellTaskServer%d Close begin\n", serverID);
 		m_thread.Close();
-		printf("CellTaskServer%d Close end\n", serverID);
+		//CELLLog::Info("CellTaskServer%d Close end\n", serverID);
 	}
 private:
 	//工作函数
@@ -86,7 +86,13 @@ private:
 			}
 			m_listCellTask.clear();
 		}
-		printf("CellTaskServer%d,OnRun stop \n",serverID);
+
+		//处理缓冲队列中的任务
+		for (auto Task : m_listCellTaskBuff)
+		{
+			Task();
+		}
+		//CELLLog::Info("CellTaskServer%d,OnRun stop \n",serverID);
 	}
 };
 

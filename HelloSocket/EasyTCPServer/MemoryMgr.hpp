@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <mutex>
+#include "CELLLog.hpp"
 #define MAX_MEMORY_SIZE 128
 
 #ifdef _DEBUG

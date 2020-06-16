@@ -24,7 +24,7 @@
 #include "CELLTimestamp.hpp"
 #include "CELLTask.hpp"
 #include "CELLIObjectPool.hpp"
-
+#include "CELLLog.hpp"
 //缓冲区
 #ifndef RECV_BUFF_SIZE
 #define RECV_BUFF_SIZE 10240 * 2//缓冲区大小
