@@ -6,7 +6,7 @@
 
 #include "INetEvent.hpp"
 #include "CellServer.hpp"
-
+#include "CELLNetWork.hpp"
 #include <stdio.h>
 #include <vector>
 #include <map>
@@ -47,18 +47,7 @@ public:
     //初始化
     SOCKET initSocket()
     {
-        //启动 Win sock 2.x
-#ifdef _WIN32
-        WORD ver = MAKEWORD(2, 2);
-        WSADATA data;
-        WSAStartup(ver, &data);
-#else
-		//忽略异常信号，默认情况会导致进程终止
-		if (signal(SIGPIPE,SIG_IGN) == SIG_ERR)
-		{
-			return 1;
-		}
-#endif //_WIN32
+		CELLNetWork::Init();
 
         if (INVALID_SOCKET != m_sock)
         {
@@ -212,7 +201,6 @@ public:
 			m_vectServers.clear();
 #ifdef _WIN32
             closesocket(m_sock);
-            WSACleanup();
 #else
             close(m_sock);
 #endif

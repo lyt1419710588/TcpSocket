@@ -6,7 +6,7 @@
 #include <ctime>
 class CELLLog
 {
-public:
+private:
 	CELLLog()
 	{
 		_CellTask.Start();
