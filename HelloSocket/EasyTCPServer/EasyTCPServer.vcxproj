@@ -89,8 +89,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>
-      </AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\dev\CPPNet\cppnet01\TcpSocket\HelloSocket\depend\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
@@ -102,8 +101,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>
-      </AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\dev\CPPNet\cppnet01\TcpSocket\HelloSocket\depend\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
@@ -117,8 +115,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>
-      </AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\dev\CPPNet\cppnet01\TcpSocket\HelloSocket\depend\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
@@ -134,8 +131,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>
-      </AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\dev\CPPNet\cppnet01\TcpSocket\HelloSocket\depend\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
@@ -145,26 +141,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Alloctor.cpp" />
     <ClCompile Include="server.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="Alloctor.h" />
-    <ClInclude Include="Cell.hpp" />
-    <ClInclude Include="CELLBuffer.hpp" />
-    <ClInclude Include="CellClient.hpp" />
-    <ClInclude Include="CELLIObjectPool.hpp" />
-    <ClInclude Include="CELLLog.hpp" />
-    <ClInclude Include="CELLNetWork.hpp" />
-    <ClInclude Include="CELLSemaphore.hpp" />
-    <ClInclude Include="CellServer.hpp" />
-    <ClInclude Include="CELLTask.hpp" />
-    <ClInclude Include="CELLThread.hpp" />
-    <ClInclude Include="CELLTimestamp.hpp" />
-    <ClInclude Include="EasyTcpServer.hpp" />
-    <ClInclude Include="INetEvent.hpp" />
-    <ClInclude Include="MemoryMgr.hpp" />
-    <ClInclude Include="MessageHeader.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

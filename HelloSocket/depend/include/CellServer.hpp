@@ -63,6 +63,7 @@ public:
 				oldTime = CELLTime::getNowInMilliSec();
 				continue;
 			}
+			checkTime();
 			fd_set fd_read;
 			fd_set fd_write;
 			//fd_set fd_Exc;
@@ -85,7 +86,16 @@ public:
 			{
 				memcpy(&fd_read, &m_fd_read_back, sizeof(m_fd_read_back));
 			}
-			memcpy(&fd_write, &m_fd_read_back, sizeof(m_fd_read_back));
+
+			for (auto iter : m_vectClients)
+			{	
+				if (iter.second->needWrite())
+				{
+					FD_SET(iter.second->getSocket(), &fd_write);
+					m_maxSock = iter.second->getSocket();
+				}
+			}
+			//memcpy(&fd_write, &m_fd_read_back, sizeof(m_fd_read_back));
 			//memcpy(&fd_Exc, &m_fd_read_back, sizeof(m_fd_read_back));
 
 			//nfds是一个整数值，是指fd_set集合中所有描述符(socket)的范围
@@ -99,11 +109,15 @@ public:
 				pThread->Exit();
 				break;
 			}
+			else if(ret == 0)
+			{
+				continue;
+			}
 
 			ReadData(fd_read);
 			WriteData(fd_write);
 			//WriteData(fd_Exc);
-			checkTime();
+			
 			//CELLLog::Info("CELLServer%d,fd_write=%d.fd_read=%d\n", m_id,fd_write.fd_count,fd_read.fd_count);
 			/*if (fd_Exc.fd_count > 0)
 			{

@@ -129,6 +129,10 @@ public:
 		}
 		return false;
 	}
+	bool needWrite()
+	{
+		return true;
+	}
 private:
 	SOCKET m_sockfd;
 	//接收消息
