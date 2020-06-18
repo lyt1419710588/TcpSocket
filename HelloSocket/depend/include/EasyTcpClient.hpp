@@ -35,7 +35,7 @@ public:
 		else
 		{
 			_pClient = new CellClient(sock);
-			 CELLLog::Info("socket = %d建立成功\n", _pClient->getSocket());
+			 //CELLLog::Info("socket = %d建立成功\n", _pClient->getSocket());
 		}
 		return 0;
 	}
@@ -44,7 +44,7 @@ public:
 	{
 		if (!_pClient)
 		{
-			CELLLog::Info("初始化socket\n");
+			//CELLLog::Info("初始化socket\n");
 			initSocket();
 		}
 		//链接
