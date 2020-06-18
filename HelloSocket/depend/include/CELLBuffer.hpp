@@ -97,6 +97,11 @@ public:
 		}
 		return false;
 	}
+
+	bool needWrite()
+	{
+		return m_nLastPos > 0;
+	}
 private:
 
 	//»º³åÇø

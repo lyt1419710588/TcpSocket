@@ -131,7 +131,7 @@ public:
 	}
 	bool needWrite()
 	{
-		return true;
+		return m_SendBuff.needWrite();
 	}
 private:
 	SOCKET m_sockfd;

@@ -2,7 +2,58 @@
 #include <stdio.h>
 #include <thread>
 #include <atomic>
+#include <memory>
 #include "CELLTimestamp.hpp"
+
+
+class MyClient :public EasyTcpClient
+{
+public:
+	void OnNetMsg(DataHeader* header)
+	{
+		//处理客户端请求
+		switch (header->cmd)
+		{
+		case CMD_LOGIN_RESULT:
+		{
+			//接收服务器返回的数据
+			LoginResult *ret = (LoginResult*)header;
+			// CELLLog::Info("收到服务端消息：retLogin = %d，数据长度:%d\n", ret->result, header->dataLength);
+		}
+		break;
+		case CMD_LOGOUT_RESULT:
+		{
+			//接收服务器返回的数据
+			LogoutResult *ret = (LogoutResult*)header;
+			// CELLLog::Info("收到服务端消息：retLogout = %d，数据长度:%d\n", ret->result, header->dataLength);
+		}
+		break;
+		case CMD_NEW_USER_JOIN:
+		{
+			//接收服务器返回的数据
+			NewUserJoin *ret = (NewUserJoin*)header;
+			// CELLLog::Info("收到服务端消息：newUerJoinIN  sock = %d，数据长度:%d\n", ret->sock, header->dataLength);
+		}
+		break;
+		case CMD_ERROR:
+		{
+			//接收服务器返回的数据
+			 CELLLog::Info("收到服务端消息：CMD_ERROR  sock = %d，数据长度:%d\n", _pClient->getSocket(), header->dataLength);
+		}
+		break;
+		case CMD_HEART_S2C:
+		{
+
+		}
+		break;
+		default:
+		{
+			 CELLLog::Info("收到服务端未定义数据，  sock = %d，数据长度:%d\n", _pClient->getSocket(), header->dataLength);
+		}
+		break;
+		}
+	}
+};
 bool g_Run = true;
 void cmdthread()
 {
@@ -12,7 +63,7 @@ void cmdthread()
 		scanf("%s", cmdBUF);
 		if (0 == strcmp(cmdBUF, "exit"))
 		{
-			printf("退出线程\n");
+			 CELLLog::Info("退出线程\n");
 			g_Run = false;
 			break;
 		}
@@ -55,13 +106,13 @@ void sendthread(int id)
 			nConnect = i;
 			return ;
 		}
-		client[i] = new EasyTcpClient;
+		client[i] = new MyClient;
 		client[i]->Connect("127.0.0.1", 4567);
 	}
 	//建立接收线程
 	std::thread mythread(recvthread, begin, end);
 	mythread.detach();
-	printf("线程 %d进入,nConnect<begin=%d><end=%d>\n", id,begin,end);
+	 CELLLog::Info("线程 %d进入,nConnect<begin=%d><end=%d>\n", id,begin,end);
 	if (!g_Run)
 	{
 		for (int i = begin; i < end; i++)
@@ -80,18 +131,16 @@ void sendthread(int id)
 	//
 	
 	//
-	Login login[1];
-	for (int i = 0; i < 1; i++)
-	{
-		strcpy(login[i].userName, "lyt");
-		strcpy(login[i].password, "123456");
-	}
+	std::shared_ptr<Login> login = std::make_shared<Login>();
+	
+	strcpy(login->userName, "lyt");
+	strcpy(login->password, "123456");
 	const int nLen = sizeof(login);
 	while (g_Run)
 	{
 		for (int i = begin; i < end; i++)
 		{
-			if (SOCKET_ERROR != client[i]->SendData(login, nLen))
+			if (SOCKET_ERROR != client[i]->SendData(login))
 			{
 				m_sendCount++;
 			}
@@ -105,12 +154,12 @@ void sendthread(int id)
 		client[i]->Close();
 		delete (client[i]);
 	}
-	printf("线程 %d退出,nConnect<begin=%d><end=%d>\n", id, begin, end);
+	 CELLLog::Info("线程 %d退出,nConnect<begin=%d><end=%d>\n", id, begin, end);
 }
 int  main()
 {
 	
-
+	CELLLog::Instance().setLogPath("client.txt", "w");
 	std::thread mythread(cmdthread);
 	mythread.detach();
 
@@ -126,14 +175,14 @@ int  main()
 		auto curSec = tcurTime.getElaspedSecond();
 		if (curSec > 1.0)
 		{
-			printf("thread<%d>,clients<%d>,time<%lf>,sendCount<%d>\n", tCount, cCount, curSec, m_sendCount);
+			CELLLog::Info("thread<%d>,clients<%d>,time<%lf>,sendCount<%d>\n", tCount, cCount, curSec,(int)m_sendCount);
 			m_sendCount = 0;
 			tcurTime.update();
 		}
 		Sleep(1);
 	}
 	
-	printf("已退出\n");
+	 CELLLog::Info("已退出\n");
 	getchar();
 	return 0;
 }
