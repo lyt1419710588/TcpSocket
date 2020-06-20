@@ -64,6 +64,8 @@ public:
 				continue;
 			}
 			checkTime();
+
+
 			fd_set fd_read;
 			fd_set fd_write;
 			//fd_set fd_Exc;
@@ -89,10 +91,11 @@ public:
 
 			for (auto iter : m_vectClients)
 			{	
+				//检测需要写数据的客户端
 				if (iter.second->needWrite())
 				{
+					bNeedWrite = true;
 					FD_SET(iter.second->getSocket(), &fd_write);
-					m_maxSock = iter.second->getSocket();
 				}
 			}
 			//memcpy(&fd_write, &m_fd_read_back, sizeof(m_fd_read_back));
@@ -101,7 +104,16 @@ public:
 			//nfds是一个整数值，是指fd_set集合中所有描述符(socket)的范围
 			//即是所有描述符最大值+1，在windows中这个参数可以写0
 			timeval t{ 0,1 };
-			int ret = select(m_maxSock + 1, &fd_read, &fd_write, nullptr, &t);
+			int ret = 0;
+			if (bNeedWrite)
+			{
+				ret = select(m_maxSock + 1, &fd_read, &fd_write, nullptr, &t);
+			}
+			else
+			{
+				ret = select(m_maxSock + 1, &fd_read, nullptr, nullptr, &t);
+			}
+			
 			//CELLLog::Info("select ret = %d,count  = %d\n",ret, _count++);
 			if (ret < 0)
 			{
@@ -181,7 +193,7 @@ public:
 #else
 		for (auto iter : m_vectClients)
 		{
-			if (FD_ISSET(iter.first, &fd_write))
+			if (iter->second->needWrite() && FD_ISSET(iter.first, &fd_write))
 			{
 				if (-1 == iter->second->SendDataReal())
 				{
@@ -342,6 +354,8 @@ private:
 	CELLThread m_thread;
 	//CellServerID
 	int m_id = -1;
+	//是否有客户端需要写数据
+	bool bNeedWrite = false;
 };
 
 
