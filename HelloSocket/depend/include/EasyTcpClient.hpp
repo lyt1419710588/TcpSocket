@@ -10,7 +10,7 @@ class EasyTcpClient
 public:
 	EasyTcpClient()
 	{
-		m_isConnected = true;
+		m_isConnected = false;
 	}
 	//虚析构函数
 	virtual ~EasyTcpClient()
@@ -105,7 +105,7 @@ public:
 			if (_pClient->needWrite())
 			{
 				FD_SET(m_sock, &fd_write);
-				 ret = select(m_sock, &fd_read, &fd_write, nullptr, &tl);
+				ret = select(m_sock, &fd_read, &fd_write, nullptr, &tl);
 			}
 			else
 			{
@@ -137,6 +137,10 @@ public:
 					Close();
 					return false;
 				}
+			/*	else
+				{
+					CELLLog::Info("select = %d 数据发送\n", m_sock);
+				}*/
 			}
 			return true;
 		}
@@ -182,6 +186,11 @@ public:
 	int SendData(std::shared_ptr<DataHeader> data)
 	{
 		return _pClient->SendData(data);
+	}
+
+	CellClient *getCurClient()
+	{
+		return _pClient;
 	}
 protected:
 	CellClient *_pClient = nullptr;

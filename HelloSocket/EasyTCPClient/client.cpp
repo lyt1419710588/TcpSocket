@@ -70,9 +70,9 @@ void cmdthread()
 	}
 }
 
-const int cCount = 1000;
+const int cCount = 1;
 EasyTcpClient *client[cCount];
-const int tCount = 4;//线程数量
+const int tCount = 1;//线程数量
 std::atomic_int m_sendCount = 0;
 std::atomic_int m_readyCount = 0;
 
@@ -83,10 +83,6 @@ void recvthread(int begin, int end)
 	{
 		for (int i = begin; i < end; i++)
 		{
-			if (t.getElaspedSecond() > 3.0 && i == begin)
-			{
-				continue;
-			}
 			client[i]->OnRun();
 		}
 	}
@@ -112,7 +108,7 @@ void sendthread(int id)
 	//建立接收线程
 	std::thread mythread(recvthread, begin, end);
 	mythread.detach();
-	 CELLLog::Info("线程 %d进入,nConnect<begin=%d><end=%d>\n", id,begin,end);
+	CELLLog::Info("线程 %d进入,nConnect<begin=%d><end=%d>\n", id,begin,end);
 	if (!g_Run)
 	{
 		for (int i = begin; i < end; i++)
@@ -125,7 +121,7 @@ void sendthread(int id)
 	while (m_readyCount < tCount)
 	{
 		//等待其他线程准备好发送数据
-		std::chrono::milliseconds t(1);
+		std::chrono::milliseconds t(10);
 		std::this_thread::sleep_for(t);
 	}
 	//
@@ -144,8 +140,12 @@ void sendthread(int id)
 			{
 				m_sendCount++;
 			}
+			else
+			{
+				//CELLLog::Info("客户端发送数据失败client = %d",client[i]->getCurClient()->getSocket());
+			}
 		}
-		std::chrono::milliseconds t(1);
+		std::chrono::milliseconds t(500);
 		std::this_thread::sleep_for(t);
 
 	}
@@ -179,10 +179,10 @@ int  main()
 			m_sendCount = 0;
 			tcurTime.update();
 		}
-		Sleep(1);
+		CELLThread::Sleep(1);
 	}
 	
-	 CELLLog::Info("已退出\n");
+	CELLLog::Info("已退出\n");
 	getchar();
 	return 0;
 }

@@ -108,6 +108,7 @@ public:
 			if (bNeedWrite)
 			{
 				ret = select(m_maxSock + 1, &fd_read, &fd_write, nullptr, &t);
+				bNeedWrite = false;
 			}
 			else
 			{
@@ -161,7 +162,7 @@ public:
 					continue;
 				}
 			}
-			/*iter->second->checkSendTime(dt);*/
+			iter->second->checkSendTime(dt);
 			iter++;
 		}
 	}
