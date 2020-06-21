@@ -17,7 +17,7 @@ public:
 		_nSize = nSize;
 		_pBuff = pData;
 	}
-	~CELLStream()
+	virtual ~CELLStream()
 	{
 		if (_pBuff && _bDelete)
 		{
@@ -25,7 +25,20 @@ public:
 			_pBuff = nullptr;
 		}
 	}
-private:
+
+	char* Data()
+	{
+		return _pBuff;
+	}
+	int length()
+	{
+		return _nWritePos;
+	}
+	inline void setWritePos(int n)
+	{
+		_nWritePos = n;
+	}
+protected:
 	inline bool canRead(uint32_t n)
 	{
 		return _nSize - _nReadPos >= n;

@@ -37,6 +37,7 @@ public:
 	//处理网络信息
 	void  OnRun(CELLThread *pThread)
 	{
+		CELLLog::Info("CELLServer::OnRun() start--------------\n");
 		while (pThread->isRun())
 		{
 			m_client_change = false;
@@ -301,6 +302,7 @@ public:
 
 	void Start()
 	{
+		CELLLog::Info("CELLServer::Start()");
 		m_thread.Start(nullptr,
 			[this](CELLThread *pThread) {
 			OnRun(pThread);},

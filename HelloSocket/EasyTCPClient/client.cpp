@@ -70,9 +70,9 @@ void cmdthread()
 	}
 }
 
-const int cCount = 1;
+const int cCount = 1000;
 EasyTcpClient *client[cCount];
-const int tCount = 1;//线程数量
+const int tCount = 4;//线程数量
 std::atomic_int m_sendCount = 0;
 std::atomic_int m_readyCount = 0;
 
@@ -103,7 +103,7 @@ void sendthread(int id)
 			return ;
 		}
 		client[i] = new MyClient;
-		client[i]->Connect("127.0.0.1", 4567);
+		client[i]->Connect("127.0.0.1", 4568);
 	}
 	//建立接收线程
 	std::thread mythread(recvthread, begin, end);
@@ -145,7 +145,7 @@ void sendthread(int id)
 				//CELLLog::Info("客户端发送数据失败client = %d",client[i]->getCurClient()->getSocket());
 			}
 		}
-		std::chrono::milliseconds t(500);
+		std::chrono::milliseconds t(200);
 		std::this_thread::sleep_for(t);
 
 	}

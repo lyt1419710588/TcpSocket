@@ -20,6 +20,6 @@ int main()
 	call = [n](int a, int b) -> int {
 		return 10;
 	};
-	int n = call(5, 6);
+	n = call(5, 6);
 	return 0;
 }

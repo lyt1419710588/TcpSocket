@@ -100,7 +100,7 @@ public:
 			fd_set fd_write;
 			FD_ZERO(&fd_write);
 
-			timeval tl = { 0,0 };
+			timeval tl = { 0,10 };
 			int ret;
 			if (_pClient->needWrite())
 			{
@@ -187,7 +187,10 @@ public:
 	{
 		return _pClient->SendData(data);
 	}
-
+	int SendData(const char* pData, int nLen)
+	{
+		return _pClient->SendData(pData, nLen);
+	}
 	CellClient *getCurClient()
 	{
 		return _pClient;

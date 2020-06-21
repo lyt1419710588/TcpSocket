@@ -78,18 +78,17 @@ public:
 	//发送SOCKET数据
 	int SendData(std::shared_ptr<DataHeader> header)
 	{
-		int ret = SOCKET_ERROR;
-		if (header)
-		{
-			
-			if (m_SendBuff.push((const char*)header.get(),header->dataLength))
-			{
-				return header->dataLength;
-			}
-		}
-		return ret;
+		return SendData((const char*)header.get(), header->dataLength);
 	}
 
+	int SendData(const char* pData,int nLen)
+	{
+		if (m_SendBuff.push(pData, nLen))
+		{
+			return nLen;
+		}
+		return SOCKET_ERROR;
+	}
 	//计时重置
 	void resetDTHeart()
 	{

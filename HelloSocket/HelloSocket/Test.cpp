@@ -1,7 +1,7 @@
 #include "EasyTcpClient.hpp"
 
 #include "CELLStream.hpp"
-
+#include "CELLMSGStream.hpp"
 class MyClient :public EasyTcpClient
 {
 public:
@@ -10,11 +10,26 @@ public:
 		//处理客户端请求
 		switch (header->cmd)
 		{
-		case CMD_LOGIN_RESULT:
+		case CMD_LOGOUT_RESULT:
 		{
 			//接收服务器返回的数据
-			LoginResult *ret = (LoginResult*)header;
+			/*LoginResult *ret = (LoginResult*)header;*/
 			// CELLLog::Info("收到服务端消息：retLogin = %d，数据长度:%d\n", ret->result, header->dataLength);
+
+			CELLRecvStream r(header);
+			auto s1 = r.readInt8();
+			auto s2 = r.readInt16();
+			auto s3 = r.readInt32();
+			auto s4 = r.readFloat();
+			auto s5 = r.readDouble();
+
+
+			char strName1[10] = {};
+			r.ReadArray(strName1, 10);
+
+			int pas1[10] = {};
+			r.ReadArray(pas1, 10);
+
 		}
 		break;
 		case CMD_ERROR:
@@ -33,20 +48,21 @@ public:
 };
 int  main()
 {
-	CELLStream s;
+	CELLSendStream s;
 
+	s.setNetCmd(CMD_LOGOUT);
 	s.writeInt8(15);
 	s.writeInt16(15);
 	s.writeInt32(15);
 	s.writeFloat(15.333f);
 	s.writeDouble(15.333f);
-	char* strName = "laoli";
+	char* strName = "client";
 	s.writeArray(strName,strlen(strName));
 
 	int pas[5] = {1,2,3,4,5};
 	s.writeArray(pas, 5);
-
-	auto s1 = s.readInt8();
+	s.finish();
+	/*auto s1 = s.readInt8();
 	auto s2 = s.readInt16();
 	auto s3 = s.readInt32();
 	auto s4 = s.readFloat();
@@ -58,14 +74,15 @@ int  main()
 
 	int pas1[10] = {};
 	s.ReadArray(pas1, 10);
-
+*/
 
 	MyClient client;
-	client.Connect("127.0.0.1", 4567);
+	client.Connect("127.0.0.1", 4568);
+	client.SendData(s.Data(),s.length());
 	while (client.isRun())
 	{
 		client.OnRun();
-		CELLThread::Sleep(500);
+		CELLThread::Sleep(10);
 	}
 	return 0;
 }

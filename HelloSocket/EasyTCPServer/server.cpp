@@ -1,9 +1,7 @@
 #/*include "Alloctor.h"*/
 #include "Cell.hpp"
 #include "EasyTcpServer.hpp"
-#include <stdio.h>
-#include <thread>
-
+#include "CELLMSGStream.hpp"
 //bool g_Run = true;
 //void cmdthread()
 //{
@@ -73,6 +71,38 @@ public:
 			//LogoutResult ret;
 			//ret.result = 1;
 			//SendData(_cSock, &ret);
+
+			CELLRecvStream r(header);
+			r.getNetCmd();
+			auto s1 = r.readInt8();
+			auto s2 = r.readInt16();
+			auto s3 = r.readInt32();
+			auto s4 = r.readFloat();
+			auto s5 = r.readDouble();
+
+
+			char strName1[10] = {};
+			r.ReadArray(strName1, 10);
+
+			int pas1[10] = {};
+			r.ReadArray(pas1, 10);
+
+			CELLSendStream s;
+
+			s.setNetCmd(CMD_LOGOUT_RESULT);
+			s.writeInt8(15);
+			s.writeInt16(15);
+			s.writeInt32(15);
+			s.writeFloat(15.333f);
+			s.writeDouble(15.333f);
+			char* strName = "server";
+			s.writeArray(strName, strlen(strName));
+
+			int pas[5] = { 1,2,3,4,5 };
+			s.writeArray(pas, 5);
+			s.finish();
+
+			pClient->SendData(s.Data(), s.length());
 		}
 		break;
 		case CMD_HEART_C2S:
@@ -95,9 +125,9 @@ int  main()
 	CELLLog::Instance().setLogPath("server.txt","w");
 	Myserver server;
 	server.initSocket();
-	server.Bind(nullptr, 4567);
+	server.Bind("127.0.0.1", 4568);
 	server.Listen(5);
-	server.Start(4);
+	server.Start(1);
 	/*std::thread mythread(cmdthread);
 	mythread.detach();*/
 	char cmdBUF[128] = {};
