@@ -80,6 +80,7 @@ private:
 	CELLSemaphore m_sem;
 	//多线程中使用该线程类枷锁
 	std::mutex m_mutex;
-	bool m_bRun;
+	//初始化为flase
+	bool m_bRun = false;
 };
 #endif // !_CELLTHREAD_HPP_

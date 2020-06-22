@@ -73,7 +73,7 @@ public:
 			//SendData(_cSock, &ret);
 
 			CELLRecvStream r(header);
-			r.getNetCmd();
+			
 			auto s1 = r.readInt8();
 			auto s2 = r.readInt16();
 			auto s3 = r.readInt32();
@@ -103,6 +103,7 @@ public:
 			s.finish();
 
 			pClient->SendData(s.Data(), s.length());
+			CELLLog::Info("myserver::OnNetMsg:Recv CMD_LOGOUT MSG \n");
 		}
 		break;
 		case CMD_HEART_C2S:

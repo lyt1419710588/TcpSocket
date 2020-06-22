@@ -8,6 +8,10 @@ public:
 	CELLRecvStream(DataHeader* pHeader):CELLStream((char*)pHeader,pHeader->dataLength)
 	{
 		push(pHeader->dataLength);
+		//读取长度
+		readInt16();
+		//读取命令
+		getNetCmd();
 	}
 
 	uint16_t getNetCmd()
@@ -45,6 +49,20 @@ public:
 		setWritePos(0);
 		Write<uint16_t>(pos);
 		setWritePos(pos);
+	}
+
+	bool WriteString(const char* str, int length)
+	{
+		return writeArray(str, length);
+	}
+	bool WriteString(const char* str)	
+	{
+		return writeArray(str, strlen(str));
+	}
+
+	bool WriteString(const std::string str)
+	{
+		return writeArray(str.c_str(), str.length());
 	}
 private:
 

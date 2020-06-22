@@ -16,8 +16,8 @@ struct DataHeader {
 		dataLength = sizeof(DataHeader);
 		cmd = CMD_ERROR;
 	}
-	short cmd;
 	short dataLength;
+	short cmd;
 };
 struct Login :public DataHeader
 {

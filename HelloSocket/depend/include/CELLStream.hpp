@@ -1,5 +1,6 @@
 #ifndef _CELL_STAREAM_HPP_
 #define _CELL_STAREAM_HPP_
+#include "CELLLog.hpp"
 #include <cstdint>
 
 class CELLStream
@@ -9,6 +10,7 @@ public:
 	{
 		_nSize = nSize;
 		_pBuff = new char[_nSize];
+		memset(_pBuff, 0, nSize);
 	}
 
 	CELLStream(char* pData,int nSize = 1024,bool bDel = false)
@@ -71,6 +73,8 @@ public:
 			}
 			return true;
 		}
+		//¥ÌŒÛ»’÷æ
+		CELLLog::Info("error,CELLStream::Read failed \n");
 		return false;
 	}
 	template<typename T>
@@ -97,6 +101,7 @@ public:
 				return tLen;
 			}
 		}
+		CELLLog::Info("error,CELLStream::ReadArray failed \n");
 		return 0;
 	}
 	////read
@@ -170,6 +175,7 @@ public:
 			push(aLen);
 			return true;
 		}
+		CELLLog::Info("error,CELLStream::writeArray failed \n");
 		return false;
 	}
 	
@@ -183,6 +189,7 @@ public:
 			push(nLen);
 			return true;
 		}
+		CELLLog::Info("error,CELLStream::Write failed \n");
 		return false;
 	}
 private:

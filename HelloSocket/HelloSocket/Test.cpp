@@ -62,7 +62,9 @@ int  main()
 	int pas[5] = {1,2,3,4,5};
 	s.writeArray(pas, 5);
 	s.finish();
-	/*auto s1 = s.readInt8();
+	/*auto sLength = s.readInt16();
+	auto scmd = s.readInt16();
+	auto s1 = s.readInt8();
 	auto s2 = s.readInt16();
 	auto s3 = s.readInt32();
 	auto s4 = s.readFloat();
@@ -73,8 +75,8 @@ int  main()
 	s.ReadArray(strName1, 10);
 
 	int pas1[10] = {};
-	s.ReadArray(pas1, 10);
-*/
+	s.ReadArray(pas1, 10);*/
+
 
 	MyClient client;
 	client.Connect("127.0.0.1", 4568);

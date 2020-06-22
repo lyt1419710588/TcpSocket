@@ -165,31 +165,43 @@ public:
 	int m_lastPos = 0;
 	int RecvData()
 	{	
-		//接收客户端的请求数据
-		int nLen = _pClient->RecvData();
-
-		if (nLen > 0)
+		if (isRun())
 		{
-			while (_pClient->hasMsg())
+			//接收客户端的请求数据
+			int nLen = _pClient->RecvData();
+
+			if (nLen > 0)
 			{
-				//处理网络消息
-				OnNetMsg(_pClient->front_msg());
-				//移除消息队列（缓冲区）最前端的数据
-				_pClient->pop_front_msg();
+				while (_pClient->hasMsg())
+				{
+					//处理网络消息
+					OnNetMsg(_pClient->front_msg());
+					//移除消息队列（缓冲区）最前端的数据
+					_pClient->pop_front_msg();
+				}
 			}
+			return nLen;
 		}
-		return nLen;
+		return 0;
 	}
 	//响应网络数据
 	virtual void OnNetMsg(DataHeader* header)  = 0;
 	//发送数据
 	int SendData(std::shared_ptr<DataHeader> data)
 	{
-		return _pClient->SendData(data);
+		if (isRun())
+		{
+			return _pClient->SendData(data);
+		}
+		return 0;
 	}
 	int SendData(const char* pData, int nLen)
 	{
-		return _pClient->SendData(pData, nLen);
+		if (isRun())
+		{
+			return _pClient->SendData(pData, nLen);
+		}
+		return 0;
 	}
 	CellClient *getCurClient()
 	{

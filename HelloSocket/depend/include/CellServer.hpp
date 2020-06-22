@@ -245,7 +245,7 @@ public:
 		
 		if (nLen < 0)
 		{
-			//CELLLog::Info("客户端<socket = %d>已退出！，任务结束！\n", pClient->getSocket());
+			CELLLog::Info("客户端<socket = %d>已退出！，任务结束！\n", pClient->getSocket());
 			return -1;
 		}
 		//接收网络数据事件
@@ -302,13 +302,14 @@ public:
 
 	void Start()
 	{
-		CELLLog::Info("CELLServer::Start()");
+		CELLLog::Info("CELLServer::Start(),in");
+		m_CellTaskServer.Start();
 		m_thread.Start(nullptr,
 			[this](CELLThread *pThread) {
 			OnRun(pThread);},
 			[this](CELLThread *pThread) {
 				ClearClients(); });
-		m_CellTaskServer.Start();
+		CELLLog::Info("CELLServer::Start(),out");
 	}
 
 	size_t getClientNum()
