@@ -14,7 +14,7 @@ public:
 		{
 			//接收服务器返回的数据
 			/*LoginResult *ret = (LoginResult*)header;*/
-			// CELLLog::Info("收到服务端消息：retLogin = %d，数据长度:%d\n", ret->result, header->dataLength);
+			// CELLLog_Info("收到服务端消息：retLogin = %d，数据长度:%d\n", ret->result, header->dataLength);
 
 			CELLRecvStream r(header);
 			auto s1 = r.readInt8();
@@ -35,12 +35,12 @@ public:
 		case CMD_ERROR:
 		{
 			//接收服务器返回的数据
-			CELLLog::Info("收到服务端消息：CMD_ERROR  sock = %d，数据长度:%d\n", _pClient->getSocket(), header->dataLength);
+			CELLLog_Info("收到服务端消息：CMD_ERROR  sock = %d，数据长度:%d\n", _pClient->getSocket(), header->dataLength);
 		}
 		break;
 		default:
 		{
-			CELLLog::Info("收到服务端未定义数据，  sock = %d，数据长度:%d\n", _pClient->getSocket(), header->dataLength);
+			CELLLog_Info("收到服务端未定义数据，  sock = %d，数据长度:%d\n", _pClient->getSocket(), header->dataLength);
 		}
 		break;
 		}

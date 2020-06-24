@@ -24,18 +24,18 @@ public:
 		CELLNetWork::Init();
 		if (_pClient)
 		{
-			 CELLLog::Info("关闭之前链接，socket = %d\n",_pClient->getSocket());
+			CELLLog_Info("关闭之前链接，socket = %d",_pClient->getSocket());
 			Close();
 		}
 		SOCKET sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 		if (INVALID_SOCKET == sock)
 		{
-			 CELLLog::Info("socket = %d建立失败\n", _pClient->getSocket());
+			 CELLLog_Info("socket = %d建立失败", _pClient->getSocket());
 		}
 		else
 		{
 			_pClient = new CellClient(sock);
-			 //CELLLog::Info("socket = %d建立成功\n", _pClient->getSocket());
+			 //CELLLog_Info("socket = %d建立成功", _pClient->getSocket());
 		}
 		return 0;
 	}
@@ -44,7 +44,7 @@ public:
 	{
 		if (!_pClient)
 		{
-			//CELLLog::Info("初始化socket\n");
+			//CELLLog_Info("初始化socket");
 			initSocket();
 		}
 		//链接
@@ -56,16 +56,16 @@ public:
 #else
 		_sin.sin_addr.s_addr = inet_addr(ip);
 #endif
-		//CELLLog::Info("<socket=%d>正在链接服务器<%s,%d>\n",_pClient->getSocket(),ip,port);
+		//CELLLog_Info("<socket=%d>正在链接服务器<%s,%d>",_pClient->getSocket(),ip,port);
 		int ret = connect(_pClient->getSocket(), (sockaddr*)&_sin, sizeof(sockaddr_in));
 		if (SOCKET_ERROR == ret)
 		{
-			 CELLLog::Info("socket = %d 链接服务器%s,%d失败\n", _pClient->getSocket(), ip, port);
+			 CELLLog_Info("socket = %d 链接服务器%s,%d失败", _pClient->getSocket(), ip, port);
 		}
 		else
 		{
 			m_isConnected = true;
-		    //CELLLog::Info("socket = %d 链接服务器%s,%d\n", _pClient->getSocket(), ip, port);
+		    //CELLLog_Info("socket = %d 链接服务器%s,%d", _pClient->getSocket(), ip, port);
 		}
 		return ret;
 	}
@@ -112,18 +112,18 @@ public:
 				 ret = select(m_sock, &fd_read, nullptr, nullptr, &tl);
 			}
 			
-			//  CELLLog::Info("select ret = %d,count  = %d\n", ret, _count++);
+			//  CELLLog_Info("select ret = %d,count  = %d", ret, _count++);
 			if (ret < 0)
 			{
-				CELLLog::Info("select = %d 与服务端断开链接，任务结束\n", m_sock);
+				CELLLog_Info("select = %d 与服务端断开链接，任务结束", m_sock);
 				Close();
 				return false;
 			}
 			if (FD_ISSET(m_sock, &fd_read))
 			{
-				if (-1 == RecvData())
+				if (SOCKET_ERROR == RecvData())
 				{
-					CELLLog::Info("select = %d 任务结束2\n",m_sock);
+					CELLLog_Info("select = %d 任务结束2",m_sock);
 					Close();
 					return false;
 				}
@@ -131,15 +131,15 @@ public:
 
 			if (FD_ISSET(m_sock, &fd_write))
 			{
-				if (-1 == _pClient->SendDataReal())
+				if (SOCKET_ERROR == _pClient->SendDataReal())
 				{
-					CELLLog::Info("select = %d 任务结束2\n", m_sock);
+					CELLLog_Info("select = %d 任务结束2", m_sock);
 					Close();
 					return false;
 				}
 			/*	else
 				{
-					CELLLog::Info("select = %d 数据发送\n", m_sock);
+					CELLLog_Info("select = %d 数据发送", m_sock);
 				}*/
 			}
 			return true;

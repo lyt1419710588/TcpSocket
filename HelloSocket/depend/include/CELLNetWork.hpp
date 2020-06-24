@@ -24,7 +24,7 @@ private:
 	{
 #ifdef _WIN32
 		WSACleanup();
-		CELLLog::Info("socket 环境清理  \n");
+		CELLLog_Info("socket 环境清理  ");
 #endif // _WIN32
 
 	}

@@ -53,9 +53,9 @@ public:
 	void Close()
 	{
 		
-		//CELLLog::Info("CellTaskServer%d Close begin\n", serverID);
+		//CELLLog_Info("CellTaskServer%d Close begin", serverID);
 		m_thread.Close();
-		//CELLLog::Info("CellTaskServer%d Close end\n", serverID);
+		//CELLLog_Info("CellTaskServer%d Close end", serverID);
 	}
 private:
 	//¹¤×÷º¯Êý
@@ -92,7 +92,7 @@ private:
 		{
 			Task();
 		}
-		//CELLLog::Info("CellTaskServer%d,OnRun stop \n",serverID);
+		//CELLLog_Info("CellTaskServer%d,OnRun stop ",serverID);
 	}
 };
 

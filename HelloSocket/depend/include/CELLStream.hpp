@@ -74,7 +74,7 @@ public:
 			return true;
 		}
 		//¥ÌŒÛ»’÷æ
-		CELLLog::Info("error,CELLStream::Read failed \n");
+		CELLLog_Error("CELLStream::Read failed ");
 		return false;
 	}
 	template<typename T>
@@ -101,7 +101,7 @@ public:
 				return tLen;
 			}
 		}
-		CELLLog::Info("error,CELLStream::ReadArray failed \n");
+		CELLLog_Error("CELLStream::ReadArray failed ");
 		return 0;
 	}
 	////read
@@ -175,7 +175,7 @@ public:
 			push(aLen);
 			return true;
 		}
-		CELLLog::Info("error,CELLStream::writeArray failed \n");
+		CELLLog_Error("CELLStream::writeArray failed ");
 		return false;
 	}
 	
@@ -189,7 +189,7 @@ public:
 			push(nLen);
 			return true;
 		}
-		CELLLog::Info("error,CELLStream::Write failed \n");
+		CELLLog_Error("CELLStream::Write failed ");
 		return false;
 	}
 private:

@@ -12,7 +12,7 @@
 //		if (0 == strcmp(cmdBUF, "exit"))
 //		{
 //			g_Run = false;
-//			CELLLog::Info("退出线程\n");
+//			CELLLog_Info("退出线程");
 //			break;
 //		}
 //	}
@@ -48,7 +48,7 @@ public:
 
 			pClient->resetDTHeart();
 			Login *login = (Login*)header;
-			//CELLLog::Info("收到命令<socket = %d>CMD_LOGIN 数据长度:%d,userName = %s Password = %s\n", _cSock,header->dataLength, login->userName, login->password);
+			//CELLLog_Info("收到命令<socket = %d>CMD_LOGIN 数据长度:%d,userName = %s Password = %s", _cSock,header->dataLength, login->userName, login->password);
 			//忽略判断用户名密码是否正确
 			//LoginResult loginresult;
 			//loginresult.result = 1;
@@ -59,14 +59,14 @@ public:
 			//if (SOCKET_ERROR == pClient->SendData(ret))
 			//{
 			//	//缓冲区满
-			//	CELLLog::Info("<socket = %d,Send Buff Full!!!!\n>",pClient->getSocket());
+			//	CELLLog_Info("<socket = %d,Send Buff Full!!!!\n>",pClient->getSocket());
 			//}
 		}
 		break;
 		case CMD_LOGOUT:
 		{
 			//Logout *logout = (Logout*)header;
-			//CELLLog::Info("收到命令<socket = %d>CMD_LOGOUT 数据长度:%d,userName = %s\n", _cSock, header->dataLength, logout->userName);
+			//CELLLog_Info("收到命令<socket = %d>CMD_LOGOUT 数据长度:%d,userName = %s", _cSock, header->dataLength, logout->userName);
 			//忽略判断用户名密码是否正确
 			//LogoutResult ret;
 			//ret.result = 1;
@@ -103,7 +103,7 @@ public:
 			s.finish();
 
 			pClient->SendData(s.Data(), s.length());
-			CELLLog::Info("myserver::OnNetMsg:Recv CMD_LOGOUT MSG \n");
+			CELLLog_Info("myserver::OnNetMsg:Recv CMD_LOGOUT MSG ");
 		}
 		break;
 		case CMD_HEART_C2S:
@@ -114,21 +114,59 @@ public:
 		}
 		break;
 		default:
-			CELLLog::Info("未定义数据，  sock = %d，数据长度:%d\n", pClient->getSocket(), header->dataLength);
+			CELLLog_Info("未定义数据，  sock = %d，数据长度:%d", pClient->getSocket(), header->dataLength);
 			//DataHeader header;
 			//SendData(_cSock, &header);
 			break;
 		}
 	}
 };
-int  main()
+
+const char* argToStr(int argc,char* args[],int index,const char* def,const char* argName)
 {
-	CELLLog::Instance().setLogPath("server.txt","w");
+	if (index >= argc)
+	{
+		CELLLog_Error("argToStr,index = %d ,argc = %d,argName = %s ",index,argc, argName);
+	}
+	else
+	{
+		def = args[index];
+	}
+	CELLLog_Info("%s = %s",argName,def);
+	return def;
+}
+
+int argToInt(int argc, char* args[], int index, int def, const char* argName)
+{
+	if (index >= argc)
+	{
+		CELLLog_Error("argToInt,index = %d ,argc = %d，argName = %s", index, argc, argName);
+	}
+	else
+	{
+		def = atoi(args[index]);
+	}
+	CELLLog_Info("%s = %d", argName, def);
+	return def;
+}
+int  main(int argc,char *args[])
+{
+	CELLLog::Instance().setLogPath("server", "w");
+
+	const char *strIP = argToStr(argc,args,1,"any","IP");
+	uint16_t nPort = (uint16_t)argToInt(argc, args, 2, 4567, "nPort");
+	int nThread = argToInt(argc, args, 3, 1, "nThread");
+	int nClient = argToInt(argc, args, 4, 1, "nClient");
+
+	if (strcmp(strIP,"any") == 0)
+	{
+		strIP = nullptr;
+	}
 	Myserver server;
 	server.initSocket();
-	server.Bind("127.0.0.1", 4568);
+	server.Bind(strIP, nPort);
 	server.Listen(5);
-	server.Start(1);
+	server.Start(nThread);
 	/*std::thread mythread(cmdthread);
 	mythread.detach();*/
 	char cmdBUF[128] = {};
@@ -138,17 +176,17 @@ int  main()
 		if (0 == strcmp(cmdBUF, "exit"))
 		{
 			server.Close();
-			CELLLog::Info("退出线程\n");
+			CELLLog_Info("退出线程");
 			break;
 		}
 		else
 		{
-			CELLLog::Info("不支持的命令！！！\n");
+			CELLLog_Info("不支持的命令！！！");
 		}
 	}
 
 	
-    CELLLog::Info("已退出\n");
+    CELLLog_Info("已退出");
 	/*while (true)
 	{
 		Sleep(1);

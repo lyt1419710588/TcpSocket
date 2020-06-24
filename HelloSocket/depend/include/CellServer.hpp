@@ -37,7 +37,7 @@ public:
 	//处理网络信息
 	void  OnRun(CELLThread *pThread)
 	{
-		CELLLog::Info("CELLServer::OnRun() start--------------\n");
+		CELLLog_Info("CELLServer::OnRun() start--------------");
 		while (pThread->isRun())
 		{
 			m_client_change = false;
@@ -116,10 +116,10 @@ public:
 				ret = select(m_maxSock + 1, &fd_read, nullptr, nullptr, &t);
 			}
 			
-			//CELLLog::Info("select ret = %d,count  = %d\n",ret, _count++);
+			//CELLLog_Info("select ret = %d,count  = %d",ret, _count++);
 			if (ret < 0)
 			{
-				CELLLog::Info("CELLServer%d,OnRun,selectr任务结束，ERROR\n",m_id);
+				CELLLog_Info("CELLServer%d,OnRun,selectr任务结束，ERROR",m_id);
 				pThread->Exit();
 				break;
 			}
@@ -132,14 +132,14 @@ public:
 			WriteData(fd_write);
 			//WriteData(fd_Exc);
 			
-			//CELLLog::Info("CELLServer%d,fd_write=%d.fd_read=%d\n", m_id,fd_write.fd_count,fd_read.fd_count);
+			//CELLLog_Info("CELLServer%d,fd_write=%d.fd_read=%d", m_id,fd_write.fd_count,fd_read.fd_count);
 			/*if (fd_Exc.fd_count > 0)
 			{
-				CELLLog::Info("######fd_Exc=%d\n", fd_Exc.fd_count);
+				CELLLog_Info("######fd_Exc=%d", fd_Exc.fd_count);
 			}*/
 			//return true;
 		}
-		CELLLog::Info("CellServer%d,OnRun exit\n",m_id);
+		CELLLog_Info("CellServer%d,OnRun exit",m_id);
 		//return false;
 	/*	return true;*/
 	}
@@ -245,7 +245,7 @@ public:
 		
 		if (nLen < 0)
 		{
-			CELLLog::Info("客户端<socket = %d>已退出！，任务结束！\n", pClient->getSocket());
+			CELLLog_Info("客户端<socket = %d>已退出！，任务结束！", pClient->getSocket());
 			return -1;
 		}
 		//接收网络数据事件
@@ -269,7 +269,7 @@ public:
 		/*auto t1 = m_tTime.getElaspedSecond();
 		if (t1 >= 1.0)
 		{
-		CELLLog::Info("time<%lf>,socket<%d>,clientNum<%d>,recvCount<%d>\n", t1, _cSock, m_vectClients.size(), m_recvCount);
+		CELLLog_Info("time<%lf>,socket<%d>,clientNum<%d>,recvCount<%d>", t1, _cSock, m_vectClients.size(), m_recvCount);
 		m_tTime.update();
 		m_recvCount = 0;
 		}*/
@@ -279,12 +279,12 @@ public:
 	//关闭
 	void Close()
 	{
-		CELLLog::Info("Cellserver%d Close begin\n", m_id);
+		CELLLog_Info("Cellserver%d Close begin", m_id);
 		
 		//清除环境
 		m_CellTaskServer.Close();
 		m_thread.Close();
-		CELLLog::Info("Cellserver%d Close end\n",m_id);
+		CELLLog_Info("Cellserver%d Close end",m_id);
 	}
 
 	void ClearClients()
@@ -302,14 +302,14 @@ public:
 
 	void Start()
 	{
-		CELLLog::Info("CELLServer::Start(),in");
+		CELLLog_Info("CELLServer::Start(),in");
 		m_CellTaskServer.Start();
 		m_thread.Start(nullptr,
 			[this](CELLThread *pThread) {
 			OnRun(pThread);},
 			[this](CELLThread *pThread) {
 				ClearClients(); });
-		CELLLog::Info("CELLServer::Start(),out");
+		CELLLog_Info("CELLServer::Start(),out");
 	}
 
 	size_t getClientNum()
