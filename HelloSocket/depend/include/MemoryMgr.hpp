@@ -1,4 +1,4 @@
-#ifndef _MEMORYMGR_HPP
+ï»¿#ifndef _MEMORYMGR_HPP
 #define _MEMORYMGR_HPP
 #include <stdlib.h>
 #include <assert.h>
@@ -14,26 +14,26 @@
 #endif // !_DEBUG
 
 class MemoryAlloc;
-//ÄÚ´æ¿ì
+//å†…å­˜å¿«
 class MemoryBlock
 {
 public:
-	//ÄÚ´æ¿é±àºÅ
+	//å†…å­˜å—ç¼–å·
 	int nID;
-	//ÒıÓÃ´ÎÊı
+	//å¼•ç”¨æ¬¡æ•°
 	int nRef;
-	//ËùÊô´óÄÚ´æ¿é
+	//æ‰€å±å¤§å†…å­˜å—
 	MemoryAlloc* pAlloc;
-	//ÏÂÒ»¿éÎ»ÖÃ
+	//ä¸‹ä¸€å—ä½ç½®
 	MemoryBlock* pNext;
-	//ÊÇ·ñÔÚÄÚ´æ³ØÖĞ
+	//æ˜¯å¦åœ¨å†…å­˜æ± ä¸­
 	bool bPool;
 private:
-	//Ô¤Áô
+	//é¢„ç•™
 	char cNull[3];
 };
 
-//ÄÚ´æ³Ø
+//å†…å­˜æ± 
 class MemoryAlloc
 {
 public:
@@ -51,7 +51,7 @@ public:
 			free(m_pBuf);
 		}
 	}
-	///ÉêÇëÄÚ´æ
+	///ç”³è¯·å†…å­˜
 	void* allocMem(size_t nLen)
 	{
 		std::lock_guard<std::mutex> t(m_mutex);
@@ -81,7 +81,7 @@ public:
 		xPrintf("allocMem:%llx,id=%d,size=%d\n", pReturn, pReturn->nID, nLen);
 		return ((char*)pReturn + sizeof(MemoryBlock));
 	}
-	//ÊÍ·ÅÄÚ´æ
+	//é‡Šæ”¾å†…å­˜
 	void freeMemory(void* pMem)
 	{
 		
@@ -109,21 +109,21 @@ public:
 			free(pBlock);
 		}
 	}
-	//³õÊ¼»¯ÄÚ´æ³Ø
+	//åˆå§‹åŒ–å†…å­˜æ± 
 	void InitMemory()
 	{
-		//¶ÏÑÔ
+		//æ–­è¨€
 		assert(nullptr == m_pBuf);
 		if (m_pBuf)
 		{
 			return;
 		}
-		xPrintf("ÄÚ´æ³Ø£º%llx³õÊ¼»¯,m_nSize = %d,m_nBlockSize = %d\n", m_pBuf, m_nSize, m_nBlockSize);
-		//¼ÆËãÄÚ´æ³Ø´óĞ¡
+		xPrintf("å†…å­˜æ± ï¼š%llxåˆå§‹åŒ–,m_nSize = %d,m_nBlockSize = %d\n", m_pBuf, m_nSize, m_nBlockSize);
+		//è®¡ç®—å†…å­˜æ± å¤§å°
 		size_t bufsize = (m_nSize + sizeof(MemoryBlock)) * m_nBlockSize;
-		//ÏñÏµÍ³ÉêÇë³ØµÄÄÚ´æ
+		//åƒç³»ç»Ÿç”³è¯·æ± çš„å†…å­˜
 		m_pBuf = (char*)malloc(bufsize);
-		//³õÊ¼»¯ÄÚ´æ³Ø
+		//åˆå§‹åŒ–å†…å­˜æ± 
 		m_pHeader = (MemoryBlock*)m_pBuf;
 		m_pHeader->bPool = true;
 		m_pHeader->nID = 0;
@@ -147,15 +147,15 @@ public:
 		}
 	}
 protected:
-	//ÄÚ´æ³ØÊ×µØÖ·
+	//å†…å­˜æ± é¦–åœ°å€
 	char* m_pBuf;
-	//Í·²¿ÄÚ´æµ¥Ôª
+	//å¤´éƒ¨å†…å­˜å•å…ƒ
 	MemoryBlock* m_pHeader;
-	//ÄÚ´æ³Ø´óĞ¡
+	//å†…å­˜æ± å¤§å°
 	size_t m_nSize;
-	//ÄÚ´æ³Ø¿éÊı
+	//å†…å­˜æ± å—æ•°
 	size_t m_nBlockSize;
-	//Ëø
+	//é”
 	std::mutex m_mutex;
 };
 
@@ -171,7 +171,7 @@ public:
 		m_nBlockSize = nBlockSize;
 	}
 };
-//ÄÚ´æ¹ÜÀí¹¤¾ß
+//å†…å­˜ç®¡ç†å·¥å…·
 class MemoryMgr
 {
 private:
@@ -192,11 +192,11 @@ private:
 public:
 	static MemoryMgr& Instance()
 	{
-		//µ¥Àı
+		//å•ä¾‹
 		static MemoryMgr mgr;
 		return mgr;
 	}
-	//ÉêÇëÄÚ´æ
+	//ç”³è¯·å†…å­˜
 	void* allocMem(size_t nLen)
 	{
 		if (nLen <= MAX_MEMORY_SIZE)
@@ -216,7 +216,7 @@ public:
 			return ((char*)pReturn + sizeof(MemoryBlock));
 		}	
 	}
-	//ÊÍ·ÅÄÚ´æ
+	//é‡Šæ”¾å†…å­˜
 	void freeMemory(void* pMem)
 	{
 		MemoryBlock* pBlock = (MemoryBlock*)((char*)pMem - sizeof(MemoryBlock));
@@ -234,14 +234,14 @@ public:
 		
 	}
 
-	//Ôö¼ÓÄÚ´æ¿éµÄÒıÓÃ
+	//å¢åŠ å†…å­˜å—çš„å¼•ç”¨
 	void addRef(void *pMem)
 	{
 		MemoryBlock* pBlock = (MemoryBlock*)((char*)pMem - sizeof(MemoryBlock));
 		pBlock->nRef++;
 	}
 private:
-	//³õÊ¼»¯ÄÚ´æ³ØÓ³ÉäÊı×é
+	//åˆå§‹åŒ–å†…å­˜æ± æ˜ å°„æ•°ç»„
 	void Init_szAlloc(int nBegin,int nEnd, MemoryAlloc* mem)
 	{
 		xPrintf("Init_szAlloc(nBegin = %d,nEnd = %d,mem = %llx \n)", nBegin, nEnd, mem);

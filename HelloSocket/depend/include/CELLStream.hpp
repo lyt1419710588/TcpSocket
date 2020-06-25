@@ -1,4 +1,4 @@
-#ifndef _CELL_STAREAM_HPP_
+ï»¿#ifndef _CELL_STAREAM_HPP_
 #define _CELL_STAREAM_HPP_
 #include "CELLLog.hpp"
 #include <cstdint>
@@ -73,7 +73,7 @@ public:
 			}
 			return true;
 		}
-		//´íÎóÈÕÖ¾
+		//é”™è¯¯æ—¥å¿—
 		CELLLog_Error("CELLStream::Read failed ");
 		return false;
 	}
@@ -82,13 +82,13 @@ public:
 	{
 		return Read(n, false);
 	}
-	//¶ÁÈ¡Êı×é
+	//è¯»å–æ•°ç»„
 	template<typename T>
 	uint32_t ReadArray(T *pData,uint32_t  nLen)
 	{
-		//¶ÁÈ¡Êı×éÔªËØ¸öÊı
+		//è¯»å–æ•°ç»„å…ƒç´ ä¸ªæ•°
 		uint32_t tLen = 0;
-		//¶ÁÈ¡Êı¾İ³¤¶È£¬µ«²»±ãÒË¶ÁÈ¡Î»ÖÃ
+		//è¯»å–æ•°æ®é•¿åº¦ï¼Œä½†ä¸ä¾¿å®œè¯»å–ä½ç½®
 		Read(tLen,false);
 		if (tLen < nLen)
 		{
@@ -193,16 +193,16 @@ public:
 		return false;
 	}
 private:
-	//Êı¾İ»º³åÇø
+	//æ•°æ®ç¼“å†²åŒº
 	char* _pBuff = nullptr;
-	//»º³åÇøµÄ´óĞ¡
+	//ç¼“å†²åŒºçš„å¤§å°
 	int _nSize = 0;
 
-	//ÒÑ¶ÁÈ¡µÄÊı¾İÎ²²¿Î»ÖÃ
+	//å·²è¯»å–çš„æ•°æ®å°¾éƒ¨ä½ç½®
 	int _nReadPos = 0;
-	//ÒÑĞ´µ½µÄÊı¾İÎ²²¿Î»ÖÃ
+	//å·²å†™åˆ°çš„æ•°æ®å°¾éƒ¨ä½ç½®
 	int _nWritePos = 0;
-	//»º³åÇøÊÇ·ñÓ¦¸Ã±»ÊÍ·Å
+	//ç¼“å†²åŒºæ˜¯å¦åº”è¯¥è¢«é‡Šæ”¾
 	bool _bDelete = true;
 
 };

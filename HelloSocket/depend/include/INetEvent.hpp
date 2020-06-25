@@ -1,21 +1,21 @@
-#ifndef _INETEVEMT_HPP_
+ï»¿#ifndef _INETEVEMT_HPP_
 #define _INETEVEMT_HPP_
 
 #include <memory>
 #include "CellClient.hpp"
-//ÍøÂçÊÂ¼ş½Ó¿Ú
+//ç½‘ç»œäº‹ä»¶æ¥å£
 class CellServer;
 class INetEvent
 {
 public:
-	//´¿Ğéº¯Êı
-	//¿Í»§¶Ë¼ÓÈëÊ±Í¨Öª£¬¿Í»§¶ËÀë¿ªÊÂ¼ş
+	//çº¯è™šå‡½æ•°
+	//å®¢æˆ·ç«¯åŠ å…¥æ—¶é€šçŸ¥ï¼Œå®¢æˆ·ç«¯ç¦»å¼€äº‹ä»¶
 	virtual void OnNetJoin(std::shared_ptr<CellClient> pClient) = 0;
-	//¿Í»§¶ËÀë¿ªÊ±Í¨Öª£¬¿Í»§¶ËÀë¿ªÊÂ¼ş
+	//å®¢æˆ·ç«¯ç¦»å¼€æ—¶é€šçŸ¥ï¼Œå®¢æˆ·ç«¯ç¦»å¼€äº‹ä»¶
 	virtual void OnNetLeave(std::shared_ptr<CellClient> pClient) = 0;
-	//¿Í»§¶Ë¶ËÊÕµ½ÏûÏ¢ºóÍ¨ÖªÖ÷Ïß³Ì
+	//å®¢æˆ·ç«¯ç«¯æ”¶åˆ°æ¶ˆæ¯åé€šçŸ¥ä¸»çº¿ç¨‹
 	virtual void OnNetMsg(CellServer* pCellServer, std::shared_ptr<CellClient> pClient, DataHeader*  header) = 0;
-	//recvÊÂ¼ş
+	//recväº‹ä»¶
 	virtual void OnNetRecv(std::shared_ptr<CellClient> pClient) = 0;
 private:
 

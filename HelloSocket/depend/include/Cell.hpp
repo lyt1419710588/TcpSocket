@@ -1,7 +1,7 @@
-#ifndef _CELL_HPP_
+ï»¿#ifndef _CELL_HPP_
 #define _CELL_HPP_
 
-//SOCKETÏà¹Ø
+//SOCKETç›¸å…³
 #ifdef _WIN32
 #define FD_SETSIZE 10024
 #define WIN32_LEAN_AND_MEAN
@@ -19,16 +19,16 @@
 #define SOCKET_ERROR (-1)
 #endif
 
-//×Ô¶¨Òå
+//è‡ªå®šä¹‰
 #include "MessageHeader.hpp"
 #include "CELLTimestamp.hpp"
 #include "CELLTask.hpp"
 #include "CELLIObjectPool.hpp"
 #include "CELLLog.hpp"
-//»º³åÇø
+//ç¼“å†²åŒº
 #ifndef RECV_BUFF_SIZE
-#define RECV_BUFF_SIZE 10240 * 2//»º³åÇø´óĞ¡
-#define SEND_BUFF_SIZE RECV_BUFF_SIZE //·¢ËÍ»º³åÇø 
+#define RECV_BUFF_SIZE 10240 * 2//ç¼“å†²åŒºå¤§å°
+#define SEND_BUFF_SIZE RECV_BUFF_SIZE //å‘é€ç¼“å†²åŒº 
 #endif // !RECV_BUFF_SIZE
 
 #endif // !_CELL_HPP_

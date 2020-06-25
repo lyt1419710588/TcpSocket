@@ -1,4 +1,4 @@
-#ifndef _EASYTCPSERVER_HPP
+ï»¿#ifndef _EASYTCPSERVER_HPP
 #define _EASYTCPSERVER_HPP
 
 #include "Cell.hpp"
@@ -15,22 +15,22 @@
 #include <atomic>
 #include <memory>
 
-//¿Í»§¶Ë½ÓÊÕ·şÎñ
+//å®¢æˆ·ç«¯æ¥æ”¶æœåŠ¡
 class EasyTcpServer :public INetEvent
 {
 private:
 	CELLThread m_thread;
     SOCKET m_sock;
-    //·şÎñÁĞ±í
+    //æœåŠ¡åˆ—è¡¨
     std::vector<std::shared_ptr<CellServer> > m_vectServers;
-    //Ã¿ÃëÏûÏ¢¼ÆÊ±
+    //æ¯ç§’æ¶ˆæ¯è®¡æ—¶
     CELLTimestamp m_tTime;
 protected:
-    //¿Í»§¶Ë¼ÆÊı
+    //å®¢æˆ·ç«¯è®¡æ•°
     std::atomic_int m_clientCount;
-	//½ÓÊÕµ½ÏûÏ¢°üÊó
+	//æ¥æ”¶åˆ°æ¶ˆæ¯åŒ…é¼ 
 	std::atomic_int m_recvCount;
-	//ÏûÏ¢°üÊı
+	//æ¶ˆæ¯åŒ…æ•°
 	std::atomic_int  m_msgCount;
 public:
     EasyTcpServer()
@@ -44,33 +44,33 @@ public:
     {
         Close();
     }
-    //³õÊ¼»¯
+    //åˆå§‹åŒ–
     SOCKET initSocket()
     {
 		CELLNetWork::Init();
 
         if (INVALID_SOCKET != m_sock)
         {
-            CELLLog_Info("¹Ø±ÕÖ®Ç°Á´½Ó£¬socket = %d", m_sock);
+            CELLLog_Info("å…³é—­ä¹‹å‰é“¾æ¥ï¼Œsocket = %d", m_sock);
             Close();
         }
         m_sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
         if (INVALID_SOCKET == m_sock)
         {
-            CELLLog_Info("socket = %d½¨Á¢Ê§°Ü", m_sock);
+            CELLLog_Info("socket = %då»ºç«‹å¤±è´¥", m_sock);
         }
         else
         {
-            CELLLog_Info("socket = %d½¨Á¢³É¹¦", m_sock);
+            CELLLog_Info("socket = %då»ºç«‹æˆåŠŸ", m_sock);
         }
         return m_sock;
     }
-    //°ó¶¨¶Ë¿ÚºÅ
+    //ç»‘å®šç«¯å£å·
     int Bind(const char* ip, unsigned short port)
     {
         if (INVALID_SOCKET == m_sock)
         {
-            CELLLog_Info("³õÊ¼»¯socket");
+            CELLLog_Info("åˆå§‹åŒ–socket");
             initSocket();
         }
         //bind
@@ -99,26 +99,26 @@ public:
         int ret = bind(m_sock, (sockaddr*)&_sin, sizeof(_sin));
         if (SOCKET_ERROR == ret)
         {
-            CELLLog_Error("°ó¶¨¶Ë¿ÚÊ§°Ü,%d£¡", port);
+            CELLLog_Error("ç»‘å®šç«¯å£å¤±è´¥,%dï¼", port);
         }
         else
         {
-            CELLLog_Info("SUCCESS,°ó¶¨¶Ë¿Ú³É¹¦:%d£¡", port);
+            CELLLog_Info("SUCCESS,ç»‘å®šç«¯å£æˆåŠŸ:%dï¼", port);
         }
         return ret;
     }
-    //¼àÌı
+    //ç›‘å¬
     int Listen(int n)
     {
         //listen
         int ret = listen(m_sock, n);
         if (SOCKET_ERROR == ret)
         {
-            CELLLog_Error("socket = %d¼àÌıÊ§°Ü£¡", m_sock);
+            CELLLog_Error("socket = %dç›‘å¬å¤±è´¥ï¼", m_sock);
         }
         else
         {
-            CELLLog_Info("SUCCESS,socket = %d¼àÌı³É¹¦£¡", m_sock);
+            CELLLog_Info("SUCCESS,socket = %dç›‘å¬æˆåŠŸï¼", m_sock);
         }
         return ret;
     }
@@ -140,28 +140,28 @@ public:
         _cSock = accept(m_sock, (sockaddr*)&clientA, &nClientA);
         if (INVALID_SOCKET == _cSock)
         {
-            CELLLog_Info("socket = %d´íÎó£¬½ÓÊÜµÄ¿Í»§¶ËSOCKET ÎŞĞ§", m_sock);
+            CELLLog_Info("socket = %dé”™è¯¯ï¼Œæ¥å—çš„å®¢æˆ·ç«¯SOCKET æ— æ•ˆ", m_sock);
         }
         else
         {
             //NewUserJoin userJoin;
             //userJoin.sock = _cSock;
             //SendDataToAll((DataHeader*)&userJoin);
-			//Ö±½Ómake_sharedÎŞ·¨½øÈë¶ÔÏó³Ø 
+			//ç›´æ¥make_sharedæ— æ³•è¿›å…¥å¯¹è±¡æ±  
 			std::shared_ptr<CellClient> c(new CellClient(_cSock));
 			addClientToCellServer(c);
            // addClientToCellServer(std::make_shared<CellClient>(_cSock));
             //m_vectClients.push_back(new CellClient(_cSock));
             //send
-            //CELLLog_Info("ĞÂ¿Í»§¶Ë¼ÓÈë,sock = %d,ip = %s£¬¿Í»§¶ËÊı = %d ", _cSock, inet_ntoa(clientA.sin_addr), m_vectClients.size());
+            //CELLLog_Info("æ–°å®¢æˆ·ç«¯åŠ å…¥,sock = %d,ip = %sï¼Œå®¢æˆ·ç«¯æ•° = %d ", _cSock, inet_ntoa(clientA.sin_addr), m_vectClients.size());
         }
         return _cSock;
     }
 
-    //²éÑ¯×îĞ¡¿Í»§¶ËÊıÏß³Ì
+    //æŸ¥è¯¢æœ€å°å®¢æˆ·ç«¯æ•°çº¿ç¨‹
     void addClientToCellServer(std::shared_ptr<CellClient> pClient)
     {
-        //²éÑ¯¿Í»§¶Ë×îÉÙµÃÏûÏ¢´¦ÀíÏß³Ì
+        //æŸ¥è¯¢å®¢æˆ·ç«¯æœ€å°‘å¾—æ¶ˆæ¯å¤„ç†çº¿ç¨‹
         auto pMinCellServer = m_vectServers[0];
         for (auto pCellServer : m_vectServers)
         {
@@ -178,24 +178,24 @@ public:
         {
             auto ser = std::make_shared<CellServer>(n + 1);
             m_vectServers.push_back(ser);
-            //×¢²áÍøÂçÊÂ¼ş½ÓÊÜ¶ÔÏó
+            //æ³¨å†Œç½‘ç»œäº‹ä»¶æ¥å—å¯¹è±¡
             ser->setEventObj(this);
-            //Æô¶¯ÏûÏ¢´¦Àí·şÎñÏß³Ì
+            //å¯åŠ¨æ¶ˆæ¯å¤„ç†æœåŠ¡çº¿ç¨‹
             ser->Start();
         }
-		//Ïß³Ì
+		//çº¿ç¨‹
 		m_thread.Start(nullptr, [this](CELLThread *pThread) {
 			OnRun(pThread);
 		});
     }
 
   
-    //¹Ø±Õ
+    //å…³é—­
     void Close()
     {
 		CELLLog_Info("EasyTcpServerClose begin ");
 		m_thread.Close();
-        //Çå³ı»·¾³
+        //æ¸…é™¤ç¯å¢ƒ
         if (m_sock != INVALID_SOCKET)
         {
 			m_vectServers.clear();
@@ -209,13 +209,13 @@ public:
 		
 		CELLLog_Info("EasyTcpServerClose end ");
     }
-    //¼ÆËã²¢Êä³öÃ¿ÃëµÄÏûÏ¢°üÊı
+    //è®¡ç®—å¹¶è¾“å‡ºæ¯ç§’çš„æ¶ˆæ¯åŒ…æ•°
     void time4msg()
     {
         auto t1 = m_tTime.getElaspedSecond();
         if (t1 >= 1.0)
         {
-            CELLLog_Info("thread<%d>,time<%lf>,socket<%d>,clientNum<%d>,recvCount<%d>£¬msgCount<%d>", m_vectServers.size(), t1, m_sock,(int)m_clientCount,(int)(m_recvCount / t1),(int)(m_msgCount / t1));
+            CELLLog_Info("thread<%d>,time<%lf>,socket<%d>,clientNum<%d>,recvCount<%d>ï¼ŒmsgCount<%d>", m_vectServers.size(), t1, m_sock,(int)m_clientCount,(int)(m_recvCount / t1),(int)(m_msgCount / t1));
 			m_recvCount = 0;
 			m_msgCount = 0;
             m_tTime.update();
@@ -241,7 +241,7 @@ public:
 		m_recvCount++;
 	}
 private:
-	//´¦ÀíÍøÂçĞÅÏ¢
+	//å¤„ç†ç½‘ç»œä¿¡æ¯
 	void OnRun(CELLThread *pThread)
 	{
 		while (pThread->isRun())
@@ -260,14 +260,14 @@ private:
 			//FD_SET(m_sock, &fd_except);
 
 
-			//nfdsÊÇÒ»¸öÕûÊıÖµ£¬ÊÇÖ¸fd_set¼¯ºÏÖĞËùÓĞÃèÊö·û(socket)µÄ·¶Î§
-			//¼´ÊÇËùÓĞÃèÊö·û×î´óÖµ+1£¬ÔÚwindowsÖĞÕâ¸ö²ÎÊı¿ÉÒÔĞ´0
+			//nfdsæ˜¯ä¸€ä¸ªæ•´æ•°å€¼ï¼Œæ˜¯æŒ‡fd_seté›†åˆä¸­æ‰€æœ‰æè¿°ç¬¦(socket)çš„èŒƒå›´
+			//å³æ˜¯æ‰€æœ‰æè¿°ç¬¦æœ€å¤§å€¼+1ï¼Œåœ¨windowsä¸­è¿™ä¸ªå‚æ•°å¯ä»¥å†™0
 			timeval tl = { 0,1};
 			int ret = select(m_sock + 1, &fd_read, 0, 0, &tl);
 			//CELLLog_Info("select ret = %d,count  = %d",ret, _count++);
 			if (ret < 0)
 			{
-				CELLLog_Info("EasyTcpServer::OnRun,selectÈÎÎñ½áÊø£¬ÍË³ö");
+				CELLLog_Info("EasyTcpServer::OnRun,selectä»»åŠ¡ç»“æŸï¼Œé€€å‡º");
 				pThread->Exit();
 				break;
 			}

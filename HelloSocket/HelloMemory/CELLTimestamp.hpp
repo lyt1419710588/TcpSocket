@@ -1,4 +1,4 @@
-#ifndef _CELLTIMESTAMP_H
+Ôªø#ifndef _CELLTIMESTAMP_H
 #define _CELLTIMESTAMP_H
 
 #include <chrono>
@@ -14,22 +14,22 @@ public:
 	{
 
 	}
-	//∏¸–¬µ±«∞ ±º‰
+	//Êõ¥Êñ∞ÂΩìÂâçÊó∂Èó¥
 	void update()
 	{
 		m_begin = high_resolution_clock::now();
 	}
-	//ªÒ»°µ±«∞√Î ˝
+	//Ëé∑ÂèñÂΩìÂâçÁßíÊï∞
 	double getElaspedSecond()
 	{
 		return this->getElapsedTimeInMicroSec() * 0.000001;
 	}
-	//ªÒ»°µ±«∞∫¡√Î ˝
+	//Ëé∑ÂèñÂΩìÂâçÊØ´ÁßíÊï∞
 	double getElaspedInMillSec()
 	{ 
 		return this->getElapsedTimeInMicroSec() * 0.001;
 	}
-	//ªÒ»°Œ¢√Ó
+	//Ëé∑ÂèñÂæÆÂ¶ô
 	long long getElapsedTimeInMicroSec()
 	{
 		return duration_cast<microseconds>(high_resolution_clock::now() - m_begin).count();

@@ -1,13 +1,13 @@
-#ifndef _CELLCLIENT_HPP_
+ï»¿#ifndef _CELLCLIENT_HPP_
 #define _CELLCLIENT_HPP_
 
 #include "Cell.hpp"
 #include "CELLBuffer.hpp"
-//¿Í»§¶ËËÀÍö¼ÆÊ±Ê±¼ä
+//å®¢æˆ·ç«¯æ­»äº¡è®¡æ—¶æ—¶é—´
 #define CLIENT_HEART_DEAD_TIME 60000
-//Ö¸¶¨Ê±¼äÇå¿Õ·¢ËÍ»º³åÇøÊı¾İ
+//æŒ‡å®šæ—¶é—´æ¸…ç©ºå‘é€ç¼“å†²åŒºæ•°æ®
 #define CLIENT_SEND_BUFF_TIME 200
-//¿Í»§¶ËÊı¾İ¶ÔÏó
+//å®¢æˆ·ç«¯æ•°æ®å¯¹è±¡
 class CellClient :public ObjectPoolBase<CellClient, 1000>
 {
 public:
@@ -68,14 +68,14 @@ public:
 			m_RecvBuff.pop(front_msg()->dataLength);
 		}	
 	}
-	//Àí½â½«»º³åÇøÊı¾İ·¢ËÍ¸ø¿Í»§¶Ë
+	//ç†è§£å°†ç¼“å†²åŒºæ•°æ®å‘é€ç»™å®¢æˆ·ç«¯
 	int SendDataReal()
 	{
-		//ÖØÖÃ·¢ËÍÊ±¼ä
+		//é‡ç½®å‘é€æ—¶é—´
 		resetDTSend();
 		return m_SendBuff.writeToSocket(m_sockfd);
 	}
-	//·¢ËÍSOCKETÊı¾İ
+	//å‘é€SOCKETæ•°æ®
 	int SendData(std::shared_ptr<DataHeader> header)
 	{
 		return SendData((const char*)header.get(), header->dataLength);
@@ -89,17 +89,17 @@ public:
 		}
 		return SOCKET_ERROR;
 	}
-	//¼ÆÊ±ÖØÖÃ
+	//è®¡æ—¶é‡ç½®
 	void resetDTHeart()
 	{
 		m_dtHeart = 0;
 	}
-	//ÖØÖÃ·¢ËÍÊ±¼ä
+	//é‡ç½®å‘é€æ—¶é—´
 	void resetDTSend()
 	{
 		m_dtSend = 0;
 	}
-	//ĞÄÌø¼ì²â
+	//å¿ƒè·³æ£€æµ‹
 	bool checkHeart(time_t dt)
 	{
 		m_dtHeart += dt;
@@ -112,15 +112,15 @@ public:
 		return false;
 	}
 
-	//¼ì²é·¢ËÍÊ±¼ä
+	//æ£€æŸ¥å‘é€æ—¶é—´
 	bool checkSendTime(time_t dt)
 	{
 		m_dtSend += dt;
 		if (m_dtSend >= CLIENT_SEND_BUFF_TIME)
 		{
 			/*CELLLog_Info("senTime now---:%d,dt_sentTime=%d,dt=%d", m_sockfd, m_dtSend,dt);*/
-			//Á¢¼´·¢ËÍ»º´æÊı¾İ
-			//ÖØÖÃ·¢ËÍ¼ÆÊ±
+			//ç«‹å³å‘é€ç¼“å­˜æ•°æ®
+			//é‡ç½®å‘é€è®¡æ—¶
 			SendDataReal();
 			resetDTSend();
 			/*m_dtSend = 0;*/
@@ -134,20 +134,20 @@ public:
 	}
 private:
 	SOCKET m_sockfd;
-	//½ÓÊÕÏûÏ¢
+	//æ¥æ”¶æ¶ˆæ¯
 	CELLBuffer m_RecvBuff;
 	
 
-	//·¢ËÍ»º³åÇø
+	//å‘é€ç¼“å†²åŒº
 	CELLBuffer m_SendBuff;
 
-	//ËÀÍö¼ÆÊ±
+	//æ­»äº¡è®¡æ—¶
 	time_t m_dtHeart;
 
-	//ÉÏ´Î·¢ËÍÏûÏ¢Êı¾İÊ±¼ä
+	//ä¸Šæ¬¡å‘é€æ¶ˆæ¯æ•°æ®æ—¶é—´
 	time_t m_dtSend;
 
-	//·¢ËÍ»º³åÇøĞ´ÂúµÄ¼ÆÊı
+	//å‘é€ç¼“å†²åŒºå†™æ»¡çš„è®¡æ•°
 	int m_sendBuffFullCount = 0;
 };
 #endif // !_CELLCLIENT_HPP_

@@ -1,4 +1,4 @@
-#include "EasyTcpClient.hpp"
+ï»¿#include "EasyTcpClient.hpp"
 
 #include "CELLStream.hpp"
 #include "CELLMSGStream.hpp"
@@ -7,14 +7,14 @@ class MyClient :public EasyTcpClient
 public:
 	void OnNetMsg(DataHeader* header)
 	{
-		//´¦Àí¿Í»§¶ËÇëÇó
+		//å¤„ç†å®¢æˆ·ç«¯è¯·æ±‚
 		switch (header->cmd)
 		{
 		case CMD_LOGOUT_RESULT:
 		{
-			//½ÓÊÕ·þÎñÆ÷·µ»ØµÄÊý¾Ý
+			//æŽ¥æ”¶æœåŠ¡å™¨è¿”å›žçš„æ•°æ®
 			/*LoginResult *ret = (LoginResult*)header;*/
-			// CELLLog_Info("ÊÕµ½·þÎñ¶ËÏûÏ¢£ºretLogin = %d£¬Êý¾Ý³¤¶È:%d\n", ret->result, header->dataLength);
+			// CELLLog_Info("æ”¶åˆ°æœåŠ¡ç«¯æ¶ˆæ¯ï¼šretLogin = %dï¼Œæ•°æ®é•¿åº¦:%d\n", ret->result, header->dataLength);
 
 			CELLRecvStream r(header);
 			auto s1 = r.readInt8();
@@ -34,13 +34,13 @@ public:
 		break;
 		case CMD_ERROR:
 		{
-			//½ÓÊÕ·þÎñÆ÷·µ»ØµÄÊý¾Ý
-			CELLLog_Info("ÊÕµ½·þÎñ¶ËÏûÏ¢£ºCMD_ERROR  sock = %d£¬Êý¾Ý³¤¶È:%d\n", _pClient->getSocket(), header->dataLength);
+			//æŽ¥æ”¶æœåŠ¡å™¨è¿”å›žçš„æ•°æ®
+			CELLLog_Info("æ”¶åˆ°æœåŠ¡ç«¯æ¶ˆæ¯ï¼šCMD_ERROR  sock = %dï¼Œæ•°æ®é•¿åº¦:%d\n", _pClient->getSocket(), header->dataLength);
 		}
 		break;
 		default:
 		{
-			CELLLog_Info("ÊÕµ½·þÎñ¶ËÎ´¶¨ÒåÊý¾Ý£¬  sock = %d£¬Êý¾Ý³¤¶È:%d\n", _pClient->getSocket(), header->dataLength);
+			CELLLog_Info("æ”¶åˆ°æœåŠ¡ç«¯æœªå®šä¹‰æ•°æ®ï¼Œ  sock = %dï¼Œæ•°æ®é•¿åº¦:%d\n", _pClient->getSocket(), header->dataLength);
 		}
 		break;
 		}

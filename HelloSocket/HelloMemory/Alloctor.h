@@ -1,4 +1,4 @@
-#ifndef _ALLOC_H
+﻿#ifndef _ALLOC_H
 #define _ALLOC_H
 
 void* operator new(size_t length);

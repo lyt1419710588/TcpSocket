@@ -1,4 +1,4 @@
-#include "EasyTcpClient.hpp"
+ï»¿#include "EasyTcpClient.hpp"
 #include <stdio.h>
 #include <thread>
 #include <atomic>
@@ -11,34 +11,34 @@ class MyClient :public EasyTcpClient
 public:
 	void OnNetMsg(DataHeader* header)
 	{
-		//´¦Àí¿Í»§¶ËÇëÇó
+		//å¤„ç†å®¢æˆ·ç«¯è¯·æ±‚
 		switch (header->cmd)
 		{
 		case CMD_LOGIN_RESULT:
 		{
-			//½ÓÊÕ·þÎñÆ÷·µ»ØµÄÊý¾Ý
+			//æŽ¥æ”¶æœåŠ¡å™¨è¿”å›žçš„æ•°æ®
 			LoginResult *ret = (LoginResult*)header;
-			// CELLLog_Info("ÊÕµ½·þÎñ¶ËÏûÏ¢£ºretLogin = %d£¬Êý¾Ý³¤¶È:%d\n", ret->result, header->dataLength);
+			// CELLLog_Info("æ”¶åˆ°æœåŠ¡ç«¯æ¶ˆæ¯ï¼šretLogin = %dï¼Œæ•°æ®é•¿åº¦:%d\n", ret->result, header->dataLength);
 		}
 		break;
 		case CMD_LOGOUT_RESULT:
 		{
-			//½ÓÊÕ·þÎñÆ÷·µ»ØµÄÊý¾Ý
+			//æŽ¥æ”¶æœåŠ¡å™¨è¿”å›žçš„æ•°æ®
 			LogoutResult *ret = (LogoutResult*)header;
-			// CELLLog_Info("ÊÕµ½·þÎñ¶ËÏûÏ¢£ºretLogout = %d£¬Êý¾Ý³¤¶È:%d\n", ret->result, header->dataLength);
+			// CELLLog_Info("æ”¶åˆ°æœåŠ¡ç«¯æ¶ˆæ¯ï¼šretLogout = %dï¼Œæ•°æ®é•¿åº¦:%d\n", ret->result, header->dataLength);
 		}
 		break;
 		case CMD_NEW_USER_JOIN:
 		{
-			//½ÓÊÕ·þÎñÆ÷·µ»ØµÄÊý¾Ý
+			//æŽ¥æ”¶æœåŠ¡å™¨è¿”å›žçš„æ•°æ®
 			NewUserJoin *ret = (NewUserJoin*)header;
-			// CELLLog_Info("ÊÕµ½·þÎñ¶ËÏûÏ¢£ºnewUerJoinIN  sock = %d£¬Êý¾Ý³¤¶È:%d\n", ret->sock, header->dataLength);
+			// CELLLog_Info("æ”¶åˆ°æœåŠ¡ç«¯æ¶ˆæ¯ï¼šnewUerJoinIN  sock = %dï¼Œæ•°æ®é•¿åº¦:%d\n", ret->sock, header->dataLength);
 		}
 		break;
 		case CMD_ERROR:
 		{
-			//½ÓÊÕ·þÎñÆ÷·µ»ØµÄÊý¾Ý
-			 CELLLog_Info("ÊÕµ½·þÎñ¶ËÏûÏ¢£ºCMD_ERROR  sock = %d£¬Êý¾Ý³¤¶È:%d\n", _pClient->getSocket(), header->dataLength);
+			//æŽ¥æ”¶æœåŠ¡å™¨è¿”å›žçš„æ•°æ®
+			 CELLLog_Info("æ”¶åˆ°æœåŠ¡ç«¯æ¶ˆæ¯ï¼šCMD_ERROR  sock = %dï¼Œæ•°æ®é•¿åº¦:%d\n", _pClient->getSocket(), header->dataLength);
 		}
 		break;
 		case CMD_HEART_S2C:
@@ -48,7 +48,7 @@ public:
 		break;
 		default:
 		{
-			 CELLLog_Info("ÊÕµ½·þÎñ¶ËÎ´¶¨ÒåÊý¾Ý£¬  sock = %d£¬Êý¾Ý³¤¶È:%d\n", _pClient->getSocket(), header->dataLength);
+			 CELLLog_Info("æ”¶åˆ°æœåŠ¡ç«¯æœªå®šä¹‰æ•°æ®ï¼Œ  sock = %dï¼Œæ•°æ®é•¿åº¦:%d\n", _pClient->getSocket(), header->dataLength);
 		}
 		break;
 		}
@@ -63,7 +63,7 @@ void cmdthread()
 		scanf("%s", cmdBUF);
 		if (0 == strcmp(cmdBUF, "exit"))
 		{
-			 CELLLog_Info("ÍË³öÏß³Ì\n");
+			 CELLLog_Info("é€€å‡ºçº¿ç¨‹\n");
 			g_Run = false;
 			break;
 		}
@@ -72,7 +72,7 @@ void cmdthread()
 
 const int cCount = 1000;
 EasyTcpClient *client[cCount];
-const int tCount = 4;//Ïß³ÌÊýÁ¿
+const int tCount = 4;//çº¿ç¨‹æ•°é‡
 std::atomic_int m_sendCount = 0;
 std::atomic_int m_readyCount = 0;
 
@@ -89,7 +89,7 @@ void recvthread(int begin, int end)
 }
 void sendthread(int id)
 {
-	//Õ»ÄÚ´æ1M
+	//æ ˆå†…å­˜1M
 	//client.initSocket();
 	int nConnect = 0;
 	int c = cCount / tCount;
@@ -105,10 +105,10 @@ void sendthread(int id)
 		client[i] = new MyClient;
 		client[i]->Connect("127.0.0.1", 4568);
 	}
-	//½¨Á¢½ÓÊÕÏß³Ì
+	//å»ºç«‹æŽ¥æ”¶çº¿ç¨‹
 	std::thread mythread(recvthread, begin, end);
 	mythread.detach();
-	CELLLog_Info("Ïß³Ì %d½øÈë,nConnect<begin=%d><end=%d>\n", id,begin,end);
+	CELLLog_Info("çº¿ç¨‹ %dè¿›å…¥,nConnect<begin=%d><end=%d>\n", id,begin,end);
 	if (!g_Run)
 	{
 		for (int i = begin; i < end; i++)
@@ -120,7 +120,7 @@ void sendthread(int id)
 	m_readyCount++;
 	while (m_readyCount < tCount)
 	{
-		//µÈ´ýÆäËûÏß³Ì×¼±¸ºÃ·¢ËÍÊý¾Ý
+		//ç­‰å¾…å…¶ä»–çº¿ç¨‹å‡†å¤‡å¥½å‘é€æ•°æ®
 		std::chrono::milliseconds t(10);
 		std::this_thread::sleep_for(t);
 	}
@@ -142,7 +142,7 @@ void sendthread(int id)
 			}
 			else
 			{
-				//CELLLog_Info("¿Í»§¶Ë·¢ËÍÊý¾ÝÊ§°Üclient = %d",client[i]->getCurClient()->getSocket());
+				//CELLLog_Info("å®¢æˆ·ç«¯å‘é€æ•°æ®å¤±è´¥client = %d",client[i]->getCurClient()->getSocket());
 			}
 		}
 		std::chrono::milliseconds t(200);
@@ -154,7 +154,7 @@ void sendthread(int id)
 		client[i]->Close();
 		delete (client[i]);
 	}
-	 CELLLog_Info("Ïß³Ì %dÍË³ö,nConnect<begin=%d><end=%d>\n", id, begin, end);
+	 CELLLog_Info("çº¿ç¨‹ %dé€€å‡º,nConnect<begin=%d><end=%d>\n", id, begin, end);
 }
 int  main()
 {
@@ -182,7 +182,7 @@ int  main()
 		CELLThread::Sleep(1);
 	}
 	
-	CELLLog_Info("ÒÑÍË³ö\n");
+	CELLLog_Info("å·²é€€å‡º\n");
 	getchar();
 	return 0;
 }

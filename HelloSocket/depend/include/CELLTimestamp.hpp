@@ -1,4 +1,4 @@
-#ifndef _CELLTIMESTAMP_H
+ï»¿#ifndef _CELLTIMESTAMP_H
 #define _CELLTIMESTAMP_H
 
 #include <chrono>
@@ -7,7 +7,7 @@ using namespace std::chrono;
 class CELLTime
 {
 public:
-	//»ñÈ¡µ±Ç°Ê±¼ä´Á
+	//è·å–å½“å‰æ—¶é—´æˆ³
 	static time_t getNowInMilliSec()
 	{
 		return duration_cast<milliseconds>(high_resolution_clock::now().time_since_epoch()).count();
@@ -24,22 +24,22 @@ public:
 	{
 
 	}
-	//¸üĞÂµ±Ç°Ê±¼ä
+	//æ›´æ–°å½“å‰æ—¶é—´
 	void update()
 	{
 		m_begin = high_resolution_clock::now();
 	}
-	//»ñÈ¡µ±Ç°ÃëÊı
+	//è·å–å½“å‰ç§’æ•°
 	double getElaspedSecond()
 	{
 		return this->getElapsedTimeInMicroSec() * 0.000001;
 	}
-	//»ñÈ¡µ±Ç°ºÁÃëÊı
+	//è·å–å½“å‰æ¯«ç§’æ•°
 	double getElaspedInMillSec()
 	{ 
 		return this->getElapsedTimeInMicroSec() * 0.001;
 	}
-	//»ñÈ¡Î¢Ãî
+	//è·å–å¾®å¦™
 	long long getElapsedTimeInMicroSec()
 	{
 		return duration_cast<microseconds>(high_resolution_clock::now() - m_begin).count();

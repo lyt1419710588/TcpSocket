@@ -1,4 +1,4 @@
-#include "Alloctor.h"
+﻿#include "Alloctor.h"
 #include "MemoryMgr.hpp"
 void* operator new(size_t length)
 {

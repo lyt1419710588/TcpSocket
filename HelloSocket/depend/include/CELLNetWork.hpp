@@ -1,4 +1,4 @@
-#ifndef _CELL_NETWORK_HPP_
+ï»¿#ifndef _CELL_NETWORK_HPP_
 #define _CELL_NETWORK_HPP_
 
 #include "Cell.hpp"
@@ -7,13 +7,13 @@ class CELLNetWork
 private:
 	CELLNetWork()
 	{
-		//Æô¶¯ Win sock 2.x
+		//å¯åŠ¨ Win sock 2.x
 #ifdef _WIN32
 		WORD ver = MAKEWORD(2, 2);
 		WSADATA data;
 		WSAStartup(ver, &data);
 #else
-		//ºöÂÔÒì³£ĞÅºÅ£¬Ä¬ÈÏÇé¿ö»áµ¼ÖÂ½ø³ÌÖÕÖ¹
+		//å¿½ç•¥å¼‚å¸¸ä¿¡å·ï¼Œé»˜è®¤æƒ…å†µä¼šå¯¼è‡´è¿›ç¨‹ç»ˆæ­¢
 		if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
 		{
 			return 1;
@@ -24,7 +24,7 @@ private:
 	{
 #ifdef _WIN32
 		WSACleanup();
-		CELLLog_Info("socket »·¾³ÇåÀí  ");
+		CELLLog_Info("socket ç¯å¢ƒæ¸…ç†  ");
 #endif // _WIN32
 
 	}

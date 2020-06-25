@@ -162,6 +162,7 @@
     <ClInclude Include="..\depend\include\EasyTcpClient.hpp" />
     <ClInclude Include="..\depend\include\EasyTcpServer.hpp" />
     <ClInclude Include="..\depend\include\INetEvent.hpp" />
+    <ClInclude Include="..\depend\include\MemoryMgr.hpp" />
     <ClInclude Include="..\depend\include\MessageHeader.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

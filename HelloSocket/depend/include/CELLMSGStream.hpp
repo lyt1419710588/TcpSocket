@@ -1,4 +1,4 @@
-#ifndef _CELL_MSG_STAREAM_HPP_
+ï»¿#ifndef _CELL_MSG_STAREAM_HPP_
 #define _CELL_MSG_STAREAM_HPP_
 #include "Cell.hpp"
 #include "CELLStream.hpp"
@@ -8,9 +8,9 @@ public:
 	CELLRecvStream(DataHeader* pHeader):CELLStream((char*)pHeader,pHeader->dataLength)
 	{
 		push(pHeader->dataLength);
-		//¶ÁÈ¡³¤¶È
+		//è¯»å–é•¿åº¦
 		readInt16();
-		//¶ÁÈ¡ÃüÁî
+		//è¯»å–å‘½ä»¤
 		getNetCmd();
 	}
 
@@ -29,13 +29,13 @@ class CELLSendStream :public CELLStream
 public:
 	CELLSendStream(int nSize = 1024) :CELLStream(nSize)
 	{
-		//Ô¤ÏÈÕ¼Áì³¤¶ÈĞèÒªµÄ¿Õ¼ä
+		//é¢„å…ˆå é¢†é•¿åº¦éœ€è¦çš„ç©ºé—´
 		Write<uint16_t>(0);
 	}
 
 	CELLSendStream(char* pData, int nSize = 1024, bool bDel = false) :CELLStream(pData, nSize, bDel)
 	{
-		//Ô¤ÏÈÕ¼Áì³¤¶ÈĞèÒªµÄ¿Õ¼ä
+		//é¢„å…ˆå é¢†é•¿åº¦éœ€è¦çš„ç©ºé—´
 		Write<uint16_t>(0);
 	}
 

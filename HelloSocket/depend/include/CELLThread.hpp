@@ -1,4 +1,4 @@
-#ifndef _CELLTHREAD_HPP_
+ï»¿#ifndef _CELLTHREAD_HPP_
 #define _CELLTHREAD_HPP_
 
 #include "CELLSemaphore.hpp"
@@ -40,9 +40,9 @@ public:
 		}
 	}
 
-	//ÔÚ¹¤×÷º¯ÊıÖĞÍË³ö²»ĞèÒªµÈ´ı
-	//²»ĞèÒªÊ¹ÓÃĞÅºÅÁ¿×èÈûµÈ´ı
-	//Èç¹ûÊ¹ÓÃĞÅºÅÁ¿£¬»áÔì³ÉËÀËø
+	//åœ¨å·¥ä½œå‡½æ•°ä¸­é€€å‡ºä¸éœ€è¦ç­‰å¾…
+	//ä¸éœ€è¦ä½¿ç”¨ä¿¡å·é‡é˜»å¡ç­‰å¾…
+	//å¦‚æœä½¿ç”¨ä¿¡å·é‡ï¼Œä¼šé€ æˆæ­»é”
 	void Exit()
 	{
 		std::lock_guard<std::mutex> lock(m_mutex);
@@ -78,9 +78,9 @@ private:
 	EventCall m_OnDestory;
 
 	CELLSemaphore m_sem;
-	//¶àÏß³ÌÖĞÊ¹ÓÃ¸ÃÏß³ÌÀà¼ÏËø
+	//å¤šçº¿ç¨‹ä¸­ä½¿ç”¨è¯¥çº¿ç¨‹ç±»æ·é”
 	std::mutex m_mutex;
-	//³õÊ¼»¯Îªflase
+	//åˆå§‹åŒ–ä¸ºflase
 	bool m_bRun = false;
 };
 #endif // !_CELLTHREAD_HPP_

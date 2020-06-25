@@ -1,4 +1,4 @@
-#ifndef _CELLLOG_HPP_
+﻿#ifndef _CELLLOG_HPP_
 #define _CELLLOG_HPP_
 
 

@@ -1,4 +1,4 @@
-#ifndef _MESSAGEHEADER_HPP
+﻿#ifndef _MESSAGEHEADER_HPP
 #define _MESSAGEHEADER_HPP
 enum CMD {
 	CMD_LOGIN,

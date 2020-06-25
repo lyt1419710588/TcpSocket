@@ -1,4 +1,4 @@
-#include <iostream>
+ï»¿#include <iostream>
 #include <thread>
 #include <mutex>
 #include <atomic>
@@ -10,15 +10,15 @@ const int tCount = 4;
 atomic_int sum = 0;
 void workfun(int index)
 {
-	//m.lock();//ÁÙ½çÇø¿ªÊ¼
-	//lock_guard<mutex> lg(m); //×ÔĞıËø
+	//m.lock();//ä¸´ç•ŒåŒºå¼€å§‹
+	//lock_guard<mutex> lg(m); //è‡ªæ—‹é”
 	for (int  i = 0; i < 20000000; i++)
 	{
 		
 		sum++;
 		
-	}//Ïß³Ì°²È«£¬Ïß³Ì²»°²È«
-	//m.unlock();//ÁÙ½çÇø½áÊø
+	}//çº¿ç¨‹å®‰å…¨ï¼Œçº¿ç¨‹ä¸å®‰å…¨
+	//m.unlock();//ä¸´ç•ŒåŒºç»“æŸ
 	//cout << index << "hello,other thread" << endl;
 }
 int main()
@@ -40,9 +40,9 @@ int main()
 	sum = 0;
 	for (int i = 0; i < 80000000; i++)
 	{
-		//m.lock();//ÁÙ½çÇø¿ªÊ¼
+		//m.lock();//ä¸´ç•ŒåŒºå¼€å§‹
 		sum++;
-		//m.unlock();//ÁÙ½çÇø½áÊø
+		//m.unlock();//ä¸´ç•ŒåŒºç»“æŸ
 	}
 	cout << "cTime = " << (long long)ctime.getElaspedInMillSec() << "sum = " << sum << endl;
 	cout << "hello,main thread" << endl;

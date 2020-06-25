@@ -1,4 +1,4 @@
-#ifndef _EASYTCPCLIENT_HPP
+ï»¿#ifndef _EASYTCPCLIENT_HPP
 #define _EASYTCPCLIENT_HPP
 
 #include "Cell.hpp"
@@ -12,42 +12,42 @@ public:
 	{
 		m_isConnected = false;
 	}
-	//ĞéÎö¹¹º¯Êı
+	//è™šææ„å‡½æ•°
 	virtual ~EasyTcpClient()
 	{
 		Close();
 	}
-	//³õÊ¼»¯
+	//åˆå§‹åŒ–
 	int initSocket()
 	{
-		//Æô¶¯ Win sock 2.x
+		//å¯åŠ¨ Win sock 2.x
 		CELLNetWork::Init();
 		if (_pClient)
 		{
-			CELLLog_Info("¹Ø±ÕÖ®Ç°Á´½Ó£¬socket = %d",_pClient->getSocket());
+			CELLLog_Info("å…³é—­ä¹‹å‰é“¾æ¥ï¼Œsocket = %d",_pClient->getSocket());
 			Close();
 		}
 		SOCKET sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 		if (INVALID_SOCKET == sock)
 		{
-			 CELLLog_Info("socket = %d½¨Á¢Ê§°Ü", _pClient->getSocket());
+			 CELLLog_Info("socket = %då»ºç«‹å¤±è´¥", _pClient->getSocket());
 		}
 		else
 		{
 			_pClient = new CellClient(sock);
-			 //CELLLog_Info("socket = %d½¨Á¢³É¹¦", _pClient->getSocket());
+			 //CELLLog_Info("socket = %då»ºç«‹æˆåŠŸ", _pClient->getSocket());
 		}
 		return 0;
 	}
-	//Á´½Ó·şÎñÆ÷
+	//é“¾æ¥æœåŠ¡å™¨
 	int Connect(const char* ip,unsigned short port)
 	{
 		if (!_pClient)
 		{
-			//CELLLog_Info("³õÊ¼»¯socket");
+			//CELLLog_Info("åˆå§‹åŒ–socket");
 			initSocket();
 		}
-		//Á´½Ó
+		//é“¾æ¥
 		sockaddr_in _sin = {};
 		_sin.sin_family = AF_INET;
 		_sin.sin_port = htons(port);
@@ -56,24 +56,24 @@ public:
 #else
 		_sin.sin_addr.s_addr = inet_addr(ip);
 #endif
-		//CELLLog_Info("<socket=%d>ÕıÔÚÁ´½Ó·şÎñÆ÷<%s,%d>",_pClient->getSocket(),ip,port);
+		//CELLLog_Info("<socket=%d>æ­£åœ¨é“¾æ¥æœåŠ¡å™¨<%s,%d>",_pClient->getSocket(),ip,port);
 		int ret = connect(_pClient->getSocket(), (sockaddr*)&_sin, sizeof(sockaddr_in));
 		if (SOCKET_ERROR == ret)
 		{
-			 CELLLog_Info("socket = %d Á´½Ó·şÎñÆ÷%s,%dÊ§°Ü", _pClient->getSocket(), ip, port);
+			 CELLLog_Info("socket = %d é“¾æ¥æœåŠ¡å™¨%s,%då¤±è´¥", _pClient->getSocket(), ip, port);
 		}
 		else
 		{
 			m_isConnected = true;
-		    //CELLLog_Info("socket = %d Á´½Ó·şÎñÆ÷%s,%d", _pClient->getSocket(), ip, port);
+		    //CELLLog_Info("socket = %d é“¾æ¥æœåŠ¡å™¨%s,%d", _pClient->getSocket(), ip, port);
 		}
 		return ret;
 	}
 
-	//¹Ø±Õsocket
+	//å…³é—­socket
 	void Close()
 	{
-		//Çå³ı»·¾³
+		//æ¸…é™¤ç¯å¢ƒ
 		if (_pClient)
 		{
 			delete _pClient;
@@ -82,11 +82,11 @@ public:
 		m_isConnected = false;
 	}
 
-	//·¢ËÍÊı¾İ
+	//å‘é€æ•°æ®
 
 	
 	int _count = 0;
-	//´¦ÀíÍøÂçÊı¾İ
+	//å¤„ç†ç½‘ç»œæ•°æ®
 	bool OnRun()
 	{
 		if (isRun())
@@ -115,7 +115,7 @@ public:
 			//  CELLLog_Info("select ret = %d,count  = %d", ret, _count++);
 			if (ret < 0)
 			{
-				CELLLog_Info("select = %d Óë·şÎñ¶Ë¶Ï¿ªÁ´½Ó£¬ÈÎÎñ½áÊø", m_sock);
+				CELLLog_Info("select = %d ä¸æœåŠ¡ç«¯æ–­å¼€é“¾æ¥ï¼Œä»»åŠ¡ç»“æŸ", m_sock);
 				Close();
 				return false;
 			}
@@ -123,7 +123,7 @@ public:
 			{
 				if (SOCKET_ERROR == RecvData())
 				{
-					CELLLog_Info("select = %d ÈÎÎñ½áÊø2",m_sock);
+					CELLLog_Info("select = %d ä»»åŠ¡ç»“æŸ2",m_sock);
 					Close();
 					return false;
 				}
@@ -133,13 +133,13 @@ public:
 			{
 				if (SOCKET_ERROR == _pClient->SendDataReal())
 				{
-					CELLLog_Info("select = %d ÈÎÎñ½áÊø2", m_sock);
+					CELLLog_Info("select = %d ä»»åŠ¡ç»“æŸ2", m_sock);
 					Close();
 					return false;
 				}
 			/*	else
 				{
-					CELLLog_Info("select = %d Êı¾İ·¢ËÍ", m_sock);
+					CELLLog_Info("select = %d æ•°æ®å‘é€", m_sock);
 				}*/
 			}
 			return true;
@@ -150,33 +150,33 @@ public:
 	{
 		return (_pClient) && m_isConnected;
 	}
-	//½ÓÊÕÊı¾İ,´¦ÀíÕ³°ü£¬²ğ·Ö°ü
-	//µÚ¶ş»º³åÇø£¬Ë«»º³å
+	//æ¥æ”¶æ•°æ®,å¤„ç†ç²˜åŒ…ï¼Œæ‹†åˆ†åŒ…
+	//ç¬¬äºŒç¼“å†²åŒºï¼ŒåŒç¼“å†²
 #ifndef RECV_BUFF_SIZE
-#define RECV_BUFF_SIZE 10240//»º³åÇø´óĞ¡
+#define RECV_BUFF_SIZE 10240//ç¼“å†²åŒºå¤§å°
 #endif // !RECV_BUFF_SIZE
 
 
-	//½ÓÊÕ»º³åÇø
+	//æ¥æ”¶ç¼“å†²åŒº
 	char m_recvBUF[RECV_BUFF_SIZE] = {};
-	//ÏûÏ¢»º³åÇø
+	//æ¶ˆæ¯ç¼“å†²åŒº
 	char m_szMsgBUF[RECV_BUFF_SIZE * 4] = {};
-	//ÏûÏ¢»º³åÇøÎ²²¿Î»ÖÃ
+	//æ¶ˆæ¯ç¼“å†²åŒºå°¾éƒ¨ä½ç½®
 	int m_lastPos = 0;
 	int RecvData()
 	{	
 		if (isRun())
 		{
-			//½ÓÊÕ¿Í»§¶ËµÄÇëÇóÊı¾İ
+			//æ¥æ”¶å®¢æˆ·ç«¯çš„è¯·æ±‚æ•°æ®
 			int nLen = _pClient->RecvData();
 
 			if (nLen > 0)
 			{
 				while (_pClient->hasMsg())
 				{
-					//´¦ÀíÍøÂçÏûÏ¢
+					//å¤„ç†ç½‘ç»œæ¶ˆæ¯
 					OnNetMsg(_pClient->front_msg());
-					//ÒÆ³ıÏûÏ¢¶ÓÁĞ£¨»º³åÇø£©×îÇ°¶ËµÄÊı¾İ
+					//ç§»é™¤æ¶ˆæ¯é˜Ÿåˆ—ï¼ˆç¼“å†²åŒºï¼‰æœ€å‰ç«¯çš„æ•°æ®
 					_pClient->pop_front_msg();
 				}
 			}
@@ -184,9 +184,9 @@ public:
 		}
 		return 0;
 	}
-	//ÏìÓ¦ÍøÂçÊı¾İ
+	//å“åº”ç½‘ç»œæ•°æ®
 	virtual void OnNetMsg(DataHeader* header)  = 0;
-	//·¢ËÍÊı¾İ
+	//å‘é€æ•°æ®
 	int SendData(std::shared_ptr<DataHeader> data)
 	{
 		if (isRun())

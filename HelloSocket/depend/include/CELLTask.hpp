@@ -1,4 +1,4 @@
-#ifndef _CELLTASK_H
+ï»¿#ifndef _CELLTASK_H
 #define _CELLTASK_H
 
 #include <thread>
@@ -8,7 +8,7 @@
 
 
 #include "CELLThread.hpp"
-//ÓÃÓÚÖ´ĞĞÈÎÎñµÄ·şÎñÀàĞÍ
+//ç”¨äºæ‰§è¡Œä»»åŠ¡çš„æœåŠ¡ç±»å‹
 class CellTaskServer
 {
 public :
@@ -16,14 +16,14 @@ public :
 private:
 	typedef std::function<void()> CellTask;
 private:
-	//ÈÎÎñÊı¾İ
+	//ä»»åŠ¡æ•°æ®
 	std::list<CellTask> m_listCellTask;
-	//ÈÎÎñÊı¾İ»º³åÇø
+	//ä»»åŠ¡æ•°æ®ç¼“å†²åŒº
 	std::list<CellTask> m_listCellTaskBuff;
-	//¸Ä±äÊı¾İ»º³åÇøĞèÒª¼ÏËø
+	//æ”¹å˜æ•°æ®ç¼“å†²åŒºéœ€è¦æ·é”
 	std::mutex m_mutex;
 	
-	//Ïß³Ì
+	//çº¿ç¨‹
 	CELLThread m_thread;
 public:
 	CellTaskServer()
@@ -34,22 +34,22 @@ public:
 	{
 
 	}
-	//Ìí¼ÓÈÎÎñ
+	//æ·»åŠ ä»»åŠ¡
 	void addTask(CellTask pTask)
 	{
 		std::lock_guard<std::mutex> lock(m_mutex);
 		m_listCellTaskBuff.push_back(pTask);
 	}
-	//Æô¶¯·şÎñ
+	//å¯åŠ¨æœåŠ¡
 	void Start()
 	{
-		//Ïß³Ì
+		//çº¿ç¨‹
 		m_thread.Start(nullptr, [this](CELLThread *pThread) {
 			OnRun(pThread);
 		});
 	}
 
-	//¹Ø±Õ
+	//å…³é—­
 	void Close()
 	{
 		
@@ -58,14 +58,14 @@ public:
 		//CELLLog_Info("CellTaskServer%d Close end", serverID);
 	}
 private:
-	//¹¤×÷º¯Êı
+	//å·¥ä½œå‡½æ•°
 	void OnRun(CELLThread *pThread)
 	{
 		while (pThread->isRun())
 		{
 			if (!m_listCellTaskBuff.empty())
 			{
-				//´Ó»º³åÇøÈ¡Êı¾İ
+				//ä»ç¼“å†²åŒºå–æ•°æ®
 				std::lock_guard<std::mutex> lock(m_mutex);
 				for (auto pTask : m_listCellTaskBuff)
 				{
@@ -87,7 +87,7 @@ private:
 			m_listCellTask.clear();
 		}
 
-		//´¦Àí»º³å¶ÓÁĞÖĞµÄÈÎÎñ
+		//å¤„ç†ç¼“å†²é˜Ÿåˆ—ä¸­çš„ä»»åŠ¡
 		for (auto Task : m_listCellTaskBuff)
 		{
 			Task();

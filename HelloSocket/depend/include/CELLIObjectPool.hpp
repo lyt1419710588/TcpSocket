@@ -1,4 +1,4 @@
-#ifndef _CELLOBJECTPOOL_H
+ï»¿#ifndef _CELLOBJECTPOOL_H
 #define _CELLOBJECTPOOL_H
 #include <stdlib.h>
 #include <mutex>
@@ -36,20 +36,20 @@ public:
 private:
 	struct NodeHeader
 	{
-		//ÏÂÒ»¿éÎ»ÖÃ
+		//ä¸‹ä¸€å—ä½ç½®
 		NodeHeader *pNext;
-		//¶ÔÏó¿é±ä»¯
+		//å¯¹è±¡å—å˜åŒ–
 		int nID;
-		//ÊÍ·ÅÔÚ¶ÔÏó³ØÖĞ
+		//é‡Šæ”¾åœ¨å¯¹è±¡æ± ä¸­
 		bool bPool;
-		//ÒıÓÃ´ÎÊı
+		//å¼•ç”¨æ¬¡æ•°
 		char nRef;
 	private:
 		char c1;
 		char c2;
 	};
 public:
-	//ÉêÇë¶ÔÏó
+	//ç”³è¯·å¯¹è±¡
 	void *allocObjMemory(size_t nSize)
 	{
 		std::lock_guard<std::mutex> lg(m_mutex);
@@ -72,7 +72,7 @@ public:
 		xPrintf("allocObjMemory:%llx,id=%d,size=%d", pReturn, pReturn->nID, nSize);
 		return ((char*)pReturn + sizeof(NodeHeader));
 	}
-	//ÊÍ·Å¶ÔÏó
+	//é‡Šæ”¾å¯¹è±¡
 	void freeObjMemory(void* pMem)
 	{
 
@@ -100,14 +100,14 @@ public:
 		}
 	}
 private:
-	//³õÊ¼»¯¶ÔÏó³Ø
+	//åˆå§‹åŒ–å¯¹è±¡æ± 
 	void InitPool()
 	{
-		//¼ÆËã¶ÔÏó³ØµÄ´óĞ¡
+		//è®¡ç®—å¯¹è±¡æ± çš„å¤§å°
 		size_t n = nSize * (sizeof(T) + sizeof(NodeHeader));
-		//ÏñÄÚ´æ³ØÉêÇëÄÚ´æ
+		//åƒå†…å­˜æ± ç”³è¯·å†…å­˜
 		m_pBuf = new char[n];
-		//³õÊ¼»¯¶ÔÏó³Ø
+		//åˆå§‹åŒ–å¯¹è±¡æ± 
 		m_pHeader = (NodeHeader*)m_pBuf;
 		m_pHeader->nID = 0;
 		m_pHeader->nRef = 0;
@@ -115,7 +115,7 @@ private:
 		m_pHeader->pNext = nullptr;
 
 		NodeHeader *pPreTemp = m_pHeader;
-		//±ãÀûÄÚ´æ¿é£¬³õÊ¼»¯¶ÔÏó³Ø
+		//ä¾¿åˆ©å†…å­˜å—ï¼Œåˆå§‹åŒ–å¯¹è±¡æ± 
 		for (size_t i = 1; i < nSize; i++)
 		{	
 			NodeHeader *pTemp = (NodeHeader*)(m_pBuf + i * (sizeof(T) + sizeof(NodeHeader)));
@@ -128,11 +128,11 @@ private:
 		}
 	}
 private:
-	//¶ÔÏó³ØÊ×²¿
+	//å¯¹è±¡æ± é¦–éƒ¨
 	NodeHeader *m_pHeader;
-	//¶ÔÏó³Ø»º´æÇøµØÖ·
+	//å¯¹è±¡æ± ç¼“å­˜åŒºåœ°å€
 	char *m_pBuf;
-	//Ëø
+	//é”
 	std::mutex m_mutex;
 };
 template <class T, size_t nSize>
@@ -148,7 +148,7 @@ public:
 	{
 		objectPool().freeObjMemory(p);
 	}
-	//Ä£°å¿É±ä²ÎÊı£¬²»¶¨²ÎÊı
+	//æ¨¡æ¿å¯å˜å‚æ•°ï¼Œä¸å®šå‚æ•°
 	template<class ...Args>
 	static T* createObj(Args... args)
 	{
@@ -163,7 +163,7 @@ public:
 private:
 	static CellObjectPool<T,nSize>& objectPool()
 	{
-		//¾²Ì¬¶ÔÏó³Ø¶ÔÏó
+		//é™æ€å¯¹è±¡æ± å¯¹è±¡
 		static CellObjectPool<T, nSize> sPool;
 		return  sPool;
 	}

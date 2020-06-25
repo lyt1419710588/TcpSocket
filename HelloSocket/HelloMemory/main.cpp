@@ -1,4 +1,4 @@
-#include <stdlib.h>
+ï»¿#include <stdlib.h>
 #include "Alloctor.h"
 #include <stdio.h>
 #include <iostream>
@@ -32,8 +32,8 @@ const int mCount = 8;
 const int nCount = mCount / tCount;
 void workfun(int index)
 {
-	//m.lock();//ÁÙ½çÇø¿ªÊ¼
-	//lock_guard<mutex> lg(m); //×ÔĞıËø
+	//m.lock();//ä¸´ç•ŒåŒºå¼€å§‹
+	//lock_guard<mutex> lg(m); //è‡ªæ—‹é”
 	ClassA* data[nCount];
 	for (size_t i = 0; i < nCount; i++)
 	{
@@ -44,7 +44,7 @@ void workfun(int index)
 	{
 		ClassA::deleteObj(data[i]);
 	}
-	 //m.unlock();//ÁÙ½çÇø½áÊø
+	 //m.unlock();//ä¸´ç•ŒåŒºç»“æŸ
 	 //cout << index << "hello,other thread" << endl;
 }
 

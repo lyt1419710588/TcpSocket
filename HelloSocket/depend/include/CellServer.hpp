@@ -1,4 +1,4 @@
-#ifndef _CELLSERVER_HPP_
+ï»¿#ifndef _CELLSERVER_HPP_
 #define _CELLSERVER_HPP_
 
 #include "Cell.hpp"
@@ -9,7 +9,7 @@
 #include <map>
 
 
-//ÍøÂç´¦ÀíÊÕ·şÎñ
+//ç½‘ç»œå¤„ç†æ”¶æœåŠ¡
 class CellServer
 {
 public:
@@ -34,7 +34,7 @@ public:
 		m_pInetEvent = pObj;
 	}
 	
-	//´¦ÀíÍøÂçĞÅÏ¢
+	//å¤„ç†ç½‘ç»œä¿¡æ¯
 	void  OnRun(CELLThread *pThread)
 	{
 		CELLLog_Info("CELLServer::OnRun() start--------------");
@@ -56,7 +56,7 @@ public:
 				}
 				m_vectClientsBuff.clear();
 			}
-			//Èç¹ûÃ»ÓĞĞèÒª´¦ÀíµÃ¿Í»§¶Ë¾ÍÌø¹ı
+			//å¦‚æœæ²¡æœ‰éœ€è¦å¤„ç†å¾—å®¢æˆ·ç«¯å°±è·³è¿‡
 			if (m_vectClients.empty())
 			{
 				std::chrono::milliseconds t(1);
@@ -92,7 +92,7 @@ public:
 
 			for (auto iter : m_vectClients)
 			{	
-				//¼ì²âĞèÒªĞ´Êı¾İµÄ¿Í»§¶Ë
+				//æ£€æµ‹éœ€è¦å†™æ•°æ®çš„å®¢æˆ·ç«¯
 				if (iter.second->needWrite())
 				{
 					bNeedWrite = true;
@@ -102,8 +102,8 @@ public:
 			//memcpy(&fd_write, &m_fd_read_back, sizeof(m_fd_read_back));
 			//memcpy(&fd_Exc, &m_fd_read_back, sizeof(m_fd_read_back));
 
-			//nfdsÊÇÒ»¸öÕûÊıÖµ£¬ÊÇÖ¸fd_set¼¯ºÏÖĞËùÓĞÃèÊö·û(socket)µÄ·¶Î§
-			//¼´ÊÇËùÓĞÃèÊö·û×î´óÖµ+1£¬ÔÚwindowsÖĞÕâ¸ö²ÎÊı¿ÉÒÔĞ´0
+			//nfdsæ˜¯ä¸€ä¸ªæ•´æ•°å€¼ï¼Œæ˜¯æŒ‡fd_seté›†åˆä¸­æ‰€æœ‰æè¿°ç¬¦(socket)çš„èŒƒå›´
+			//å³æ˜¯æ‰€æœ‰æè¿°ç¬¦æœ€å¤§å€¼+1ï¼Œåœ¨windowsä¸­è¿™ä¸ªå‚æ•°å¯ä»¥å†™0
 			timeval t{ 0,1 };
 			int ret = 0;
 			if (bNeedWrite)
@@ -119,7 +119,7 @@ public:
 			//CELLLog_Info("select ret = %d,count  = %d",ret, _count++);
 			if (ret < 0)
 			{
-				CELLLog_Info("CELLServer%d,OnRun,selectrÈÎÎñ½áÊø£¬ERROR",m_id);
+				CELLLog_Info("CELLServer%d,OnRun,selecträ»»åŠ¡ç»“æŸï¼ŒERROR",m_id);
 				pThread->Exit();
 				break;
 			}
@@ -240,23 +240,23 @@ public:
 	int RecvData(std::shared_ptr<CellClient>& pClient)
 	{
 
-		//½ÓÊÕ¿Í»§¶ËµÄÇëÇóÊı¾İ
+		//æ¥æ”¶å®¢æˆ·ç«¯çš„è¯·æ±‚æ•°æ®
 		int nLen = pClient->RecvData();
 		
 		if (nLen < 0)
 		{
-			CELLLog_Info("¿Í»§¶Ë<socket = %d>ÒÑÍË³ö£¡£¬ÈÎÎñ½áÊø£¡", pClient->getSocket());
+			CELLLog_Info("å®¢æˆ·ç«¯<socket = %d>å·²é€€å‡ºï¼ï¼Œä»»åŠ¡ç»“æŸï¼", pClient->getSocket());
 			return -1;
 		}
-		//½ÓÊÕÍøÂçÊı¾İÊÂ¼ş
+		//æ¥æ”¶ç½‘ç»œæ•°æ®äº‹ä»¶
 		m_pInetEvent->OnNetRecv(pClient);
 
-		//Ñ­»· ÅĞ¶ÏÊÇ·ñÓĞÏûÏ¢ĞèÒª´¦Àí
+		//å¾ªç¯ åˆ¤æ–­æ˜¯å¦æœ‰æ¶ˆæ¯éœ€è¦å¤„ç†
 		while (pClient->hasMsg())
 		{
-			//´¦ÀíÍøÂçÏûÏ¢
+			//å¤„ç†ç½‘ç»œæ¶ˆæ¯
 			OnNetMsg(pClient, pClient->front_msg());
-			//ÒÆ³ıÏûÏ¢¶ÓÁĞ£¨»º³åÇø£©×îÇ°¶ËµÄÊı¾İ
+			//ç§»é™¤æ¶ˆæ¯é˜Ÿåˆ—ï¼ˆç¼“å†²åŒºï¼‰æœ€å‰ç«¯çš„æ•°æ®
 			pClient->pop_front_msg();
 		}
 
@@ -264,7 +264,7 @@ public:
 	}
 	void OnNetMsg(std::shared_ptr<CellClient> pClient, DataHeader* header)
 	{
-		//´¦Àí¿Í»§¶ËÇëÇó
+		//å¤„ç†å®¢æˆ·ç«¯è¯·æ±‚
 		m_pInetEvent->OnNetMsg(this, pClient, header);
 		/*auto t1 = m_tTime.getElaspedSecond();
 		if (t1 >= 1.0)
@@ -276,12 +276,12 @@ public:
 	}
 
 
-	//¹Ø±Õ
+	//å…³é—­
 	void Close()
 	{
 		CELLLog_Info("Cellserver%d Close begin", m_id);
 		
-		//Çå³ı»·¾³
+		//æ¸…é™¤ç¯å¢ƒ
 		m_CellTaskServer.Close();
 		m_thread.Close();
 		CELLLog_Info("Cellserver%d Close end",m_id);
@@ -319,7 +319,7 @@ public:
 
 	void addSendTask(std::shared_ptr<CellClient> pClient, std::shared_ptr<DataHeader> ret)
 	{
-		//ÀûÓÃlambda±í´ïÊ½ÊµÏÖ£¬±ÜÃâ¹ı¶àµÄÀà£¬Âß¼­Ì«¸´ÔÓ
+		//åˆ©ç”¨lambdaè¡¨è¾¾å¼å®ç°ï¼Œé¿å…è¿‡å¤šçš„ç±»ï¼Œé€»è¾‘å¤ªå¤æ‚
 		m_CellTaskServer.addTask([pClient, ret]() 
 		{
 			if (SOCKET_ERROR == pClient->SendData(ret))
@@ -332,33 +332,33 @@ public:
 		
 private:
 	SOCKET m_sock;
-	//¿Í»§¶ËÕıÊ½¶ÓÁĞ
+	//å®¢æˆ·ç«¯æ­£å¼é˜Ÿåˆ—
 	std::map<SOCKET, std::shared_ptr<CellClient> > m_vectClients;
-	std::vector<std::shared_ptr<CellClient> > m_vectClientsBuff;//¿Í»§¶Ë»º³å¶ÓÁĞ
-	std::mutex m_mutex;//Ôö¼Ó¿Í»§¶ËËø,»º³å¶ÓÁĞËø
+	std::vector<std::shared_ptr<CellClient> > m_vectClientsBuff;//å®¢æˆ·ç«¯ç¼“å†²é˜Ÿåˆ—
+	std::mutex m_mutex;//å¢åŠ å®¢æˆ·ç«¯é”,ç¼“å†²é˜Ÿåˆ—é”
 					   //std::thread *m_pthread;
 	std::shared_ptr<std::thread> m_pthread;
-	//ÍøÂçÊÂ¼ş¶ÔÏó
+	//ç½‘ç»œäº‹ä»¶å¯¹è±¡
 	INetEvent* m_pInetEvent;
-	//½ÓÊÕÊı¾İ
+	//æ¥æ”¶æ•°æ®
 	char recvBUF[RECV_BUFF_SIZE] = {};
 
 	CellTaskServer m_CellTaskServer;
 
-	//±¸·İ¿Í»§¶Ëfd_set
+	//å¤‡ä»½å®¢æˆ·ç«¯fd_set
 	fd_set m_fd_read_back;
-	//¿Í»§¶ËÁĞ±íÊÇ·ñ±ä»¯
+	//å®¢æˆ·ç«¯åˆ—è¡¨æ˜¯å¦å˜åŒ–
 	bool m_client_change;
-	//×î´ó¿Í»§¶ËsockÖµ
+	//æœ€å¤§å®¢æˆ·ç«¯sockå€¼
 	SOCKET m_maxSock;
 
 	time_t oldTime = CELLTime::getNowInMilliSec();
 	
-	//Ïß³Ì
+	//çº¿ç¨‹
 	CELLThread m_thread;
 	//CellServerID
 	int m_id = -1;
-	//ÊÇ·ñÓĞ¿Í»§¶ËĞèÒªĞ´Êı¾İ
+	//æ˜¯å¦æœ‰å®¢æˆ·ç«¯éœ€è¦å†™æ•°æ®
 	bool bNeedWrite = false;
 };
 

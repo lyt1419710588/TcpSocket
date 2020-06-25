@@ -1,4 +1,4 @@
-#include <functional>
+ï»¿#include <functional>
 //function
 //lambda
 
@@ -15,7 +15,7 @@ int main()
 
 	std::function<int(int, int)> call;
 
-	//lambda±í´ïÊ½
+	//lambdaè¡¨è¾¾å¼
 	int n = 5;
 	call = [n](int a, int b) -> int {
 		return 10;

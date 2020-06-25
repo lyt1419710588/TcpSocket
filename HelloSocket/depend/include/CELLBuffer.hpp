@@ -1,4 +1,4 @@
-#ifndef _CELL_BUFFER_HPP_
+ï»¿#ifndef _CELL_BUFFER_HPP_
 #define _CELL_BUFFER_HPP_
 
 #include "Cell.hpp"
@@ -42,9 +42,9 @@ public:
 	{
 		if (m_nLastPos + nLen <= m_nSize)
 		{
-			//½«Òª·¢ËÍµÄÊý¾Ý¿½±´µ½Êý¾Ý»º³åÇø
+			//å°†è¦å‘é€çš„æ•°æ®æ‹·è´åˆ°æ•°æ®ç¼“å†²åŒº
 			memcpy(m_pBuff + m_nLastPos, pData, nLen);
-			//¼ÆËãÊý¾ÝÎ²²¿Î»ÖÃ
+			//è®¡ç®—æ•°æ®å°¾éƒ¨ä½ç½®
 			m_nLastPos += nLen;
 			if (m_nLastPos == m_nSize)
 			{
@@ -104,13 +104,13 @@ public:
 	}
 private:
 
-	//»º³åÇø
+	//ç¼“å†²åŒº
 	char* m_pBuff = nullptr;
-	//»º³åÇøÊý¾ÝÎ²²¿Î»ÖÃ£¬ÒÑÓÐÊý¾Ý³¤¶È
+	//ç¼“å†²åŒºæ•°æ®å°¾éƒ¨ä½ç½®ï¼Œå·²æœ‰æ•°æ®é•¿åº¦
 	int m_nLastPos = 0;
-	//»º³åÇø´óÐ¡,×Ö½Ú³¤¶È
+	//ç¼“å†²åŒºå¤§å°,å­—èŠ‚é•¿åº¦
 	int m_nSize = 0;
-	//»º³åÇø·ÅÂú´ÎÊý¼ÆÊý
+	//ç¼“å†²åŒºæ”¾æ»¡æ¬¡æ•°è®¡æ•°
 	int m_nBuffFull = 0;
 };
 
