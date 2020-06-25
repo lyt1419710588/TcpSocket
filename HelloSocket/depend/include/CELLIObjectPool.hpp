@@ -50,7 +50,7 @@ private:
 	};
 public:
 	//申请对象
-	void *allocObjMemory(size_t nSize)
+	void *allocObjMemory(size_t nLength)
 	{
 		std::lock_guard<std::mutex> lg(m_mutex);
 		NodeHeader* pReturn = nullptr;
@@ -69,7 +69,7 @@ public:
 			assert(0 == pReturn->nRef);
 			pReturn->nRef = 1;
 		}
-		xPrintf("allocObjMemory:%llx,id=%d,size=%d", pReturn, pReturn->nID, nSize);
+		xPrintf("allocObjMemory:%llx,id=%d,size=%d", pReturn, pReturn->nID, nLength);
 		return ((char*)pReturn + sizeof(NodeHeader));
 	}
 	//释放对象
