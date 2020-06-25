@@ -193,14 +193,14 @@ public:
 			}
 		}
 #else
-		for (auto iter : m_vectClients)
+		for (auto iter = m_vectClients.begin();iter != m_vectClients.end();iter++)
 		{
-			if (iter->second->needWrite() && FD_ISSET(iter.first, &fd_write))
+			if (iter->second->needWrite() && FD_ISSET(iter->first, &fd_write))
 			{
 				if (-1 == iter->second->SendDataReal())
 				{
 					OnClientLeave(iter->second);
-					iter = m_vectClients.erase(iter);
+					m_vectClients.erase(iter++);
 				}
 			}
 		}
@@ -223,14 +223,14 @@ public:
 			}
 		}
 #else
-		for (auto iter : m_vectClients)
+		for (auto iter = m_vectClients.begin();iter != m_vectClients.end();iter++)
 		{
-			if (FD_ISSET(iter.first, &fd_read))
+			if (FD_ISSET(iter->first, &fd_read))
 			{
-				if (-1 == RecvData(iter.second))
+				if (-1 == RecvData(iter->second))
 				{
 					OnClientLeave(iter->second);
-					iter = m_vectClients.erase(iter);
+					m_vectClients.erase(iter++);
 				}
 			}
 		}
