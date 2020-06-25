@@ -123,7 +123,7 @@ public:
 				fprintf(sLog->_file, "%s", "\n");
 				fflush(sLog->_file);
 			}
-			printf("%s",temp);
+			printf("[%s]",temp);
 			printf(pFormat, arg...);
 			printf("\n");
 		});

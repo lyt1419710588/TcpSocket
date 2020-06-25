@@ -2,6 +2,7 @@
 #include "Cell.hpp"
 #include "EasyTcpServer.hpp"
 #include "CELLMSGStream.hpp"
+#include "CELLConfig.hpp"
 //bool g_Run = true;
 //void cmdthread()
 //{
@@ -122,41 +123,41 @@ public:
 	}
 };
 
-const char* argToStr(int argc,char* args[],int index,const char* def,const char* argName)
-{
-	if (index >= argc)
-	{
-		CELLLog_Error("argToStr,index = %d ,argc = %d,argName = %s ",index,argc, argName);
-	}
-	else
-	{
-		def = args[index];
-	}
-	CELLLog_Info("%s = %s",argName,def);
-	return def;
-}
-
-int argToInt(int argc, char* args[], int index, int def, const char* argName)
-{
-	if (index >= argc)
-	{
-		CELLLog_Error("argToInt,index = %d ,argc = %d，argName = %s", index, argc, argName);
-	}
-	else
-	{
-		def = atoi(args[index]);
-	}
-	CELLLog_Info("%s = %d", argName, def);
-	return def;
-}
+//const char* argToStr(int argc,char* args[],int index,const char* def,const char* argName)
+//{
+//	if (index >= argc)
+//	{
+//		CELLLog_Error("argToStr,index = %d ,argc = %d,argName = %s ",index,argc, argName);
+//	}
+//	else
+//	{
+//		def = args[index];
+//	}
+//	CELLLog_Info("%s = %s",argName,def);
+//	return def;
+//}
+//
+//int argToInt(int argc, char* args[], int index, int def, const char* argName)
+//{
+//	if (index >= argc)
+//	{
+//		CELLLog_Error("argToInt,index = %d ,argc = %d，argName = %s", index, argc, argName);
+//	}
+//	else
+//	{
+//		def = atoi(args[index]);
+//	}
+//	CELLLog_Info("%s = %d", argName, def);
+//	return def;
+//}
 int  main(int argc,char *args[])
 {
 	CELLLog::Instance().setLogPath("server", "w");
-
-	const char *strIP = argToStr(argc,args,1,"any","IP");
-	uint16_t nPort = (uint16_t)argToInt(argc, args, 2, 4567, "nPort");
-	int nThread = argToInt(argc, args, 3, 1, "nThread");
-	int nClient = argToInt(argc, args, 4, 1, "nClient");
+	CELLConfig::Instance().Init(argc, args);
+	const char *strIP = CELLConfig::Instance().getStr("strIP","any");
+	uint16_t nPort = CELLConfig::Instance().getInt("nPort", 4567);
+	int nThread = CELLConfig::Instance().getInt("nThread", 4);
+	int nClient = CELLConfig::Instance().getInt("nClient", 5);
 
 	if (strcmp(strIP,"any") == 0)
 	{
