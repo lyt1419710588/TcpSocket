@@ -13,10 +13,16 @@ class CellClient :public ObjectPoolBase<CellClient, 1000>
 public:
 	int id = -1;
 	int serverID = -1;
+
+	//测试接收发送逻辑使用
+	//用于server检测接收到的消息ID是否连续
+	int nRecvMsgID = 1;
+	//用于client检测接收到的消息ID是否连续
+	int nSendMsgID = 1;
 public:
-	CellClient(SOCKET sock = INVALID_SOCKET):
-		m_SendBuff(SEND_BUFF_SIZE),
-		m_RecvBuff(RECV_BUFF_SIZE)
+	CellClient(SOCKET sock = INVALID_SOCKET,int sendBuffSize = SEND_BUFF_SIZE,int recvBuffSize = RECV_BUFF_SIZE):
+		m_SendBuff(sendBuffSize),
+		m_RecvBuff(recvBuffSize)
 	{
 		static int n = 1;
 		id = n++;

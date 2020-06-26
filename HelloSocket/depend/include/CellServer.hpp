@@ -59,91 +59,97 @@ public:
 			//如果没有需要处理得客户端就跳过
 			if (m_vectClients.empty())
 			{
-				std::chrono::milliseconds t(1);
-				std::this_thread::sleep_for(t);
+				CELLThread::Sleep(1);
 				oldTime = CELLTime::getNowInMilliSec();
 				continue;
 			}
 			checkTime();
 
-
-			fd_set fd_read;
-			fd_set fd_write;
-			//fd_set fd_Exc;
-			FD_ZERO(&fd_read);
-			if (m_client_change)
+			if (!DoSelect())
 			{
-				m_maxSock = m_vectClients.begin()->second->getSocket();
-				for (auto iter : m_vectClients)
-				{
-					FD_SET(iter.second->getSocket(), &fd_read);
-					if (m_maxSock  < iter.second->getSocket())
-					{
-						m_maxSock = iter.second->getSocket();
-					}
-				}
-				memcpy(&m_fd_read_back, &fd_read, sizeof(fd_read));
-				m_client_change = false;
-			}
-			else
-			{
-				memcpy(&fd_read, &m_fd_read_back, sizeof(m_fd_read_back));
-			}
-
-			for (auto iter : m_vectClients)
-			{	
-				//检测需要写数据的客户端
-				if (iter.second->needWrite())
-				{
-					bNeedWrite = true;
-					FD_SET(iter.second->getSocket(), &fd_write);
-				}
-			}
-			//memcpy(&fd_write, &m_fd_read_back, sizeof(m_fd_read_back));
-			//memcpy(&fd_Exc, &m_fd_read_back, sizeof(m_fd_read_back));
-
-			//nfds是一个整数值，是指fd_set集合中所有描述符(socket)的范围
-			//即是所有描述符最大值+1，在windows中这个参数可以写0
-			timeval t{ 0,1 };
-			int ret = 0;
-			if (bNeedWrite)
-			{
-				ret = select(m_maxSock + 1, &fd_read, &fd_write, nullptr, &t);
-				bNeedWrite = false;
-			}
-			else
-			{
-				ret = select(m_maxSock + 1, &fd_read, nullptr, nullptr, &t);
-			}
-			
-			//CELLLog_Info("select ret = %d,count  = %d",ret, _count++);
-			if (ret < 0)
-			{
-				CELLLog_Info("CELLServer%d,OnRun,selectr任务结束，ERROR",m_id);
 				pThread->Exit();
-				break;
 			}
-			else if(ret == 0)
-			{
-				continue;
-			}
-
-			ReadData(fd_read);
-			WriteData(fd_write);
-			//WriteData(fd_Exc);
-			
-			//CELLLog_Info("CELLServer%d,fd_write=%d.fd_read=%d", m_id,fd_write.fd_count,fd_read.fd_count);
-			/*if (fd_Exc.fd_count > 0)
-			{
-				CELLLog_Info("######fd_Exc=%d", fd_Exc.fd_count);
-			}*/
-			//return true;
+			DoMsg();
 		}
 		CELLLog_Info("CellServer%d,OnRun exit",m_id);
 		//return false;
 	/*	return true;*/
 	}
 
+	bool DoSelect()
+	{
+		fd_set fd_read;
+		fd_set fd_write;
+		//fd_set fd_Exc;
+		FD_ZERO(&fd_read);
+		FD_ZERO(&fd_write);
+		if (m_client_change)
+		{
+			m_maxSock = m_vectClients.begin()->second->getSocket();
+			for (auto iter : m_vectClients)
+			{
+				FD_SET(iter.second->getSocket(), &fd_read);
+				if (m_maxSock  < iter.second->getSocket())
+				{
+					m_maxSock = iter.second->getSocket();
+				}
+			}
+			memcpy(&m_fd_read_back, &fd_read, sizeof(fd_read));
+			m_client_change = false;
+		}
+		else
+		{
+			memcpy(&fd_read, &m_fd_read_back, sizeof(m_fd_read_back));
+		}
+
+		for (auto iter : m_vectClients)
+		{
+			//检测需要写数据的客户端
+			if (iter.second->needWrite())
+			{
+				bNeedWrite = true;
+				FD_SET(iter.second->getSocket(), &fd_write);
+			}
+		}
+		//memcpy(&fd_write, &m_fd_read_back, sizeof(m_fd_read_back));
+		//memcpy(&fd_Exc, &m_fd_read_back, sizeof(m_fd_read_back));
+
+		//nfds是一个整数值，是指fd_set集合中所有描述符(socket)的范围
+		//即是所有描述符最大值+1，在windows中这个参数可以写0
+		timeval t{ 0,1 };
+		int ret = 0;
+		if (bNeedWrite)
+		{
+			ret = select(m_maxSock + 1, &fd_read, &fd_write, nullptr, &t);
+			bNeedWrite = false;
+		}
+		else
+		{
+			ret = select(m_maxSock + 1, &fd_read, nullptr, nullptr, &t);
+		}
+
+		//CELLLog_Info("select ret = %d,count  = %d",ret, _count++);
+		if (ret < 0)
+		{
+			CELLLog_Info("CELLServer%d,OnRun,selectr任务结束，ERROR", m_id);
+			return false;
+		}
+		else if (ret == 0)
+		{
+			return true;
+		}
+
+		ReadData(fd_read);
+		WriteData(fd_write);
+		//WriteData(fd_Exc);
+
+		//CELLLog_Info("CELLServer%d,fd_write=%d.fd_read=%d", m_id,fd_write.fd_count,fd_read.fd_count);
+		/*if (fd_Exc.fd_count > 0)
+		{
+		CELLLog_Info("######fd_Exc=%d", fd_Exc.fd_count);
+		}*/
+		return true;
+	}
 	
 	void checkTime()
 	{
@@ -185,7 +191,7 @@ public:
 			auto iter = m_vectClients.find(fd);
 			if (iter != m_vectClients.end())
 			{
-				if (-1 == iter->second->SendDataReal())
+				if (SOCKET_ERROR == iter->second->SendDataReal())
 				{
 					OnClientLeave(iter->second);
 					iter = m_vectClients.erase(iter);	
@@ -197,7 +203,7 @@ public:
 		{
 			if (iter->second->needWrite() && FD_ISSET(iter->first, &fd_write))
 			{
-				if (-1 == iter->second->SendDataReal())
+				if (SOCKET_ERROR == iter->second->SendDataReal())
 				{
 					OnClientLeave(iter->second);
 					m_vectClients.erase(iter++);
@@ -215,7 +221,7 @@ public:
 			auto iter = m_vectClients.find(fd);
 			if (iter != m_vectClients.end())
 			{
-				if (-1 == RecvData(iter->second))
+				if (SOCKET_ERROR == RecvData(iter->second))
 				{
 					OnClientLeave(iter->second);
 					iter = m_vectClients.erase(iter);
@@ -227,7 +233,7 @@ public:
 		{
 			if (FD_ISSET(iter->first, &fd_read))
 			{
-				if (-1 == RecvData(iter->second))
+				if (SOCKET_ERROR == RecvData(iter->second))
 				{
 					OnClientLeave(iter->second);
 					m_vectClients.erase(iter++);
@@ -237,30 +243,29 @@ public:
 #endif // _WIN32
 	}
 
+	void DoMsg()
+	{
+		std::shared_ptr<CellClient> pClient = nullptr;
+		for (auto iter : m_vectClients)
+		{
+			pClient = iter.second;
+			while (pClient->hasMsg())
+			{
+				//处理网络消息
+				OnNetMsg(pClient, pClient->front_msg());
+				//移除消息队列（缓冲区）最前端的数据
+				pClient->pop_front_msg();
+			}
+		}
+	}
 	int RecvData(std::shared_ptr<CellClient>& pClient)
 	{
 
 		//接收客户端的请求数据
 		int nLen = pClient->RecvData();
-		
-		if (nLen < 0)
-		{
-			CELLLog_Info("客户端<socket = %d>已退出！，任务结束！", pClient->getSocket());
-			return -1;
-		}
 		//接收网络数据事件
 		m_pInetEvent->OnNetRecv(pClient);
-
-		//循环 判断是否有消息需要处理
-		while (pClient->hasMsg())
-		{
-			//处理网络消息
-			OnNetMsg(pClient, pClient->front_msg());
-			//移除消息队列（缓冲区）最前端的数据
-			pClient->pop_front_msg();
-		}
-
-		return 0;
+		return nLen;
 	}
 	void OnNetMsg(std::shared_ptr<CellClient> pClient, DataHeader* header)
 	{

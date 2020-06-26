@@ -18,7 +18,7 @@ public:
 		Close();
 	}
 	//初始化
-	int initSocket()
+	SOCKET initSocket(int nSendSize = SEND_BUFF_SIZE,int recvSize = RECV_BUFF_SIZE)
 	{
 		//启动 Win sock 2.x
 		CELLNetWork::Init();
@@ -34,10 +34,10 @@ public:
 		}
 		else
 		{
-			_pClient = new CellClient(sock);
+			_pClient = new CellClient(sock, nSendSize, recvSize);
 			 //CELLLog_Info("socket = %d建立成功", _pClient->getSocket());
 		}
-		return 0;
+		return sock;
 	}
 	//链接服务器
 	int Connect(const char* ip,unsigned short port)
@@ -45,7 +45,10 @@ public:
 		if (!_pClient)
 		{
 			//CELLLog_Info("初始化socket");
-			initSocket();
+			if (INVALID_SOCKET == initSocket())
+			{
+				return SOCKET_ERROR;
+			}
 		}
 		//链接
 		sockaddr_in _sin = {};
@@ -87,7 +90,7 @@ public:
 	
 	int _count = 0;
 	//处理网络数据
-	bool OnRun()
+	bool OnRun(int microseconds = 1)
 	{
 		if (isRun())
 		{
@@ -100,7 +103,7 @@ public:
 			fd_set fd_write;
 			FD_ZERO(&fd_write);
 
-			timeval tl = { 0,10 };
+			timeval tl = { 0,microseconds };
 			int ret;
 			if (_pClient->needWrite())
 			{
@@ -186,6 +189,7 @@ public:
 	}
 	//响应网络数据
 	virtual void OnNetMsg(DataHeader* header)  = 0;
+
 	//发送数据
 	int SendData(std::shared_ptr<DataHeader> data)
 	{

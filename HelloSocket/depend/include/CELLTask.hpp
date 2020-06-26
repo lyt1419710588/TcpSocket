@@ -75,8 +75,7 @@ private:
 			}
 			if (m_listCellTask.empty())
 			{
-				std::chrono::milliseconds t(1);
-				std::this_thread::sleep_for(t);
+				CELLThread::Sleep(1);
 				continue;
 			}
 

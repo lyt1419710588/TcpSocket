@@ -21,6 +21,20 @@
 
 class Myserver :public EasyTcpServer
 {
+private:
+	//自定义消息标志，收到消息后将返回应答消息
+	bool _bSendBack = false;
+	//自定义标志，是否提示：发送缓冲区已满
+	bool _bSendFull = false;
+	//是否检测接收到的消息是否连续
+	bool _bCheckMsgID = false;
+public:
+	Myserver()
+	{
+		_bSendBack = CELLConfig::Instance().hasKey("-sendback");
+		_bSendFull = CELLConfig::Instance().hasKey("-sendfull");
+		_bCheckMsgID = CELLConfig::Instance().hasKey("-checkMsgID");
+	}
 public:
 	//客户端加入时通知，客户端离开事件
 	virtual void OnNetJoin(std::shared_ptr<CellClient> pClient)
@@ -49,14 +63,38 @@ public:
 
 			pClient->resetDTHeart();
 			Login *login = (Login*)header;
-			//CELLLog_Info("收到命令<socket = %d>CMD_LOGIN 数据长度:%d,userName = %s Password = %s", _cSock,header->dataLength, login->userName, login->password);
-			//忽略判断用户名密码是否正确
-			//LoginResult loginresult;
-			//loginresult.result = 1;
+			if (_bCheckMsgID)
+			{
+				if (login->msgID != pClient->nRecvMsgID)
+				{
+					//当前消息ID和本地消息次数不匹配
+					CELLLog_Error("OnNetMsg socket<%d>  msgID<%d>  nRecvMsgID<%d>   %d",
+						pClient->getSocket(),login->msgID,pClient->nRecvMsgID,login->msgID - pClient->nRecvMsgID);
+				}
+				++pClient->nRecvMsgID;
+			}
+			if (_bSendBack)
+			{
+				std::shared_ptr<LoginResult> ret = std::make_shared<LoginResult>();
+				ret->msgID = pClient->nSendMsgID;
+				if (SOCKET_ERROR == pClient->SendData(ret))
+				{
+					//客户端发送缓冲区满了，消息没发送出去，目前直接抛弃了
+					//客户端消息太多，需要考虑策略
+					//正常链接，客户端不会有那么多消息
+					//模拟发送测试时，是否发送频率过高
+					if (_bSendFull)
+					{
+						CELLLog_Warring("socket<%d> SendFull",pClient->getSocket());
+					}
+				}
+				else
+				{
+					++pClient->nSendMsgID;
+				}
+				//pCellServer->addSendTask(pClient, ret);
+			}
 			
-			//pClient->SendData(&loginresult);
-			std::shared_ptr<LoginResult> ret = std::make_shared<LoginResult>();
-			pCellServer->addSendTask(pClient,ret);
 			//if (SOCKET_ERROR == pClient->SendData(ret))
 			//{
 			//	//缓冲区满
@@ -152,12 +190,11 @@ public:
 //}
 int  main(int argc,char *args[])
 {
-	CELLLog::Instance().setLogPath("server", "w");
+	CELLLog::Instance().setLogPath("server", "w",false);
 	CELLConfig::Instance().Init(argc, args);
 	const char *strIP = CELLConfig::Instance().getStr("strIP","any");
 	uint16_t nPort = CELLConfig::Instance().getInt("nPort", 4567);
 	int nThread = CELLConfig::Instance().getInt("nThread", 4);
-	int nClient = CELLConfig::Instance().getInt("nClient", 5);
 
 	if (strcmp(strIP,"any") == 0)
 	{
@@ -188,11 +225,6 @@ int  main(int argc,char *args[])
 
 	
     CELLLog_Info("已退出");
-	/*while (true)
-	{
-		Sleep(1);
-	}*/
-    getchar();
     return 0;
 }
 

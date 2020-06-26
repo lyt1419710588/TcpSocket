@@ -65,7 +65,19 @@ public:
 		if (m_nLastPos > 0 && INVALID_SOCKET != sockfd)
 		{
 			ret = send(sockfd, m_pBuff, m_nLastPos, 0);
-			m_nLastPos = 0;
+			if (ret <= 0)
+			{
+				return SOCKET_ERROR;
+			}
+			if (ret == m_nLastPos)
+			{
+				m_nLastPos = 0;
+			}
+			else
+			{
+				m_nLastPos -= ret;
+				memcpy(m_pBuff, m_pBuff + ret,m_nLastPos);
+			}
 			m_nBuffFull = 0;
 		}
 		return ret;
@@ -80,7 +92,7 @@ public:
 			ret = recv(sockfd, szRecv, m_nSize - m_nLastPos, 0);
 			if (ret < 0)
 			{
-				return ret;
+				return SOCKET_ERROR;
 			}
 			m_nLastPos += ret;
 			return ret;

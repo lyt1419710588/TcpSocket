@@ -71,6 +71,7 @@ protected:
 			m_OnDestory(this);
 		}
 		m_sem.wakeup();
+		m_bRun = false;
 	}
 private:
 	EventCall m_OnCreate;

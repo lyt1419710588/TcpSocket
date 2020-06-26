@@ -90,7 +90,7 @@ public:
 		uint32_t tLen = 0;
 		//读取数据长度，但不便宜读取位置
 		Read(tLen,false);
-		if (tLen < nLen)
+		if (tLen <= nLen)
 		{
 			auto tSize = tLen * sizeof(T);
 			if (canRead(tSize + sizeof(uint32_t)))

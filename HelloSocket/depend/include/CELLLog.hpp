@@ -37,7 +37,7 @@ private:
 	}
 public:
 
-	void setLogPath(const char* logName,const char* mode)
+	void setLogPath(const char* logName,const char* mode,bool bDate = true)
 	{
 		if (_file)
 		{
@@ -47,10 +47,18 @@ public:
 		}
 		static char logPath[256] = {};
 
-		auto t = system_clock::now();
-		auto now = system_clock::to_time_t(t);
-		std::tm *tNow = std::localtime(&now);
-		sprintf(logPath,"%s[%d-%02d-%02d_%02d-%02d-%02d].txt",logName, tNow->tm_year + 1900, tNow->tm_mon + 1, tNow->tm_mday, tNow->tm_hour, tNow->tm_min, tNow->tm_sec);
+		if (bDate)
+		{
+			auto t = system_clock::now();
+			auto now = system_clock::to_time_t(t);
+			std::tm *tNow = std::localtime(&now);
+			sprintf(logPath, "%s[%d-%02d-%02d_%02d-%02d-%02d].txt", logName, tNow->tm_year + 1900, tNow->tm_mon + 1, tNow->tm_mday, tNow->tm_hour, tNow->tm_min, tNow->tm_sec);
+		}
+		else
+		{
+			sprintf(logPath,"%s.txt",logName);
+		}
+		
 		_file = fopen(logPath, mode);
 		if (_file)
 		{

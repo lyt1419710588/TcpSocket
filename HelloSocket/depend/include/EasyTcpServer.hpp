@@ -7,6 +7,7 @@
 #include "INetEvent.hpp"
 #include "CellServer.hpp"
 #include "CELLNetWork.hpp"
+#include "CELLConfig.hpp"
 #include <stdio.h>
 #include <vector>
 #include <map>
@@ -25,6 +26,13 @@ private:
     std::vector<std::shared_ptr<CellServer> > m_vectServers;
     //每秒消息计时
     CELLTimestamp m_tTime;
+
+	//客户端发送缓冲区大小
+	int _nSendBuffSize;
+	//客户端接收缓冲区大小
+	int _nRecvBuffSize;
+	//链接客户端上线
+	int _nMaxClient;
 protected:
     //客户端计数
     std::atomic_int m_clientCount;
@@ -39,6 +47,10 @@ public:
         m_clientCount = 0;
 		m_recvCount = 0;
 		m_msgCount = 0;
+
+		_nSendBuffSize = CELLConfig::Instance().getInt("nSendBuffSize", SEND_BUFF_SIZE);
+		_nRecvBuffSize = CELLConfig::Instance().getInt("nRecvBuffSize", RECV_BUFF_SIZE);
+		_nMaxClient = CELLConfig::Instance().getInt("nMaxClient", FD_SETSIZE);
     }
     virtual ~EasyTcpServer()
     {
@@ -148,8 +160,22 @@ public:
             //userJoin.sock = _cSock;
             //SendDataToAll((DataHeader*)&userJoin);
 			//直接make_shared无法进入对象池 
-			std::shared_ptr<CellClient> c(new CellClient(_cSock));
-			addClientToCellServer(c);
+
+			if (m_clientCount < _nMaxClient)
+			{
+				std::shared_ptr<CellClient> c(new CellClient(_cSock,_nSendBuffSize,_nRecvBuffSize));
+				addClientToCellServer(c);
+			}
+			else
+			{
+#ifdef _WIN32
+				closesocket(_cSock);
+#else
+				close(_cSock);
+#endif // !_WIN32
+				CELLLog_Warring("Accept to nMaxClient");
+
+			}
            // addClientToCellServer(std::make_shared<CellClient>(_cSock));
             //m_vectClients.push_back(new CellClient(_cSock));
             //send
@@ -215,7 +241,7 @@ public:
         auto t1 = m_tTime.getElaspedSecond();
         if (t1 >= 1.0)
         {
-            CELLLog_Info("thread<%d>,time<%lf>,socket<%d>,clientNum<%d>,recvCount<%d>，msgCount<%d>", m_vectServers.size(), t1, m_sock,(int)m_clientCount,(int)(m_recvCount / t1),(int)(m_msgCount / t1));
+            CELLLog_Info("thread<%d>,time<%lf>,socket<%d>,clientNum<%d>,recvCount<%d>，msgCount<%d>", m_vectServers.size(), t1, m_sock,(int)m_clientCount,(int)m_recvCount,(int)m_msgCount);
 			m_recvCount = 0;
 			m_msgCount = 0;
             m_tTime.update();
