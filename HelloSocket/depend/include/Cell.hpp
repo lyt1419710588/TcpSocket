@@ -10,6 +10,9 @@
 #include <Windows.h>
 #include <WinSock2.h>
 #else
+#ifdef __APPLE__
+#define _DARWIN_UNLIMITED_SELECT
+#endif //__APPLE__
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <string.h>

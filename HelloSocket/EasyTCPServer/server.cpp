@@ -194,7 +194,7 @@ int  main(int argc,char *args[])
 	CELLConfig::Instance().Init(argc, args);
 	const char *strIP = CELLConfig::Instance().getStr("strIP","any");
 	uint16_t nPort = CELLConfig::Instance().getInt("nPort", 4567);
-	int nThread = CELLConfig::Instance().getInt("nThread", 4);
+	int nThread = CELLConfig::Instance().getInt("nThread", 1);
 
 	if (strcmp(strIP,"any") == 0)
 	{

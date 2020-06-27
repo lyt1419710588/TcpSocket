@@ -28,12 +28,24 @@ private:
 #endif // _WIN32
 
 	}
+
+	
 public:
 	static void Init()
 	{
 		static CELLNetWork obj;
 	}
 
+	static int makereuseaddr(SOCKET fd)
+	{
+		int flag = 1;
+		if (SOCKET_ERROR == setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, (const char*)&flag, sizeof(flag)))
+		{
+			CELLLog_Warring("setsockopt SO_REUSEADDR failed,socket<%d>",(int)fd);
+			return SOCKET_ERROR;
+		}
+		return 0;
+	}
 };
 
 

@@ -260,7 +260,7 @@ void WorkThread(CELLThread* pThread, int id)
 		clients[n]->Close();
 		delete clients[n];
 	}
-	CELLLog_Info("thread<%d> exit");
+	CELLLog_Info("thread<%d> exit",id);
 	--m_readyCount;
 }
 int  main(int argc,char* args[])

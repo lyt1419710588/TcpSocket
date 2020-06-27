@@ -8,6 +8,9 @@
 #include "CellServer.hpp"
 #include "CELLNetWork.hpp"
 #include "CELLConfig.hpp"
+#include "CELLFDSet.hpp"
+
+
 #include <stdio.h>
 #include <vector>
 #include <map>
@@ -73,6 +76,7 @@ public:
         }
         else
         {
+			CELLNetWork::makereuseaddr(m_sock);
             CELLLog_Info("socket = %d建立成功", m_sock);
         }
         return m_sock;
@@ -152,7 +156,8 @@ public:
         _cSock = accept(m_sock, (sockaddr*)&clientA, &nClientA);
         if (INVALID_SOCKET == _cSock)
         {
-            CELLLog_Info("socket = %d错误，接受的客户端SOCKET 无效", m_sock);
+            CELLLog_Info("socket = %d错误，接受的客户端SOCKET 无效,error<%d>,errorMsg<%s>"
+				, m_sock,errno,strerror(errno));
         }
         else
         {
@@ -270,26 +275,20 @@ private:
 	//处理网络信息
 	void OnRun(CELLThread *pThread)
 	{
+		CELLFDSet fd_read;
 		while (pThread->isRun())
 		{
 			time4msg();
-			fd_set fd_read;
-			fd_set fd_write;
-			fd_set fd_except;
-
-			FD_ZERO(&fd_read);
-			//FD_ZERO(&fd_write);
-			//FD_ZERO(&fd_except);
-
-			FD_SET(m_sock, &fd_read);
-			//FD_SET(m_sock, &fd_write);
-			//FD_SET(m_sock, &fd_except);
+			//清理集合
+			fd_read.zero();
+			//将描述符加入集合
+			fd_read.add(m_sock);
 
 
 			//nfds是一个整数值，是指fd_set集合中所有描述符(socket)的范围
 			//即是所有描述符最大值+1，在windows中这个参数可以写0
 			timeval tl = { 0,1};
-			int ret = select(m_sock + 1, &fd_read, 0, 0, &tl);
+			int ret = select(m_sock + 1, fd_read.fdset(), 0, 0, &tl);
 			//CELLLog_Info("select ret = %d,count  = %d",ret, _count++);
 			if (ret < 0)
 			{
@@ -297,9 +296,9 @@ private:
 				pThread->Exit();
 				break;
 			}
-			if (FD_ISSET(m_sock, &fd_read))
+			if (fd_read.has(m_sock))
 			{
-				FD_CLR(m_sock, &fd_read);
+				//fd_read.del(m_sock);
 				Accept();
 			}
 		}

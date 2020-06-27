@@ -4,6 +4,8 @@
 #include "Cell.hpp"
 #include "CELLNetWork.hpp"
 #include "CellClient.hpp"
+#include "CELLFDSet.hpp"
+
 
 class EasyTcpClient
 {
@@ -34,6 +36,7 @@ public:
 		}
 		else
 		{
+			CELLNetWork::makereuseaddr(sock);
 			_pClient = new CellClient(sock, nSendSize, recvSize);
 			 //CELLLog_Info("socket = %d建立成功", _pClient->getSocket());
 		}
@@ -95,24 +98,23 @@ public:
 		if (isRun())
 		{
 			SOCKET m_sock = _pClient->getSocket();
-			fd_set fd_read;
-			
-			FD_ZERO(&fd_read);
-			FD_SET(m_sock, &fd_read);
-			
-			fd_set fd_write;
-			FD_ZERO(&fd_write);
+
+			fd_read.zero();
+			fd_read.add(m_sock);
+		 
+			fd_write.zero();
 
 			timeval tl = { 0,microseconds };
 			int ret;
 			if (_pClient->needWrite())
 			{
-				FD_SET(m_sock, &fd_write);
-				ret = select(m_sock, &fd_read, &fd_write, nullptr, &tl);
+			
+				fd_write.add(m_sock);
+				ret = select(m_sock, fd_read.fdset(), fd_write.fdset(), nullptr, &tl);
 			}
 			else
 			{
-				 ret = select(m_sock, &fd_read, nullptr, nullptr, &tl);
+				 ret = select(m_sock, fd_read.fdset(), nullptr, nullptr, &tl);
 			}
 			
 			//  CELLLog_Info("select ret = %d,count  = %d", ret, _count++);
@@ -122,7 +124,7 @@ public:
 				Close();
 				return false;
 			}
-			if (FD_ISSET(m_sock, &fd_read))
+			if (fd_read.has(m_sock))
 			{
 				if (SOCKET_ERROR == RecvData())
 				{
@@ -132,7 +134,7 @@ public:
 				}
 			}
 
-			if (FD_ISSET(m_sock, &fd_write))
+			if (fd_write.has(m_sock))
 			{
 				if (SOCKET_ERROR == _pClient->SendDataReal())
 				{
@@ -212,6 +214,9 @@ public:
 		return _pClient;
 	}
 protected:
+
+	CELLFDSet fd_read;
+	CELLFDSet fd_write;
 	CellClient *_pClient = nullptr;
 	bool m_isConnected = false;
 };

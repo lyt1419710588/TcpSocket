@@ -1,9 +1,12 @@
 ﻿#ifndef _CELLSERVER_HPP_
 #define _CELLSERVER_HPP_
 
+
+#include "CELLFDSet.hpp"
 #include "Cell.hpp"
 #include "INetEvent.hpp"
 #include "CELLSemaphore.hpp"
+
 
 #include <vector>
 #include <map>
@@ -78,37 +81,36 @@ public:
 
 	bool DoSelect()
 	{
-		fd_set fd_read;
-		fd_set fd_write;
 		//fd_set fd_Exc;
-		FD_ZERO(&fd_read);
-		FD_ZERO(&fd_write);
+		fd_read.zero();
 		if (m_client_change)
 		{
 			m_maxSock = m_vectClients.begin()->second->getSocket();
 			for (auto iter : m_vectClients)
 			{
-				FD_SET(iter.second->getSocket(), &fd_read);
+				fd_read.add(iter.second->getSocket());
 				if (m_maxSock  < iter.second->getSocket())
 				{
 					m_maxSock = iter.second->getSocket();
 				}
 			}
-			memcpy(&m_fd_read_back, &fd_read, sizeof(fd_read));
+			m_fd_read_back.copy(fd_read);
 			m_client_change = false;
 		}
 		else
 		{
-			memcpy(&fd_read, &m_fd_read_back, sizeof(m_fd_read_back));
+			fd_read.copy(m_fd_read_back);
 		}
 
+
+		fd_write.zero();
 		for (auto iter : m_vectClients)
 		{
 			//检测需要写数据的客户端
 			if (iter.second->needWrite())
 			{
 				bNeedWrite = true;
-				FD_SET(iter.second->getSocket(), &fd_write);
+				fd_write.add(iter.second->getSocket());
 			}
 		}
 		//memcpy(&fd_write, &m_fd_read_back, sizeof(m_fd_read_back));
@@ -120,18 +122,19 @@ public:
 		int ret = 0;
 		if (bNeedWrite)
 		{
-			ret = select(m_maxSock + 1, &fd_read, &fd_write, nullptr, &t);
+			ret = select(m_maxSock + 1, fd_read.fdset(), fd_write.fdset(), nullptr, &t);
 			bNeedWrite = false;
 		}
 		else
 		{
-			ret = select(m_maxSock + 1, &fd_read, nullptr, nullptr, &t);
+			ret = select(m_maxSock + 1, fd_read.fdset(), nullptr, nullptr, &t);
 		}
 
 		//CELLLog_Info("select ret = %d,count  = %d",ret, _count++);
 		if (ret < 0)
 		{
-			CELLLog_Info("CELLServer%d,OnRun,selectr任务结束，ERROR", m_id);
+			CELLLog_Info("CELLServer%d,OnRun,select任务结束，error<%d>,errormsg<%s>"
+				, m_id,errno,strerror(errno));
 			return false;
 		}
 		else if (ret == 0)
@@ -139,8 +142,8 @@ public:
 			return true;
 		}
 
-		ReadData(fd_read);
-		WriteData(fd_write);
+		ReadData();
+		WriteData();
 		//WriteData(fd_Exc);
 
 		//CELLLog_Info("CELLServer%d,fd_write=%d.fd_read=%d", m_id,fd_write.fd_count,fd_read.fd_count);
@@ -182,12 +185,13 @@ public:
 		}
 		m_client_change = true;
 	}
-	void WriteData(fd_set &fd_write)
+	void WriteData()
 	{
 #ifdef _WIN32
-		for (int i = 0; i < fd_write.fd_count; i++)
+
+		for (int i = 0; i < fd_write.fdset()->fd_count; i++)
 		{
-			SOCKET fd = fd_write.fd_array[i];
+			SOCKET fd = fd_write.fdset()->fd_array[i];
 			auto iter = m_vectClients.find(fd);
 			if (iter != m_vectClients.end())
 			{
@@ -201,7 +205,7 @@ public:
 #else
 		for (auto iter = m_vectClients.begin();iter != m_vectClients.end();iter++)
 		{
-			if (iter->second->needWrite() && FD_ISSET(iter->first, &fd_write))
+			if (iter->second->needWrite() && fd_write.has(iter->first))
 			{
 				if (SOCKET_ERROR == iter->second->SendDataReal())
 				{
@@ -212,12 +216,12 @@ public:
 		}
 #endif // _WIN32
 	}
-	void ReadData(fd_set &fd_read)
+	void ReadData()
 	{
 #ifdef _WIN32
-		for (int i = 0; i < fd_read.fd_count; i++)
+		for (int i = 0; i < fd_read.fdset()->fd_count; i++)
 		{
-			SOCKET fd = fd_read.fd_array[i];
+			SOCKET fd = fd_read.fdset()->fd_array[i];
 			auto iter = m_vectClients.find(fd);
 			if (iter != m_vectClients.end())
 			{
@@ -231,7 +235,7 @@ public:
 #else
 		for (auto iter = m_vectClients.begin();iter != m_vectClients.end();iter++)
 		{
-			if (FD_ISSET(iter->first, &fd_read))
+			if (fd_read.has(iter->first))
 			{
 				if (SOCKET_ERROR == RecvData(iter->second))
 				{
@@ -351,7 +355,9 @@ private:
 	CellTaskServer m_CellTaskServer;
 
 	//备份客户端fd_set
-	fd_set m_fd_read_back;
+	CELLFDSet m_fd_read_back;
+	CELLFDSet fd_read;
+	CELLFDSet fd_write;
 	//客户端列表是否变化
 	bool m_client_change;
 	//最大客户端sock值
@@ -361,6 +367,8 @@ private:
 	
 	//线程
 	CELLThread m_thread;
+
+	
 	//CellServerID
 	int m_id = -1;
 	//是否有客户端需要写数据
