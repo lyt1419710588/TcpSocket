@@ -153,12 +153,14 @@
     <ClInclude Include="..\depend\include\CELLLog.hpp" />
     <ClInclude Include="..\depend\include\CELLMSGStream.hpp" />
     <ClInclude Include="..\depend\include\CELLNetWork.hpp" />
+    <ClInclude Include="..\depend\include\CellSelectServer.hpp" />
     <ClInclude Include="..\depend\include\CELLSemaphore.hpp" />
     <ClInclude Include="..\depend\include\CellServer.hpp" />
     <ClInclude Include="..\depend\include\CELLStream.hpp" />
     <ClInclude Include="..\depend\include\CELLTask.hpp" />
     <ClInclude Include="..\depend\include\CELLThread.hpp" />
     <ClInclude Include="..\depend\include\CELLTimestamp.hpp" />
+    <ClInclude Include="..\depend\include\EasySelectServer.hpp" />
     <ClInclude Include="..\depend\include\EasyTcpClient.hpp" />
     <ClInclude Include="..\depend\include\EasyTcpServer.hpp" />
     <ClInclude Include="..\depend\include\INetEvent.hpp" />

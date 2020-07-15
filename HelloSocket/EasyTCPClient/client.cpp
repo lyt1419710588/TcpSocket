@@ -218,21 +218,6 @@ void WorkThread(CELLThread* pThread, int id)
 		//代号work
 		{
 			int count = 0;
-			//每轮每个客户端发送nMsg个数据
-			for (int m  = 0; m < nMsg; m++)
-			{
-				//每个客户端1条1条写入数据
-				for (int n = begin ; n < end ; n++)
-				{ 
-					if (clients[n]->isRun())
-					{
-						if (clients[n]->SendTest(login) > 0)
-						{
-							++m_sendCount;
-						}
-					}
-				}
-			}
 			//sendCount+=count
 			for (int n = begin; n < end; n++)
 			{
@@ -249,6 +234,22 @@ void WorkThread(CELLThread* pThread, int id)
 					clients[n]->checkSend(dt);
 				}
 			}
+			//每轮每个客户端发送nMsg个数据
+			for (int m  = 0; m < nMsg; m++)
+			{
+				//每个客户端1条1条写入数据
+				for (int n = begin ; n < end ; n++)
+				{ 
+					if (clients[n]->isRun())
+					{
+						if (clients[n]->SendTest(login) > 0)
+						{
+							++m_sendCount;
+						}
+					}
+				}
+			}
+			
 		}
 		CELLThread::Sleep(nWorkSleep);
 	}
@@ -272,7 +273,7 @@ int  main(int argc,char* args[])
 	strIP = CELLConfig::Instance().getStr("strIP","127.0.0.1");
 	nPort = CELLConfig::Instance().getInt("nPort", 4567);
 	nThread = CELLConfig::Instance().getInt("nThread", 1);
-	nClient = CELLConfig::Instance().getInt("nClient", 10000);
+	nClient = CELLConfig::Instance().getInt("nClient", 10);
 	nMsg = CELLConfig::Instance().getInt("nMsg", 10);
 	nSendSleep = CELLConfig::Instance().getInt("nSendSleep", 100);
 	nSendBuffSize = CELLConfig::Instance().getInt("nSendBuffSize", SEND_BUFF_SIZE);

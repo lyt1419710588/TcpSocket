@@ -80,5 +80,11 @@
     <ClInclude Include="..\depend\include\MemoryMgr.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="..\depend\include\EasySelectServer.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\depend\include\CellSelectServer.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -1,25 +1,10 @@
 ﻿#/*include "Alloctor.h"*/
 #include "Cell.hpp"
-#include "EasyTcpServer.hpp"
+#include "EasySelectServer.hpp"
 #include "CELLMSGStream.hpp"
 #include "CELLConfig.hpp"
-//bool g_Run = true;
-//void cmdthread()
-//{
-//	char cmdBUF[128] = {};
-//	while (true)
-//	{
-//		scanf("%s", cmdBUF);
-//		if (0 == strcmp(cmdBUF, "exit"))
-//		{
-//			g_Run = false;
-//			CELLLog_Info("退出线程");
-//			break;
-//		}
-//	}
-//}
 
-class Myserver :public EasyTcpServer
+class Myserver :public EasySelectServer
 {
 private:
 	//自定义消息标志，收到消息后将返回应答消息
@@ -161,33 +146,6 @@ public:
 	}
 };
 
-//const char* argToStr(int argc,char* args[],int index,const char* def,const char* argName)
-//{
-//	if (index >= argc)
-//	{
-//		CELLLog_Error("argToStr,index = %d ,argc = %d,argName = %s ",index,argc, argName);
-//	}
-//	else
-//	{
-//		def = args[index];
-//	}
-//	CELLLog_Info("%s = %s",argName,def);
-//	return def;
-//}
-//
-//int argToInt(int argc, char* args[], int index, int def, const char* argName)
-//{
-//	if (index >= argc)
-//	{
-//		CELLLog_Error("argToInt,index = %d ,argc = %d，argName = %s", index, argc, argName);
-//	}
-//	else
-//	{
-//		def = atoi(args[index]);
-//	}
-//	CELLLog_Info("%s = %d", argName, def);
-//	return def;
-//}
 int  main(int argc,char *args[])
 {
 	CELLLog::Instance().setLogPath("server", "w",false);
