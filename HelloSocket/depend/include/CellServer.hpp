@@ -26,7 +26,7 @@ public:
 		m_id = id;
 		m_CellTaskServer.serverID = id;
 	}
-	~CellServer()
+	virtual ~CellServer()
 	{
 		Close();
 		m_sock = INVALID_SOCKET;
@@ -51,17 +51,18 @@ public:
 			if (m_vectClientsBuff.size() > 0)
 			{
 				std::lock_guard<std::mutex> lock(m_mutex);
-				for (auto iter : m_vectClientsBuff)
-				{
+				for (auto pClient : m_vectClientsBuff)
+				{	
+					m_vectClients[pClient->getSocket()] = pClient;
+					pClient->serverID = m_id;
 					if (m_pInetEvent)
-					{
-						iter->serverID = m_id;
-						m_pInetEvent->OnNetJoin(iter);
+					{	
+						m_pInetEvent->OnNetJoin(pClient);
 					}
-					m_vectClients[iter->getSocket()] = iter;
-					m_client_change = true;
-				}
+					OnClientJoin(pClient);
+				}	
 				m_vectClientsBuff.clear();
+				m_client_change = true;
 			}
 			//如果没有需要处理得客户端就跳过
 			if (m_vectClients.empty())
@@ -117,6 +118,11 @@ public:
 		m_client_change = true;
 	}
 	
+	virtual void OnClientJoin(std::shared_ptr<CellClient> pClient)
+	{
+		
+	}
+
 	void DoMsg()
 	{
 		std::shared_ptr<CellClient> pClient = nullptr;

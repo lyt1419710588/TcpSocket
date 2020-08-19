@@ -16,7 +16,7 @@ private:
 		//忽略异常信号，默认情况会导致进程终止
 		if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
 		{
-			return 1;
+			return;
 		}
 #endif //_WIN32
 	}

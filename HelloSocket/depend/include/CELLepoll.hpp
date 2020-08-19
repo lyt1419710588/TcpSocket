@@ -3,16 +3,12 @@
 
 
 #if __linux__
-#include <unistd.h>
-#include <arpa/inet.h>
+
+#include "Cell.hpp"
+#include "CellClient.hpp"
+#include "CELLLog.hpp"
 #include <sys/epoll.h>
-#include <algorithm>
-#include <stdio.h>
 
-
-#define SOCKET int
-#define INVALID_SOCKET (SOCKET)(-1)
-#define SOCKET_ERROR    (-1)
 #define EPOLL_ERROR     (-1)
 class CEllEpoll
 {
@@ -52,7 +48,25 @@ public:
         int ret = epoll_ctl(_epfd,op,sockfd,&ev);
         if(EPOLL_ERROR == ret)
         {
-            perror("epoll_ctrl error \n");
+            CELLLog_Error("epoll_ctrl error");
+        }
+        return ret;
+    }
+
+    int ctrl(int op,std::shared_ptr<CellClient> pClient,uint32_t events)
+    {
+        epoll_event ev;
+        //事件类型，关心可读事件EPOLL_ERROR
+        ev.events = events;
+        //事件关联socket描述符
+        ev.data.ptr = pClient.get();
+        //像epoll 对象注册需要管理，监听的socket文件描述符
+        //并且说明关心的事件
+        //返回 0代表成功，返回负值代表失败，一般返回-1
+        int ret = epoll_ctl(_epfd,op,pClient->getSocket(),&ev);
+        if(EPOLL_ERROR == ret)
+        {
+            CELLLog_Error("epoll_ctrl error");
         }
         return ret;
     }
@@ -62,7 +76,7 @@ public:
         int ret = epoll_wait(_epfd,_pEvent,_maxEvents,timeout);
         if (EPOLL_ERROR ==  ret)
         {
-            perror("epoll_wait error \n");
+            CELLLog_Error("epoll_wait error");
         }
         return ret;
     }

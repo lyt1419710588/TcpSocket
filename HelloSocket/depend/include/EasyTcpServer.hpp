@@ -105,11 +105,11 @@ public:
 #else
         if (ip)
         {
-            sin.sin_addr.s_addr = inet_addr(ip);
+            _sin.sin_addr.s_addr = inet_addr(ip);
         }
         else
         {
-            sin.sin_addr.s_addr = INADDR_ANY;
+            _sin.sin_addr.s_addr = INADDR_ANY;
         }
 #endif
         int ret = bind(m_sock, (sockaddr*)&_sin, sizeof(_sin));

@@ -8,6 +8,10 @@
 class CellSelectServer:public CellServer
 {
 public:
+	~CellSelectServer()
+	{
+		Close();
+	}
 	bool DoNetEvent()
 	{
 		//fd_set fd_Exc;
